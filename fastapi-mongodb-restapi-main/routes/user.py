@@ -16,6 +16,7 @@ async def find_all_users():
 @user.post('/')
 async def create_user(user: User):
     conn.local.user.insert_one(dict(user))
+    print(serializeList(conn.local.user.find()))
     return serializeList(conn.local.user.find())
 
 @user.put('/{id}')
