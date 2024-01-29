@@ -1,0 +1,754 @@
+[{
+  "_id": {
+    "$oid": "65aea8a34bd084972a05d81e"
+  },
+  "clubname": "Rajpath",
+  "ownname": "Mukesh Kantilal Patel",
+  "email": "rajpath@rajpathclub.com",
+  "pnumber": 79297051801,
+  "city": "Ahmedabad",
+  "address": "Sarkhej-Gandhinagar High Way, Bodakdev, Ahmedabad 380 059 Gujarat , India",
+  "memtype": [
+    {
+      "price": 15000,
+      "type": "Full Membership"
+    },
+    {
+      "type": "Associate/Social Membership",
+      "price": 5000
+    },
+    {
+      "type": "Family Membership",
+      "price": 17000
+    }
+  ],
+  "desc": "Rajpath Club is known for providing a range of facilities and amenities for its members. These may include well-maintained sports facilities such as swimming pools, tennis courts, and a golf course. The club often hosts various social and cultural events, making it a hub for community gatherings and celebrations. Additionally, Rajpath Club may offer dining options, fitness centers, and other recreational activities to cater to the diverse interests of its members.",
+  "members": [
+    {
+      "memberid": "123456789",
+      "name": "Raj Patel",
+      "email": "rajpatel123@gmail.com",
+      "pnumber": 9856423017,
+      "gender": "Male",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2012-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-03-15T00:00:00.000Z"
+      },
+      "username": "user1234",
+      "pwd": "password1234"
+    },
+    {
+      "memberid": "987654321",
+      "name": "Sara Khan",
+      "email": "sarakhan@gmail.com",
+      "pnumber": 8765432109,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2022-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-07-22T00:00:00.000Z"
+      },
+      "username": "user5678",
+      "pwd": "password5678"
+    },
+    {
+      "memberid": "456789012",
+      "name": "Michael Johnson",
+      "email": "michaeljohnson@gmail.com",
+      "pnumber": 7890123456,
+      "gender": "Male",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2010-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-12-01T00:00:00.000Z"
+      },
+      "username": "user9012",
+      "pwd": "password9012"
+    },
+    {
+      "memberid": "789012345",
+      "name": "Emily Davis",
+      "email": "emilydavis@gmail.com",
+      "pnumber": 6543210987,
+      "gender": "Female",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2023-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-05-18T00:00:00.000Z"
+      },
+      "username": "user3456",
+      "pwd": "password3456"
+    },
+    {
+      "memberid": "123098765",
+      "name": "David Miller",
+      "email": "davidmiller@gmail.com",
+      "pnumber": 9876543210,
+      "gender": "Male",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2001-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-10-08T00:00:00.000Z"
+      },
+      "username": "user7890",
+      "pwd": "password7890"
+    },
+    {
+      "memberid": "567890123",
+      "name": "Sophia Turner",
+      "email": "sophiaturner@gmail.com",
+      "pnumber": 8765432109,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2022-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-02-28T00:00:00.000Z"
+      },
+      "username": "user2345",
+      "pwd": "password2345"
+    },
+    {
+      "memberid": "234567890",
+      "name": "John White",
+      "email": "johnwhite@gmail.com",
+      "pnumber": 7654321098,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2005-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-09-14T00:00:00.000Z"
+      },
+      "username": "user6789",
+      "pwd": "password6789"
+    },
+    {
+      "memberid": "890123456",
+      "name": "Emma Brown",
+      "email": "emmabrown@gmail.com",
+      "pnumber": 6543210987,
+      "gender": "Female",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "1981-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-04-03T00:00:00.000Z"
+      },
+      "username": "user0123",
+      "pwd": "password0123"
+    },
+    {
+      "memberid": "345678901",
+      "name": "Daniel Garcia",
+      "email": "danielgarcia@gmail.com",
+      "pnumber": 5432109876,
+      "gender": "Male",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2002-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-11-25T00:00:00.000Z"
+      },
+      "username": "user4567",
+      "pwd": "password4567"
+    },
+    {
+      "memberid": "901234567",
+      "name": "Olivia Smith",
+      "email": "oliviasmith@gmail.com",
+      "pnumber": 8765432109,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2011-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-06-10T00:00:00.000Z"
+      },
+      "username": "user8901",
+      "pwd": "password8901"
+    },
+    {
+      "name": "Kunj",
+      "email": "Kd@gmail.com",
+      "pnumber": {
+        "$numberLong": "7896541230"
+      },
+      "gender": "Male",
+      "username": "kdkd",
+      "pwd": "kd",
+      "memberid": "8752555",
+      "membertype": "Full Membership",
+      "clubname": null,
+      "start_date": {
+        "$date": "2023-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2029-01-24T00:00:00.000Z"
+      }
+    },
+    {
+      "name": "Radhika",
+      "email": "radhe@gmail.com",
+      "pnumber": {
+        "$numberLong": "4512235689"
+      },
+      "gender": "Female",
+      "username": "radhe",
+      "pwd": "krishna",
+      "memberid": "1478963258",
+      "membertype": "Family Membership",
+      "clubname": null,
+      "start_date": {
+        "$date": "2014-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2031-01-24T00:00:00.000Z"
+      }
+    }
+  ],
+  "username": "rajpath12",
+  "pwd": "rajpath"
+},
+{
+  "_id": {
+    "$oid": "65aea8a34bd084972a05d81f"
+  },
+  "clubname": "Green Meadows",
+  "ownname": "Amit Shah",
+  "email": "greenmeadows@gmail.com",
+  "pnumber": 79298765430,
+  "city": "Ahmedabad",
+  "address": "3GM2+9G5, Opp, Science City, Sola, Ahmedabad, Gujarat 380060",
+  "memtype": [
+    {
+      "price": 18000,
+      "type": "Full Membership"
+    },
+    {
+      "type": "Associate/Social Membership",
+      "price": 6000
+    },
+    {
+      "type": "Family Membership",
+      "price": 20000
+    }
+  ],
+  "desc": "Green Meadows Club offers a wide range of facilities, including state-of-the-art sports facilities, vibrant social events, and exquisite dining options. With a focus on providing a holistic experience, the club is an ideal destination for families and individuals seeking a blend of recreation and community engagement.",
+  "members": [
+    {
+      "memberid": "112233445",
+      "name": "Amit Patel",
+      "email": "amitpatel@gmail.com",
+      "pnumber": 9876543210,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2004-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-03-15T00:00:00.000Z"
+      },
+      "username": "user4455",
+      "pwd": "password4455"
+    },
+    {
+      "memberid": "556677889",
+      "name": "Neha Shah",
+      "email": "nehashah@gmail.com",
+      "pnumber": 7654321098,
+      "gender": "Female",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2021-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-07-22T00:00:00.000Z"
+      },
+      "username": "user8899",
+      "pwd": "password8899"
+    },
+    {
+      "memberid": "990011223",
+      "name": "Rajiv Kapoor",
+      "email": "rajivkapoor@gmail.com",
+      "pnumber": 8765432109,
+      "gender": "Male",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2005-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-12-01T00:00:00.000Z"
+      },
+      "username": "user2233",
+      "pwd": "password2233"
+    },
+    {
+      "memberid": "112233446",
+      "name": "Komal Sharma",
+      "email": "komalsharma@gmail.com",
+      "pnumber": 9876543211,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2022-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-10-08T00:00:00.000Z"
+      },
+      "username": "user6446",
+      "pwd": "password6446"
+    },
+    {
+      "memberid": "556677890",
+      "name": "Rahul Mehta",
+      "email": "rahulmehta@gmail.com",
+      "pnumber": 7654321097,
+      "gender": "Male",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2019-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-02-28T00:00:00.000Z"
+      },
+      "username": "user7890",
+      "pwd": "password7890"
+    },
+    {
+      "memberid": "990011224",
+      "name": "Priya Kapoor",
+      "email": "priyakapoor@gmail.com",
+      "pnumber": 8765432108,
+      "gender": "Female",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2007-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-04-03T00:00:00.000Z"
+      },
+      "username": "user1122",
+      "pwd": "password1122"
+    },
+    {
+      "memberid": "112233447",
+      "name": "Arjun Patel",
+      "email": "arjunpatel@gmail.com",
+      "pnumber": 9876543212,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2016-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-09-14T00:00:00.000Z"
+      },
+      "username": "user3447",
+      "pwd": "password3447"
+    },
+    {
+      "memberid": "556677891",
+      "name": "Sneha Shah",
+      "email": "snehashah@gmail.com",
+      "pnumber": 7654321096,
+      "gender": "Female",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2004-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-11-25T00:00:00.000Z"
+      },
+      "username": "user7891",
+      "pwd": "password7891"
+    },
+    {
+      "memberid": "990011225",
+      "name": "Vivek Kapoor",
+      "email": "vivekkapoor@gmail.com",
+      "pnumber": 8765432107,
+      "gender": "Male",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2018-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-06-10T00:00:00.000Z"
+      },
+      "username": "user1225",
+      "pwd": "password1225"
+    },
+    {
+      "memberid": "112233448",
+      "name": "Kritika Sharma",
+      "email": "kritikasharma@gmail.com",
+      "pnumber": 9876543213,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2017-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-03-05T00:00:00.000Z"
+      },
+      "username": "user3448",
+      "pwd": "password3448"
+    },
+    {
+      "memberid": "556677892",
+      "name": "Raj Mehta",
+      "email": "rajmehta@gmail.com",
+      "pnumber": 7654321095,
+      "gender": "Male",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2006-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-09-30T00:00:00.000Z"
+      },
+      "username": "user7892",
+      "pwd": "password7892"
+    },
+    {
+      "memberid": "990011226",
+      "name": "Pooja Kapoor",
+      "email": "poojakapoor@gmail.com",
+      "pnumber": 8765432106,
+      "gender": "Female",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2011-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-05-15T00:00:00.000Z"
+      },
+      "username": "user1226",
+      "pwd": "password1226"
+    },
+    {
+      "memberid": "112233449",
+      "name": "Aman Patel",
+      "email": "amanpatel@gmail.com",
+      "pnumber": 9876543214,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2006-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-08-20T00:00:00.000Z"
+      },
+      "username": "user3449",
+      "pwd": "password3449"
+    }
+  ],
+  "username": "greenmeadows30",
+  "pwd": "gmeadows88"
+},
+{
+  "_id": {
+    "$oid": "65aea8a34bd084972a05d820"
+  },
+  "clubname": "YMCA",
+  "ownname": "Dr. John Geevarghese",
+  "email": "info@ymcaic.com",
+  "pnumber": 7048331111,
+  "city": "Ahmedabad",
+  "address": "Sarkhej Gandhinagar Highway, Ahmedabad - 380 015",
+  "memtype": [
+    {
+      "price": 20000,
+      "type": "Full Membership"
+    },
+    {
+      "type": "Associate/Social Membership",
+      "price": 7000
+    },
+    {
+      "type": "Family Membership",
+      "price": 22000
+    }
+  ],
+  "desc": "YMCA Club, located in Ahmedabad, is a prominent recreational and social hub that offers a diverse range of amenities and activities for its members. With a rich history and a commitment to community well-being, YMCA Club provides state-of-the-art sports facilities, including swimming pools, fitness centers, and sports courts. The club is known for hosting various events, both sporting and cultural, fostering a sense of camaraderie among its members. Additionally, YMCA Club emphasizes family-oriented programming, making it an ideal destination for individuals and families seeking a holistic recreational experience. The club's vibrant atmosphere, coupled with its dedication to promoting health and wellness, makes it a cherished institution in Ahmedabad's social landscape.",
+  "members": [
+    {
+      "memberid": "1122334455",
+      "name": "Neha Mehta",
+      "email": "nehamehta@gmail.com",
+      "pnumber": 9876543210,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2001-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-03-15T00:00:00.000Z"
+      },
+      "username": "user4455",
+      "pwd": "password4455"
+    },
+    {
+      "memberid": "5566778899",
+      "name": "Rahul Desai",
+      "email": "rahuldesai@gmail.com",
+      "pnumber": 7654321098,
+      "gender": "Male",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2008-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-07-22T00:00:00.000Z"
+      },
+      "username": "user8899",
+      "pwd": "password8899"
+    },
+    {
+      "memberid": "9900112233",
+      "name": "Pooja Agarwal",
+      "email": "poojaagarwal@gmail.com",
+      "pnumber": 8765432109,
+      "gender": "Female",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2007-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-12-01T00:00:00.000Z"
+      },
+      "username": "user2233",
+      "pwd": "password2233"
+    },
+    {
+      "memberid": "4455667788",
+      "name": "Aditya Singh",
+      "email": "adityasingh@gmail.com",
+      "pnumber": 9876543210,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2001-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-10-08T00:00:00.000Z"
+      },
+      "username": "user7788",
+      "pwd": "password7788"
+    },
+    {
+      "memberid": "8899001122",
+      "name": "Sneha Desai",
+      "email": "snehadesai@gmail.com",
+      "pnumber": 7654321098,
+      "gender": "Female",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2019-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-02-28T00:00:00.000Z"
+      },
+      "username": "user1122",
+      "pwd": "password1122"
+    },
+    {
+      "memberid": "112233454",
+      "name": "Pooja Shah",
+      "email": "poojashah@gmail.com",
+      "pnumber": 9876543219,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2015-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-04-03T00:00:00.000Z"
+      },
+      "username": "user5454",
+      "pwd": "password5454"
+    },
+    {
+      "memberid": "556677896",
+      "name": "Ravi Desai",
+      "email": "ravidesai@gmail.com",
+      "pnumber": 7654321091,
+      "gender": "Male",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2019-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-09-14T00:00:00.000Z"
+      },
+      "username": "user7896",
+      "pwd": "password7896"
+    },
+    {
+      "memberid": "990011230",
+      "name": "Anushka Mehta",
+      "email": "anushkamehta@gmail.com",
+      "pnumber": 8765432102,
+      "gender": "Female",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2003-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-11-25T00:00:00.000Z"
+      },
+      "username": "user1230",
+      "pwd": "password1230"
+    },
+    {
+      "memberid": "112233455",
+      "name": "Rahul Patel",
+      "email": "rahulpatel@gmail.com",
+      "pnumber": 9876543220,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2005-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-09-30T00:00:00.000Z"
+      },
+      "username": "user5455",
+      "pwd": "password5455"
+    },
+    {
+      "memberid": "556677897",
+      "name": "Sonia Shah",
+      "email": "soniashah@gmail.com",
+      "pnumber": 7654321090,
+      "gender": "Female",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2007-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-06-10T00:00:00.000Z"
+      },
+      "username": "user7897",
+      "pwd": "password7897"
+    },
+    {
+      "memberid": "990011231",
+      "name": "Vijay Kapoor",
+      "email": "vijaykapoor@gmail.com",
+      "pnumber": 8765432101,
+      "gender": "Male",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2016-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-03-05T00:00:00.000Z"
+      },
+      "username": "user1231",
+      "pwd": "password1231"
+    },
+    {
+      "memberid": "112233456",
+      "name": "Simran Sharma",
+      "email": "simransharma@gmail.com",
+      "pnumber": 9876543221,
+      "gender": "Female",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2012-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-09-30T00:00:00.000Z"
+      },
+      "username": "user5456",
+      "pwd": "password5456"
+    },
+    {
+      "memberid": "556677898",
+      "name": "Karan Desai",
+      "email": "karandesai@gmail.com",
+      "pnumber": 7654321089,
+      "gender": "Male",
+      "membertype": "Associate/Social Membership",
+      "start_date": {
+        "$date": "2011-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-11-25T00:00:00.000Z"
+      },
+      "username": "user7898",
+      "pwd": "password7898"
+    },
+    {
+      "memberid": "990011232",
+      "name": "Ananya Sharma",
+      "email": "ananyasharma@gmail.com",
+      "pnumber": 8765432100,
+      "gender": "Female",
+      "membertype": "Family Membership",
+      "start_date": {
+        "$date": "2019-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-05-15T00:00:00.000Z"
+      },
+      "username": "user1232",
+      "pwd": "password1232"
+    },
+    {
+      "memberid": "112233457",
+      "name": "Rohan Patel",
+      "email": "rohanpatel@gmail.com",
+      "pnumber": 9876543222,
+      "gender": "Male",
+      "membertype": "Full Membership",
+      "start_date": {
+        "$date": "2022-03-15T00:00:00.000Z"
+      },
+      "expiry_date": {
+        "$date": "2030-08-20T00:00:00.000Z"
+      },
+      "username": "user5457",
+      "pwd": "password5457"
+    }
+  ],
+  "username": "ymca55",
+  "pwd": "ymca77"
+},
+{
+  "_id": {
+    "$oid": "65aebc71fbb06b871200dc23"
+  },
+  "clubname": "KD",
+  "ownname": "Kunj Detroja",
+  "email": "Kd@gmail.com",
+  "address": "Naroda",
+  "city": "Ahmedabad",
+  "pnumber": {
+    "$numberLong": "8745122356"
+  },
+  "desc": "wuhqcwc qw uqdhuwd wqd qwd ",
+  "memtype": [],
+  "members": [],
+  "username": "kunj",
+  "pwd": "kunj"
+}]
