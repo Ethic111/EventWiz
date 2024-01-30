@@ -7,6 +7,7 @@ class Organisation(BaseModel):
     ownname: str
     email: str
     logo:str
+    background_image:str
     address: str
     city: str
     pnumber: int
@@ -25,7 +26,7 @@ class User(BaseModel):
     username: str
     pwd: str
     memberid: Optional[str] = None
-    membertype : Optional[str] = None 
+    membertype : Optional[str] = "Public" 
     clubname : Optional[str] = None
     expiry_date: Optional[date] = None
     start_date:  Optional[date] = None
@@ -48,6 +49,7 @@ class EventPost(BaseModel):
     event_organizer_email: str
     event_organizer_pnumber: int
     type : str
+    participate:list
 
 class Admin(BaseModel):
     username: str

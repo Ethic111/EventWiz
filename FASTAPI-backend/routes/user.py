@@ -48,6 +48,122 @@ async def search_org_byname(data:dict):
     else:
         return {"error":"No organisation found","success":False}
 
+#search org member details
+@event.post("/adminorgsearchfilter")
+async def org_search_filters(data:dict):
+
+    memberlist = data["memberlist"]
+    # print(memberlist)
+    newdata = data
+    del newdata["memberlist"]
+
+    # print(newdata)
+    if (newdata["expiry_date"] != ''):
+        # data["expiry_date"] = data["expiry_date"].strftime("%Y-%m-%d")
+        newdata["expiry_date"] = datetime.strptime(newdata["expiry_date"], "%Y-%m-%d")
+    if (newdata["start_date"] != ''):    
+        # data["start_date"] = data["start_date"].strftime("%Y-%m-%d")
+        newdata["start_date"] = datetime.strptime(newdata["start_date"], "%Y-%m-%d")
+
+    # print(data)
+    filtered_data = {}
+    for key, value in newdata.items():
+        if (value != '' or value != ""):
+          filtered_data[key] = value
+    print(filtered_data)
+
+    if not filtered_data:
+        return {"error": "Empty Filter inputs", "success": False}
+
+    print("inside else")
+    result = []
+    partial_name = data.get("membername", "")
+    regex_pattern = re.compile(f"{re.escape(partial_name)}.*", re.IGNORECASE)
+
+    for memberdict in memberlist:
+        if "name" in memberdict and re.match(regex_pattern, memberdict["name"]):
+            result.append(memberdict)
+
+    print(result)
+    if result:
+        return result
+    else:
+        return {"error": "No such Member found", "success": False}
+
+#admin side org member table filters
+@event.post("/adminorgmemberstablefilters")
+async def adminside_orgmembertablefilter(filters:dict):
+    data = filters["filterdict"]
+    filtered_data = {}
+    for key, value in data.items():
+        if (value != '' or value != ""):
+            filtered_data[key] = re.escape(value)
+    #print(filtered_data)
+    content = []
+    if (len(filtered_data) != 0):
+        
+        regex_patterns = {}
+        for key, value in data.items():
+            if value:
+                regex_patterns[key] = re.compile(f'^{re.escape(value)}', re.IGNORECASE)
+
+        # print (regex_patterns)
+        # organisation = conn.event.organization.find_one({"_id":ObjectId(orgid)})
+        membersList = filters["memberlist"]
+        # if membersList:
+            # org1 = serializeDict(organisation)
+            # membersList = org1["members"]
+        if (membersList != []):
+            for memberdict in membersList:
+                match = all(regex.match(str(memberdict.get(key, ''))) for key, regex in regex_patterns.items())
+                if match:
+                    content.append(memberdict)
+            if content:
+                # for i in content:
+                #     i["expiry_date"] = i["expiry_date"].strftime("%Y-%m-%d")
+                #     i["start_date"] = i["start_date"].strftime("%Y-%m-%d")
+                return content
+            else:
+                return content
+        else:
+            return {"error":"No Members","success":False}
+        # else:
+        #     return {"error":"Organisation not found","success":False}
+    else:
+        
+        return {"error":"Please enter data in filter input","success":False,"data_dict":"empty"}
+    
+    
+# admin side loggedin members
+@event.post("/loggedinmembers") 
+async def loggedin_members(data:dict):
+
+    logginemembers = []
+    for singledict in data["data"]:
+        if singledict["loggedin"] == True :
+            logginemembers.append(singledict)
+    if logginemembers:
+        # print(logginemembers)
+        return logginemembers
+    else:
+        return {"error":"No loggedin members","success":False}
+        # print("no members has loggedin")
+    
+   
+# admin side loggedin members
+@event.post("/inactivemembers") 
+async def inactive_members(data:dict):
+
+    inactivemembers = []
+    for singledict in data["data"]:
+        if singledict["loggedin"] == False :
+            inactivemembers.append(singledict)
+    if inactivemembers:
+        # print(logginemembers)
+        return inactivemembers
+    else:
+        return {"error":"No loggedin members","success":False}
+        # print("no members has loggedin")
 
 # /////////////////////////////////////////////////////////////////////////////
 
@@ -112,11 +228,12 @@ async def get_clubnames():
     return clubname
 
 
-#all organisations names
-@event.get('/allorgnames')
-async def fetch_all_organisations_names():
+# #all organisations names
+# @event.get('/allorgnames')
+# async def fetch_all_organisations_names():
     
-    return True
+#     return True
+
 
 
 # organisation login
@@ -218,36 +335,34 @@ async def delete_user(id):
     
 # organisation filter functionality to fetch post
 @event.post("/orgfilters")
-async def org_filters(filtereddata: dict):
+async def org_filters(data: dict):
     # Build the query based on the filteredFormData
+    cname = data["clubname"]
+    filtereddata = data["filteredFormData"]
     query = {}
 
-    for field, value in filtereddata.items():
+    and_conditions = [{"clubname":cname}]
 
+    for field, value in filtereddata.items():
         if field in ["event_start_date", "event_end_date"] and value != "":
             value = datetime.strptime(value, "%Y-%m-%d")
-            #print(value)
             if field == "event_start_date":
-                query["event_start_date"] = {"$gte": value}
-                #print(query)
+                and_conditions.append({"event_start_date": {"$gte": value}})
             if field == "event_end_date":
-                query["event_start_date"] = {"$lte": value}
-                #print(query)
+                and_conditions.append({"event_start_date": {"$lte": value}})
 
         if field in ["minprice", "maxprice"] and value != "":
             if field == "minprice":
-                # Convert minprice to float and construct the query
-                query["ticket_price"] = {"$gte": float(value)}
-                #print(query)
+                and_conditions.append({"ticket_price": {"$gte": float(value)}})
             if field == "maxprice":
-                # Convert maxprice to float and construct the query
-                query["ticket_price"] = {"$lte": float(value)}
-                #print(query)
+                and_conditions.append({"ticket_price": {"$lte": float(value)}})
 
         if field == "venue_city" and value != "":
-            # Construct a case-insensitive regex pattern for venue_city
             regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
-            query[field] = {"$regex": regex_pattern}
+            and_conditions.append({"venue_city": {"$regex": regex_pattern}})
+
+    if and_conditions:
+        query["$and"] = and_conditions
 
     # Find posts based on the query
     result = conn.EventWiz.post.find(query)
@@ -256,7 +371,7 @@ async def org_filters(filtereddata: dict):
     response_list = serializeList(result)
     if response_list:
         lis = []
-        d1= {}
+        d1 = {}
         for singleDict in response_list:
             d1 = singleDict
             d1["event_start_date"] = d1["event_start_date"].strftime("%d-%m-%Y")
@@ -264,7 +379,8 @@ async def org_filters(filtereddata: dict):
             lis.append(serializeDict(d1))
         return serializeList(lis)
     else:
-        return {"error": "Error, please fill the form again", "success": False}
+        return {"error": "No such Post Available", "success": False}
+    
     
 # other organisation event post filter functionality to fetch post
 @event.post("/otherorgeventpostfilters")
@@ -509,7 +625,7 @@ def match_dates(memberdict, data):
             return False
 
     return True   
-
+# 
 #fetching member details for updating
 @event.post("/organisationunupdatedmemberdetails")
 async def update_member_details(data: dict):
@@ -630,8 +746,8 @@ async def membertable_filtering(filters:dict):
                         i["start_date"] = i["start_date"].strftime("%Y-%m-%d")
                     return content
                 else:
-                    return content
-                    # return {"error":"Members not found","success":False}
+                    # return content
+                    return {"error":"Members not found","success":False}
             else:
                 return {"error":"No Members","success":False}
         else:

@@ -119,7 +119,8 @@ function OrgEvent() {
     // Now you can use filteredFormData in your API call
     try {
       console.log("Inside try for api calling:");
-      const checking = await api.post("/orgfilters/", filteredFormData);
+      const data = {"clubname": userData["clubname"],"filteredFormData": filteredFormData}
+      const checking = await api.post("/orgfilters/", data);
       console.log(checking);
       if (checking.data.success !== false) {
         console.log(checking.data);

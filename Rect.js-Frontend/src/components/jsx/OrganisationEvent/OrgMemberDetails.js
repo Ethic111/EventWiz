@@ -133,11 +133,10 @@ function OrgMemberDetails() {
       console.error("Error fetching details:", error);
     }
   };
-  const handleSearchInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleSearchInputChange = (event) => {
     setSearchform({
       ...searchForm,
-      [name]: value,
+      [event.target.name]: event.target.value,
     });
   };
   const handlesearchSubmit = async (event) => {
@@ -169,7 +168,7 @@ function OrgMemberDetails() {
       ...prevFilters,
       [name]: value,
     }));
-    // fetchMembersFilters();
+ 
   };
 
   const fetchMembersFilters = async () => {
@@ -183,10 +182,12 @@ function OrgMemberDetails() {
       );
       if (response.data.data_dict === "empty") {
         fetchAllMemberdetails();
+      
       } else if (response.data.success != false) {
         console.log("Response=" + response.data.error);
         setDetails(response.data);
       } else {
+        // fetchAllMemberdetails();
         alert(response.data.error);
       }
     } catch (error) {

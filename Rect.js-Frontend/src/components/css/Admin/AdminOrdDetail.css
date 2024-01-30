@@ -144,7 +144,6 @@
     }
     .postcard:nth-child(2n + 1) .postcard__text::before {
       left: -12px !important;
-      transform: rotate(4deg);
     }
     .postcard:nth-child(2n + 0) .postcard__text::before {
       right: -12px !important;

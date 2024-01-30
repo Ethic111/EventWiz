@@ -37,7 +37,7 @@ function AdminOrg() {
 
   const navigate = useNavigate();
   const handleorgdetails = (org) => {
-    // console.log(JSON.stringify(org))
+    console.log(JSON.stringify(org))
     navigate("/admin/orgdetailspage", {
       state: JSON.stringify(org),
     });
@@ -158,7 +158,7 @@ function AdminOrg() {
                             <div class="card-up aqua-gradient"></div>
                             <div class="avatar mx-auto white">
                               <img
-                                src="https://mdbootstrap.com/img/Photos/Avatars/img%20%2831%29.jpg"
+                                src={org.logo}
                                 class="rounded-circle img-fluid"
                                 alt="woman avatar"
                                 onClick={() => handleorgdetails(org)}
