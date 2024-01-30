@@ -1,51 +1,31 @@
 // AdminOrgDetailed.js
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import $ from "jquery";
 import AdminNavbar from "./AdminNavbar";
 import "../../css/OrganisationEvent/orgEvent.css";
 import api from "../api";
-import "../../css/Admin/AdminOrg.css";
-import {
-  FaArrowCircleRight,
-  FaArrowCircleLeft,
-  FaRupeeSign,
-} from "react-icons/fa";
-// import { TbClockPlay } from "react-icons/tb";
+import "../../css/Admin/AdminOrdDetail.css";
+import { GrPowerReset } from "react-icons/gr";
 
 function AdminOrgDetailed() {
   const [details, setDetails] = useState();
-  const [userData, setUserData] = useState(
-    JSON.parse(localStorage.getItem("organisers"))
-  );
   const [searchForm, setSearchform] = useState({
-    event_title: "",
+    clubname: "",
   });
 
-  const [modalEaseIn, setModalEaseIn] = useState("");
+  const location = useLocation();
+  const orgData = JSON.parse(location.state);
+  console.log(orgData);
+  // if (orgData){
 
+  //   setDetails(orgData.memtype)
+  // }
+  const memtype = orgData.memtype;
+  console.log(memtype);
   useEffect(() => {
     fetchAllOrgdetails();
-
-    $(".modal").each(function () {
-      $(this).on("show.bs.modal", function () {
-        const easeIn = $(this).attr("data-easein");
-        setModalEaseIn(easeIn);
-
-        if (["bounce"].includes(easeIn)) {
-          $(".modal-dialog").velocity(`callout.${easeIn}`);
-        } else {
-          $(".modal-dialog").velocity(`transition.${easeIn}`);
-        }
-      });
-    });
   }, []);
-
-  const [isCol2Visible, setIsCol2Visible] = useState(true);
-
-  const toggleCol2Visibility = () => {
-    setIsCol2Visible(!isCol2Visible);
-  };
 
   const fetchAllOrgdetails = async () => {
     try {
@@ -63,134 +43,52 @@ function AdminOrgDetailed() {
   const navigate = useNavigate();
   const handleorgdetails = (org) => {
     // console.log(JSON.stringify(org))
-    // navigate("/organisationevents/detailedview", {
-    //   state: JSON.stringify(org),
-    // });
-  };
-
-  const handledeleteorg = async (org) => {
-    console.log("deleting button");
-    try {
-      //   const response = await api.delete(`/deleteeventorgs/${org._id}`);
-      //   console.log(response);
-      //   fetchAllOrgdetails();
-    } catch {
-      alert("Error in Deleting");
-    }
+    navigate("/admin/orgdetailspage", {
+      state: JSON.stringify(org),
+    });
   };
 
   // /////////////
 
-  const [lFormData, setLFormData] = useState({
-    event_start_date: "",
-    event_end_date: "",
-    minprice: "",
-    maxprice: "",
-    venue_city: "",
-  });
-
-  function formatDateForInput(dateString) {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return ""; // Invalid date, return an empty string
-    }
-    return date.toISOString().split("T")[0];
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setLFormData({
-      ...lFormData,
-      [name]: value,
-    });
-  };
-
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-
-    // Filter out key-value pairs with empty values
-    const filteredFormData = {};
-    for (const key in lFormData) {
-      if (lFormData[key] !== "") {
-        filteredFormData[key] = lFormData[key];
-      }
-    }
-    console.log("Filtered form:");
-    console.log(filteredFormData);
-
-    // Now you can use filteredFormData in your API call
-    try {
-      //   console.log("Inside try for api calling:");
-      //   const checking = await api.org("/orgfilters/", filteredFormData);
-      //   console.log(checking);
-      //   if (checking.data.success !== false) {
-      //     console.log(checking.data);
-      //     setDetails(checking.data);
-      //   } else {
-      //     alert(checking.data.error);
-      //   }
-      // Rest of your code...
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
   const handleformreset = () => {
-    setLFormData({
-      event_start_date: "",
-      event_end_date: "",
-      minprice: "",
-      maxprice: "",
-      venue_city: "",
-    });
     setSearchform({
-      event_title: "",
+      clubname: "",
     });
     fetchAllOrgdetails();
   };
 
-  const handleSearchInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleSearchInputChange = (event) => {
+    // const { name, value } = e.target;
     setSearchform({
       ...searchForm,
-      [name]: value,
+      [event.target.name]: event.target.value,
     });
   };
   const handlesearchSubmit = async (event) => {
     event.preventDefault();
 
     const data = {
-      clubname: userData["clubname"],
-      title: searchForm["event_title"],
+      clubname: searchForm["clubname"],
     };
     console.log("handle search submit");
     try {
-      //   const response = await api.org("/organisationeventorgsbytitle/", data);
-      //   setDetails(response.data);
+      const response = await api.post("/searchingorgbyname", data);
+      if (response.data.success !== false) {
+        console.log(response.data);
+        setDetails(response.data);
+      } else {
+        alert(response.data.error);
+      }
       // console.log(response.data);
     } catch (error) {
       console.error("Error fetching details:", error);
     }
   };
-  // {
-  //   "event_start_date": "",
-  //   "event_end_date": "",
-  //   "minprice": "210",
-  //   "maxprice": "6590",
-  //   "venue_city":""
-  // }
 
-  // const handleLoad = () =>{
-  //   console.log("helo")
-  // }
   return (
     <>
       <div>{<AdminNavbar />}</div>
-      {/* <div>
-        <Link to="/organisationevents/addorg">
-          <button className="addorgbtn">Add New Post</button>
-        </Link>
-      </div> */}
+
       <div
         style={{
           display: "flex",
@@ -198,23 +96,23 @@ function AdminOrgDetailed() {
           justifyContent: "space-between",
         }}
       >
-        <div>
-          {/* <Link to="/organisationevents/addorg">
-            <button className="addorgbtn">Add New Post</button>
-          </Link> */}
+        <div className="mt-1">
+          <Link to="/organisationevents/addpost">
+            <button className="addpostbtn">Member Data</button>
+          </Link>
         </div>
         <div className="mt-0">
           <form className="form-inline my-lg-0 " onSubmit={handlesearchSubmit}>
             <div className="row">
-              <div className="col-10 p-2">
+              <div className="col-8 p-2">
                 <input
                   className="form-control"
-                  name="event_title"
+                  name="clubname"
                   type="text"
                   placeholder="Search"
                   aria-label="Search"
                   onChange={handleSearchInputChange}
-                  value={searchForm.event_title}
+                  value={searchForm.clubname}
                 />
               </div>
               <div className="col-2 p-2">
@@ -234,6 +132,16 @@ function AdminOrgDetailed() {
                   </svg>
                 </button>
               </div>
+              <div className="col-2">
+                <button className="addorgbtn" onClick={handleformreset}>
+                  <GrPowerReset
+                    style={{
+                      height: "1.2rem",
+                      width: "1.2rem",
+                    }}
+                  />
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -242,158 +150,68 @@ function AdminOrgDetailed() {
       <div>
         <div className="loginmainEventdiv">
           <div className="row">
-            {isCol2Visible ? (
-              <div
-                className="col-2"
-                style={{
-                  backgroundColor: "#0000",
-                  color: "#0e2643",
-                  cursor: "pointer",
-                }}
-              >
-                <div className="d-flex flex-column align-items-end ">
-                  <FaArrowCircleLeft
-                    className="mt-2"
-                    onClick={toggleCol2Visibility}
-                    style={{ fontSize: "2.2rem" }}
-                  />
-                </div>
-                <br />
-                <div className="row">
-                  <p className="col-6 usereventscard_title">Filter</p>
-                  <div className="col-6">
-                    <div className="d-grid">
-                      <button className="addorgbtn" onClick={handleformreset}>
-                        Reset
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <form onSubmit={handleFormSubmit} style={{ margin: "0px" }}>
-                  <div className="row gy-3 overflow-hidden">
-                    <div className="col">
-                      <div className="form-floating mb-3">
-                        <input
-                          onChange={handleInputChange}
-                          type="date"
-                          className="form-control"
-                          id="event_start_date"
-                          placeholder=""
-                          name="event_start_date"
-                          value={formatDateForInput(lFormData.event_start_date)}
-                        />
-                        <label
-                          htmlFor="event_start_date"
-                          className="form-label"
-                        >
-                          Start Date
-                        </label>
-                      </div>
-                    </div>
-                    <div className="col">
-                      <div className="form-floating mb-3">
-                        <input
-                          onChange={handleInputChange}
-                          type="date"
-                          className="form-control"
-                          id="event_end_date"
-                          placeholder=""
-                          name="event_end_date"
-                          value={formatDateForInput(lFormData.event_end_date)}
-                        />
-                        <label htmlFor="event_end_date" className="form-label">
-                          End Date
-                        </label>
-                      </div>
-                    </div>
-                    <div className="col">
-                      Price
-                      <div className="row">
-                        <div className="col-6">
-                          <div className="form-floating mb-3">
-                            <input
-                              onChange={handleInputChange}
-                              type="number"
-                              step="0.01"
-                              className="form-control"
-                              id="minprice"
-                              placeholder=""
-                              name="minprice"
-                              value={lFormData.minprice}
-                            />
-                            <label htmlFor="minprice" className="form-label">
-                              Min
-                            </label>
-                          </div>
-                        </div>
-                        <div className="col-6">
-                          <div className="form-floating mb-3">
-                            <input
-                              onChange={handleInputChange}
-                              type="number"
-                              step="0.01"
-                              className="form-control"
-                              id="maxprice"
-                              placeholder=""
-                              name="maxprice"
-                              value={lFormData.maxprice}
-                            />
-                            <label htmlFor="maxprice" className="form-label">
-                              Max
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="form-floating mb-3">
-                        <input
-                          onChange={handleInputChange}
-                          type="text"
-                          className="form-control"
-                          id="venue_city"
-                          placeholder=""
-                          name="venue_city"
-                          value={lFormData.venue_city}
-                        />
-                        <label htmlFor="venue_city" className="form-label">
-                          Venue City
-                        </label>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <div className="d-grid">
-                        <button className="addorgbtn" type="submit">
-                          Apply
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <div className="col-12" style={{ cursor: "pointer" }}>
-                <FaArrowCircleRight
-                  className=" mt-2"
-                  onClick={toggleCol2Visibility}
-                  style={{ fontSize: "2.2rem" }}
-                />
-              </div>
-            )}
-            <div className={isCol2Visible ? "col-10" : "col-12"}>
+            <div className="col-12">
               <br />
-              <div className="row">
-                {details && details.length ? (
-                  details.map((org) => (
-                    <div
-                      key={org._id}
-                      className={
-                        isCol2Visible
-                          ? "col-4 maincardbody"
-                          : "col-3 maincardbody"
-                      }
-                    >
+              <div>
+                <section class="light">
+                  <div class="container py-2">
+                    <article class="postcard light blue">
+                      <a class="postcard__img_link" href="#">
+                        <img
+                          class="postcard__img"
+                          src="https://picsum.photos/1000/1000"
+                          alt="Image Title"
+                        />
+                      </a>
+                      <div class="postcard__text t-dark">
+                        <h1 class="postcard__title blue">
+                          <h4>{orgData.clubname}</h4>
+                        </h1>
+                        <div class="postcard__subtitle small">
+                          <strong>{orgData.ownname}</strong>
+                          <br />
+                          <strong> {orgData.email}</strong>
+                        </div>
+                        <div class="postcard__bar"></div>
+                        <div class="postcard__preview-txt">{orgData.desc}</div>
+                        <br />
+                        <div class="row">
+                          <span className="col">
+                            <strong>Contact Number:</strong> {orgData.pnumber}
+                          </span>
+                          <span className="col">
+                            <strong>City:</strong> {orgData.city}
+                          </span>
+                        </div>
+                        <br />
+                        <div class="">
+                          <strong>Address:</strong> {orgData.address}
+                        </div>
+                        <div >
+                          <br />
+                          <strong>Membership Type & Price</strong>
+                         <br/>
+                         <br/>
+                            {memtype && memtype.length ? (
+                              memtype.map((type) => (
+                                <li>
+                                  <span>
+                                    {type.type} {"-->"} {type.price}
+                                  </span>
+                                </li>
+                              ))
+                            ) : (
+                              <p>No Membership Types...</p>
+                            )}
+                          
+                        </div>
+                      </div>
+                    </article>
+                  </div>
+                </section>
+              </div>
+              {/* <div className="row">
+                    <div className="col-4 maincardbody">
                       <div class="col">
                         <section
                           class="mx-auto my-5"
@@ -406,32 +224,32 @@ function AdminOrgDetailed() {
                                 src="https://mdbootstrap.com/img/Photos/Avatars/img%20%2831%29.jpg"
                                 class="rounded-circle img-fluid"
                                 alt="woman avatar"
+                                style={{ cursor: "pointer" }}
                               />
                             </div>
                             <div class="card-body text-center">
-                              <h4 class="card-title font-weight-bold">
-                                {org.clubname}
+                              <h4
+                                class="card-title font-weight-bold"
+                                style={{ cursor: "pointer" }}
+                              >
+                                {orgData.clubname}
                               </h4>
                               <hr />
                               <p>
-                                <strong>Email: {org.email}</strong>
+                                <strong>Email: {orgData.email}</strong>
                               </p>
                               <p>
-                                <i class="fas fa-quote-left"></i> 
-                                <span style={{marginLeft:"5px"}}>{org.address}</span>
+                                <i class="fas fa-quote-left"></i>
+                                <span style={{ marginLeft: "5px" }}>
+                                  {orgData.address}
+                                </span>
                               </p>
                             </div>
                           </div>
                         </section>
                       </div>
-                     
                     </div>
-                  ))
-                ) : (
-                  <p>No Records...</p>
-                )}
-              </div>
-              
+              </div> */}
             </div>
           </div>
         </div>

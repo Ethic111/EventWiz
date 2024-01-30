@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import $ from "jquery";
 import OrganisationNavbar from "../OrganisationNavbar";
-import "../../css/OrganisationEvent/orgEvent.css";
+import "../../css/OrganisationEvent/OrgOtherEvents.css";
 import api from "../api";
 import {
   FaArrowCircleRight,
@@ -209,7 +209,7 @@ function OrgOtherEvents() {
               <div className="col-10 p-2">
                 <input
                   className="form-control"
-                  name="event_title"
+                  name="otherevent_title"
                   type="text"
                   placeholder="Search"
                   aria-label="Search"
@@ -395,12 +395,12 @@ function OrgOtherEvents() {
                       }
                     >
                       <div class="main">
-                        <ul class="cards">
-                          <li class="cards_item">
-                            <div class="card">
-                              <div class="card_image">
+                        <ul class="othercards">
+                          <li class="othercards_item">
+                            <div class="othercard">
+                              <div class="othercard_image">
                                 <img
-                                  className="maincardimage"
+                                  className="othermaincardimage"
                                   src={post.event_image}
                                   alt="event image"
                                   onClick={() => handlepostdetails(post)}
@@ -413,7 +413,7 @@ function OrgOtherEvents() {
                                   </span>
                                 </span>
                               </div>
-                              <div class="card_content">
+                              <div class="othercard_content">
                                 <h2
                                   class="card_title"
                                   onClick={() => handlepostdetails(post)}
@@ -421,7 +421,7 @@ function OrgOtherEvents() {
                                 >
                                   {post.event_title}
                                 </h2>
-                                <div class="card_text">
+                                <div class="othercard_text">
                                   <p class="cardptag">{post.event_highlight}</p>
                                   <p class="cardptag">
                                     Venue: {post.venue_name}

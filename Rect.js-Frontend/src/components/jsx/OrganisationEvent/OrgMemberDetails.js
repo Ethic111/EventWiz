@@ -30,12 +30,10 @@ function OrgMemberDetails() {
     membertype: "",
   });
   const [memType, setMemType] = useState();
-  const [userData, setUserData] = useState(
-    JSON.parse(localStorage.getItem("organisers"))
-  );
+
   const fetchAllMemtypedetails = async () => {
     try {
-      const cname = userData.clubname;
+      const cname = orgData.clubname;
       const response = await api.post("/getmemtype/", { clubname: cname });
       setMemType(response.data);
       console.log(response.data);
@@ -294,52 +292,38 @@ function OrgMemberDetails() {
                   <th scope="col" className="tablehead align-middle">
                     Username
                   </th>
-                  <th
-                    scope="col"
-                    className="tablehead align-middle"
-                    style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                  >
-                    <span>Name{" "}</span>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft:"10px"
-                      }}
-                    >
+                  <th scope="col" className="tablehead align-middle">
+                    <span>Name </span>
+                    <span>
                       <span>
-                        <IoIosArrowDropupCircle onClick={() => handlesorting("name")}/>
+                        <IoIosArrowDropupCircle
+                          onClick={() => handlesorting("name")}
+                        />
                       </span>
-                      <span >
-                        <IoIosArrowDropdownCircle onClick={() => handlesorting("name")}/>
+                      <span>
+                        <IoIosArrowDropdownCircle
+                          onClick={() => handlesorting("name")}
+                        />
                       </span>
                     </span>
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     Email
                   </th>
-                  <th
-                    scope="col"
-                    className="tablehead align-middle"
-                    style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                  >
-                    <span>Number{" "}</span>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft:"10px"
-                      }}
-                    >
+                  <th scope="col" className="tablehead align-middle">
+                    <span>Number </span>
+                    <p>
                       <span>
-                        <IoIosArrowDropupCircle onClick={() => handlesorting("pnumber")}/>
+                        <IoIosArrowDropupCircle
+                          onClick={() => handlesorting("pnumber")}
+                        />
                       </span>
-                      <span >
-                        <IoIosArrowDropdownCircle onClick={() => handlesorting("pnumber")}/>
+                      <span>
+                        <IoIosArrowDropdownCircle
+                          onClick={() => handlesorting("pnumber")}
+                        />
                       </span>
-                    </span>
+                    </p>
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     Gender
@@ -347,27 +331,20 @@ function OrgMemberDetails() {
                   <th scope="col" className="tablehead align-middle">
                     Type
                   </th>
-                  <th
-                    scope="col"
-                    className="tablehead align-middle"
-                    style={{ display: "flex", justifyContent: "center", alignItems: "center" }}
-                  >
-                    <span>Start date{" "}</span>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft:"10px"
-                      }}
-                    >
+                  <th scope="col" className="tablehead align-middle">
+                    <span>Start date </span>
+                    <p>
                       <span>
-                        <IoIosArrowDropupCircle onClick={() => handlesorting("start_date")}/>
+                        <IoIosArrowDropupCircle
+                          onClick={() => handlesorting("start_date")}
+                        />
                       </span>
-                      <span >
-                        <IoIosArrowDropdownCircle onClick={() => handlesorting("start_date")}/>
+                      <span>
+                        <IoIosArrowDropdownCircle
+                          onClick={() => handlesorting("start_date")}
+                        />
                       </span>
-                    </span>
+                    </p>
                   </th>
                   {/* <th
                     scope="col"
@@ -377,28 +354,22 @@ function OrgMemberDetails() {
                     Start date
                   </th> */}
 
-                  
-                  <th
+                  {/* <th
                     scope="col"
                     onClick={() => handlesorting("expiry_date")}
                     className="tablehead align-middle"
                   >
                     Expiry date
-                  </th>
+                  </th> */}
                   {/* <th></th> */}
-                  {/* <th
+                  <th
                     scope="col"
                     className="tablehead align-middle"
-                    style={{justifyContent: "center", alignItems: "center" }}
+                    
                   >
                     <span>Expiry date{" "}</span>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        marginLeft:"10px"
-                      }}
+                    <p
+                      
                     >
                       <span>
                         <IoIosArrowDropupCircle onClick={() => handlesorting("expiry_date")}/>
@@ -406,8 +377,8 @@ function OrgMemberDetails() {
                       <span >
                         <IoIosArrowDropdownCircle onClick={() => handlesorting("expiry_date")}/>
                       </span>
-                    </span>
-                  </th> */}
+                    </p>
+                  </th>
                   <th scope="col" className="tablehead align-middle">
                     Update
                   </th>
@@ -471,7 +442,6 @@ function OrgMemberDetails() {
                   </td>
                   <td>
                     <div type="text" className="inputdiv">
-                      
                       <select
                         onChange={handleFilterInputChange}
                         className="trtext form-select"
@@ -488,7 +458,6 @@ function OrgMemberDetails() {
                   </td>
                   <td>
                     <div type="text" className="inputdiv">
-                      
                       <select
                         onChange={handleFilterInputChange}
                         className="trtext form-select"
@@ -508,13 +477,11 @@ function OrgMemberDetails() {
                   </td>
                   <td>
                     <div type="text" className="inputdiv">
-                      
                       --
                     </div>
                   </td>
                   <td>
                     <div type="text" className="inputdiv">
-                      
                       --
                     </div>
                   </td>

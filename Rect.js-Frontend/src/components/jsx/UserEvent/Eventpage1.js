@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
+import { Link } from "react-router-dom";
 import "../../css/UserEvent/Eventpage1.css";
 import eventBackgroundImage from "../../img/Events/eventBackgroundImage.jpg";
 import AllEventpage from "./AllEventpage";
@@ -15,10 +16,7 @@ function Eventpage1() {
       {userData ? (
         <AllEventpage />
       ) : (
-        <div>
-          <div className="backgroundImg">
-            <img src={eventBackgroundImage} alt="background" />
-          </div>
+        <div className="backgroundImg">
           <div className="logoutmainEventdiv">
             <div className="container d-flex align-items-center justify-content-center">
               <div className="cookiesContent" id="cookiesPopup">
@@ -29,10 +27,9 @@ function Eventpage1() {
                   className="modalimg"
                 />
                 <p>
-                  We use cookies for improving user experience, analytics, and
-                  marketing.
+                  You need to Login or Signup!
                 </p>
-                <button className="accept">That's fine!</button>
+                <Link to="/loginregister"><button className="accept">Login/Signup</button></Link>
               </div>
             </div>
           </div>

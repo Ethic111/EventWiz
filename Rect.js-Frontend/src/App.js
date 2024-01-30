@@ -31,7 +31,6 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/home" element={<Home />} />
-          {/* <Route path="/home" element={<Admin />} /> */}
           <Route path="/events" element={<Eventpage1/>} />
           <Route path="/loginregister" element={<LoginPage />} />
           <Route path="/aboutus" element={<About />} />

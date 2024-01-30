@@ -5,266 +5,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-      body {
-        font-family: "Oxygen", sans-serif;
-        color: #050505;
+       .light {
+        background: #f3f5f7;
       }
-
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
+      .postcard .t-dark {
+        color: #18151f;
       }
-
-      .main {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-
-      .cards {
+      .postcard {
         display: flex;
-        flex-wrap: wrap;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      .cards_item {
-        display: flex;
-        padding: 1rem;
-      }
-
-      .card_image {
+        box-shadow: 0 4px 21px -12px rgba(0, 0, 0, 0.66);
+        border-radius: 10px;
+        margin: 0 0 2rem 0;
+        overflow: hidden;
         position: relative;
-        max-height: 250px;
+        color: #fff;
       }
-
-      .card_image img {
+      .postcard .postcard__bar {
+      width: 50px;
+      height: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      background-color: #392d78;
+      transition: width 0.2s ease;
+    }
+      .postcard.light {
+        background-color: #e1e5ea;
+      }
+      .postcard a {
+        color: inherit;
+      }
+      .postcard h1,
+      .postcard .h1 {
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      .postcard .small {
+        font-size: 80%;
+      }
+      .postcard .postcard__title {
+        font-size: 1.75rem;
+      }
+      .postcard .postcard__img {
+        max-height: 180px;
         width: 100%;
-        height: 100%;
         object-fit: cover;
+        position: relative;
       }
-
-      .card_price {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 45px;
-        height: 45px;
-        border-radius: 0.25rem;
-        background-color: #c89b3f;
-        font-size: 18px;
-        font-weight: 700;
+      .postcard .postcard__img_link {
+        display: contents;
       }
-
-      .card_price span {
-        font-size: 12px;
-        margin-top: -2px;
-      }
-
-      .note {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        padding: 4px 8px;
-        border-radius: 0.25rem;
-        background-color: #c89b3f;
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      @media (min-width: 40rem) {
-        .cards_item {
-          width: 50%;
-        }
-      }
-
-      @media (min-width: 56rem) {
-        .cards_item {
-          width: 33.3333%;
-        }
-      }
-
-      .card {
-        background-color: white;
-        border-radius: 0.25rem;
-        box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25);
+      .postcard .postcard__text {
+        padding: 1.5rem;
+        position: relative;
         display: flex;
         flex-direction: column;
+      }
+      .postcard .postcard__preview-txt {
         overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: justify;
+        height: 100%;
       }
-
-      .card_content {
-        position: relative;
-        padding: 16px 12px 32px 24px;
-        margin: 16px 8px 8px 0;
-        max-height: 290px;
-        overflow-y: scroll;
-      }
-
-      .card_content::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .card_content::-webkit-scrollbar-track {
-        box-shadow: 0;
-        border-radius: 0;
-      }
-
-      .card_content::-webkit-scrollbar-thumb {
-        background: #c89b3f;
-        border-radius: 15px;
-      }
-
-      .card_title {
-        position: relative;
-        margin: 0 0 24px;
-        padding-bottom: 10px;
-        text-align: center;
-        font-size: 20px;
-        font-weight: 700;
-      }
-
-      .card_title::after {
-        position: absolute;
-        display: block;
-        width: 50px;
-        height: 2px;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #c89b3f;
-        content: "";
-      }
-
-      hr {
-        margin: 24px auto;
-        width: 50px;
-        border-top: 2px solid #c89b3f;
-      }
-
-      .card_text p {
-        margin: 0 0 24px;
+      .postcard .postcard__tagbox {
+        display: flex;
+        flex-flow: row wrap;
         font-size: 14px;
-        line-height: 1.5;
+        margin: 20px 0 0 0;
+        padding: 0;
+        justify-content: center;
       }
-
-      .card_text p:last-child {
-        margin: 0;
+      .postcard .postcard__tagbox .tag__item {
+        display: inline-block;
+        background: rgba(83, 83, 83, 0.4);
+        border-radius: 3px;
+        padding: 2.5px 10px;
+        margin: 0 5px 5px 0;
+        cursor: default;
+        user-select: none;
+        transition: background-color 0.3s;
+      }
+      .postcard .postcard__tagbox .tag__item:hover {
+        background: rgba(83, 83, 83, 0.8);
+      }
+      .postcard:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: linear-gradient(-70deg, #424242, transparent 50%);
+        opacity: 1;
+        border-radius: 10px;
+      }
+      .postcard:hover .postcard__bar {
+        width: 100px;
+      }
+      .green::before,
+      .blue::before,
+      .red::before,
+      .yellow::before {
+        background-image: linear-gradient(-30deg, rgba(0, 0, 0, 0), transparent 50%);
+      }
+      @media screen and (min-width: 769px) {
+        .postcard {
+          flex-wrap: inherit;
+        }
+        .postcard .postcard__title {
+          font-size: 2rem;
+        }
+        .postcard .postcard__tagbox {
+          justify-content: start;
+        }
+        .postcard .postcard__img {
+          max-width: 380px;
+          max-height: 100%;
+          transition: transform 0.3s ease;
+        }
+        .postcard .postcard__text {
+          padding: 3rem;
+          width: 100%;
+        }
+        .postcard:hover .postcard__img {
+          transform: scale(1.1);
+        }
+        .postcard:nth-child(2n + 1) {
+          flex-direction: row;
+        }
+        .postcard:nth-child(2n + 0) {
+          flex-direction: row-reverse;
+        }
+        .postcard:nth-child(2n + 1) .postcard__text::before {
+          left: -12px !important;
+          transform: rotate(4deg);
+        }
+        .postcard:nth-child(2n + 0) .postcard__text::before {
+          right: -12px !important;
+          transform: rotate(-4deg);
+        }
+      }
+      @media screen and (min-width: 1024px) {
+        .postcard__text {
+          padding: 2rem 3.5rem;
+        }
+        .postcard__text:before {
+          content: "";
+          position: absolute;
+          display: block;
+          top: -20%;
+          height: 130%;
+          width: 55px;
+        }
+        .postcard.dark .postcard__text:before {
+          background: #18151f;
+        }
+        .postcard.light .postcard__text:before {
+          background: #e1e5ea;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="main">
-      <ul class="cards">
-        <li class="cards_item">
-          <div class="card">
-            <div class="card_image">
-              <img
-                src="https://assets.codepen.io/652/photo-1468777675496-5782faaea55b.jpeg"
-                alt="mixed vegetable salad in a mason jar."
-              />
-              <span class="card_price"><span>$</span>9</span>
-            </div>
-            <div class="card_content">
-              <h2 class="card_title">Farmstand Salad</h2>
-              <div class="card_text">
-                <p>
-                  Dig into the freshest veggies of the season! This
-                  salad-in-a-jar features a mixture of leafy greens and seasonal
-                  vegetables, fresh from the farmer's market.
-                </p>
-                <hr />
-                <p>
-                  Served with your choice of dressing on the side:
-                  <strong>housemade ranch</strong>,
-                  <strong>cherry balsamic vinaigrette</strong>,
-                  <strong>creamy chipotle</strong>,
-                  <strong>avocado green goddess</strong>, or
-                  <strong>honey mustard</strong>. Add your choice of protein for
-                  $2 more.
-                </p>
-              </div>
-            </div>
-          </div>
-        </li>
+    <div>
 
-        <li class="cards_item">
-          <div class="card">
-            <div class="card_image">
-              <img
-                src="https://assets.codepen.io/652/photo-1520174691701-bc555a3404ca.jpeg"
-                alt="a Reuben sandwich on wax paper."
-              />
-              <span class="card_price"><span>$</span>18</span>
-            </div>
-            <div class="card_content">
-              <h2 class="card_title">Ultimate Reuben</h2>
-              <div class="card_text">
-                <p>
-                  All great meals take time, but this one takes it to the next
-                  level! More than 650 hours of fermenting, brining, aging, and
-                  curing goes into each and every one of our legendary Reuben
-                  sandwiches.
-                </p>
-                <p>
-                  Every element of this extraordinary sandwich is handcrafted in
-                  our kitchens, from the rye bread baked from our secret recipe
-                  to the cave-aged Swiss cheese, right down to the pickle. The
-                  only thing we didn't make on the premises is the toothpick (
-                  but we're looking into how to do that).
-                </p>
-                <hr />
-                <p>
-                  This unforgettable sandwich has all of the classic Reuben
-                  elements: <strong>corned beef</strong>,
-                  <strong>rye bread</strong>,
-                  <strong>creamy Russian dressing</strong>,
-                  <strong>sauerkraut</strong>, plus a
-                  <strong>sweet gherkin pickle</strong>. No substitions please!
-                </p>
-                <p>
-                  Add a side of <strong>french fries</strong> or
-                  <strong>sweet potato fries</strong> for $2 more, or our
-                  <strong>housemade pub chips</strong> for $1.
-                </p>
-              </div>
-            </div>
-          </div>
-        </li>
+      <section class="light">
+        <div class="container py-2">
 
-        <li class="cards_item">
-          <div class="card">
-            <div class="card_image">
-              <span class="note">Seasonal</span>
+          <article class="postcard light blue">
+            <a class="postcard__img_link" href="#">
               <img
-                src="https://assets.codepen.io/652/photo-1544510808-91bcbee1df55.jpeg"
-                alt="A side view of a plate of figs and berries."
+                class="postcard__img"
+                src="https://picsum.photos/1000/1000"
+                alt="Image Title"
               />
-              <span class="card_price"><span>$</span>16</span>
-            </div>
-            <div class="card_content">
-              <h2 class="card_title">Fig &amp; Berry Plate</h2>
-              <div class="card_text">
-                <p>
-                  A succulent sextet of fresh figs join with a selection of
-                  bodacious seasonal berries in this refreshing, shareable
-                  dessert.
-                </p>
-                <hr />
-                <p>
-                  Choose your drizzle: <strong>cherry-balsamic vinegar</strong>,
-                  <strong>local honey</strong>, or
-                  <strong>housemade chocolate sauce</strong>.
-                </p>
+            </a>
+            <div class="postcard__text t-dark">
+              <h1 class="postcard__title blue">
+                <a href="#">Podcast Title</a>
+              </h1>
+              <div class="postcard__subtitle small">
+                <time datetime="2020-05-25 12:00:00">
+                  <i class="fas fa-calendar-alt mr-2"></i>Mon, May 25th 2020
+                </time>
               </div>
+              <div class="postcard__bar"></div>
+              <div class="postcard__preview-txt">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Eligendi, fugiat asperiores inventore beatae accusamus odit
+                minima enim, commodi quia, doloribus eius! Ducimus nemo
+                accusantium maiores velit corrupti tempora reiciendis molestiae
+                repellat vero. Eveniet ipsam adipisci illo iusto quibusdam, sunt
+                neque nulla unde ipsum dolores nobis enim quidem excepturi,
+                illum quos!
+              </div>
+              <ul class="postcard__tagbox">
+                <li class="tag__item">
+                  <i class="fas fa-tag mr-2"></i>Podcast
+                </li>
+                <li class="tag__item">
+                  <i class="fas fa-clock mr-2"></i>55 mins.
+                </li>
+                <li class="tag__item play blue">
+                  <a href="#"><i class="fas fa-play mr-2"></i>Play Episode</a>
+                </li>
+              </ul>
             </div>
-          </div>
-        </li>
-      </ul>
+
+        </div>
+      </section>
     </div>
   </body>
 </html>

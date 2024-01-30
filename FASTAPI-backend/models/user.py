@@ -6,6 +6,7 @@ class Organisation(BaseModel):
     clubname: str
     ownname: str
     email: str
+    logo:str
     address: str
     city: str
     pnumber: int
@@ -14,6 +15,7 @@ class Organisation(BaseModel):
     members: list
     username:str
     pwd:str
+    memapplied:list
 
 class User(BaseModel):
     name: str

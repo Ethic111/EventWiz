@@ -461,7 +461,7 @@ async def fetch_details_bynameordates(data:dict):
         
         org1 = serializeDict(organisation)
         partial_name = data["membername"]
-        regex_pattern = re.compile(f".*{re.escape(partial_name)}.*", re.IGNORECASE)
+        regex_pattern = re.compile(f"{re.escape(partial_name)}.*", re.IGNORECASE)
         # #print(org1)
         # member_name = data["membername"]
         # #print(member_name)
@@ -500,8 +500,8 @@ def match_dates(memberdict, data):
             return False
 
     if expiry_date and "expiry_date" in memberdict:
-        if isinstance(memberdict["expiry_date"], datetime):
-            member_expiry_date = memberdict["expiry_date"].date()
+        if isinstance(memberdict["start_date"], datetime):
+            member_expiry_date = memberdict["start_date"].date()
         else:
             member_expiry_date = datetime.strptime(memberdict["expiry_date"]["$date"], "%Y-%m-%dT%H:%M:%S.%fZ").date()
 
