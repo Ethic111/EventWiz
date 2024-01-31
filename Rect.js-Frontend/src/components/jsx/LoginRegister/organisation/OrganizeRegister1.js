@@ -30,8 +30,14 @@ function OrganizeRegister1({setOBoolean}) {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      await api.post("/organisationregistration/", lFormData);
-      
+      const result = await api.post("/organisationregistration", lFormData);
+      if (result.data.success !== false){
+        alert(result.data.message)
+        
+      }
+      else{
+        alert(result.data.error)
+      }
       setLFormData({
         clubname: "",
         ownname: "",
@@ -45,6 +51,7 @@ function OrganizeRegister1({setOBoolean}) {
         username:"",
         pwd:"",
       });
+      
     } catch (error) {
       console.error("Error submitting form:", error);
     }

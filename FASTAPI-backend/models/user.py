@@ -16,7 +16,7 @@ class Organisation(BaseModel):
     members: list
     username:str
     pwd:str
-    memapplied:list
+    memapplied:Optional[list] = []
 
 class User(BaseModel):
     name: str

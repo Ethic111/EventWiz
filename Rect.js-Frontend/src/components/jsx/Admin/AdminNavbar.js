@@ -54,7 +54,7 @@ function AdminNavbar() {
               <Link to="/admin/allorg">Organisation</Link>
             </li>
             <li>
-              <Link to="/admin/userdetails">User</Link>
+              <Link to="/admin/allusers">User</Link>
             </li>
             <li>
               <Link to="/admin/accepetrejectorg">Authorization</Link>

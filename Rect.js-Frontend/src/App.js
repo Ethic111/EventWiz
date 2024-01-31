@@ -20,6 +20,9 @@ import AdminLogin from "./components/jsx/Admin/AdminLogin";
 import AdminHome from "./components/jsx/Admin/AdminHome";
 import AdminOrg from "./components/jsx/Admin/AdminOrg";
 import AdminOrgDetailed from "./components/jsx/Admin/AdminOrgDetailed";
+import AdminUser from "./components/jsx/Admin/AdminUser";
+import AdminAuthority from "./components/jsx/Admin/AdminAuthority";
+import AdminAuthorityOrgDetails from "./components/jsx/Admin/AdminAuthorityOrgDetails";
 // import Admin  from "./Admin/Views/Admin";
 
 
@@ -51,6 +54,10 @@ function App() {
          <Route path="/admin/home" element={<AdminHome/>} />
          <Route path="/admin/allorg" element={<AdminOrg/>} />
          <Route path="/admin/orgdetailspage" element={<AdminOrgDetailed/>} />
+         <Route path="/admin/allusers" element={<AdminUser/>} />
+         <Route path="/admin/accepetrejectorg" element={<AdminAuthority/>} />
+         <Route path="/admin/appliedorgdetails" element={<AdminAuthorityOrgDetails/>} />
+         
          {/* ----------------------------------------- */}
           <Route path="*" element={<NotFound/>} />
         </Routes>
