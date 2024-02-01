@@ -1,79 +1,113 @@
-import React, { useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
-import "../css/Navbar.css";
+import React, { useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
+
 function Navbar() {
-  const [isNavOpen, setNavOpen] = useState(false);
-  
+  const location = useLocation();
+  const isHomeActive = location.pathname === "/home";
   const [userData, setUserData] = useState(
     JSON.parse(localStorage.getItem("users"))
   );
-
-  // const userData = JSON.parse(localStorage.getItem("users"));
-
-  const handleNavOpenClick = () => {
-    setNavOpen(true);
-  };
-
-  const handleNavCloseClick = () => {
-    setNavOpen(false);
-  };
-
-  // const navigate = useNavigate();
-
   const handleSignOut = async () => {
     try {
       localStorage.clear();
       setUserData(null);
-      // navigate("/home")
-      // window.location.reload();
     } catch (error) {
       console.log(error);
     }
   };
-
   return (
-    <>
-      
-      <div className="container">
-        <nav className={`nav ${isNavOpen ? "openNav" : ""}`}>
-          <i
-            className="uil uil-bars navOpenBtn"
-            onClick={handleNavOpenClick}
-          ></i>
-          <Link to="/" className="logo">
+    <div>
+      <nav
+        className="navbar navbar-dark navbar-expand-lg  fixed-top"
+        style={{ backgroundColor: "#0e2643" , height:"80px"}}
+      >
+        <div className="container-fluid">
+          <Link to="/home" className="navbar-brand ms-5">
             EventWiz
           </Link>
-          <ul className="nav-links">
-            <i
-              className="uil uil-times navCloseBtn"
-              onClick={handleNavCloseClick}
-            ></i>
-            <li>
-              <Link to="/home">Home</Link>
-            </li>
-            <li>
-              <Link to="/aboutus">About Us</Link>
-            </li>
-            <li>
-              <Link to="/events">Events</Link>
-            </li>
-            <li>
-              <Link to="/">Subscribe</Link>
-            </li>
-            <li>
-              {userData?.email ? (
-                <Link to="/home" onClick={handleSignOut}>
-                  Logout {userData.username}
-                </Link>
-              ) : (
-                <Link to="/loginregister">Login/Register</Link>
-              )}
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div
+            className="collapse navbar-collapse justify-content-end me-5"
+            id="navbarNav"
+          >
+            <ul className="navbar-nav  ">
+              <li className="nav-item">
+                <NavLink
+                  to="/home"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Home
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/events"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Events
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/subscribe"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Subscribe
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/partcipate"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Partcipated
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                {userData?.email ? (
+                  <NavLink
+                    to="/"
+                    onClick={handleSignOut}
+                    className={`nav-link ${
+                      !isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Logout {userData.username}
+                  </NavLink>
+                ) : (
+                  <NavLink
+                    to="/loginregister"
+                    className={`nav-link ${
+                      !isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Login/Register
+                  </NavLink>
+                )}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
   );
 }
 

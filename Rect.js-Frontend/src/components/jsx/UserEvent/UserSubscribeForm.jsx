@@ -1,43 +1,25 @@
-import React, {useState,useEffect} from 'react'
-import OrganizationNavbar from '../OrganisationNavbar'
-import api from '../api';
-import {toast} from "react-toastify"
+import React, { useState, useEffect } from 'react'
+import Navbar from '../Navbar'
+import api from '../api'
+import { toast } from "react-toastify"
 import { useNavigate } from 'react-router-dom';
 
-function OrgAddMember() {
-
-    const [memType, setMemType] = useState()
+function UserSubscribeForm() {
     const navigate = useNavigate();
-    const [userData, setUserData] = useState(
-        JSON.parse(localStorage.getItem("organisers"))
-    );
-
-    const fetchAllPostdetails = async () => {
-        try {
-            const cname = userData.clubname;
-            const response = await api.post("/getmemtype/", { "clubname": cname });
-            setMemType(response.data);
-            console.log(response.data);
-        } catch (error) {
-            console.error("Error fetching details:", error);
-        }
-    };
-    useEffect(() => {
-        fetchAllPostdetails();
-    }, []);
+    const [memType, setMemType] = useState()
+    const orgname = JSON.parse(localStorage.getItem("orgname"))
+    const userData = JSON.parse(localStorage.getItem("users"))
 
     const [lFormData, setLFormData] = useState({
+        clubname: orgname,
         name: "",
         email: "",
         pnumber: "",
         gender: "",
         username: "",
         pwd: "",
-        memberid: "",
         membertype: '',
-        expiry_date: "",
-        start_date: "",
-        
+
     });
 
     function formatDateForInput(dateString) {
@@ -47,7 +29,6 @@ function OrgAddMember() {
         }
         return date.toISOString().split('T')[0];
     }
-
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -61,37 +42,51 @@ function OrgAddMember() {
         event.preventDefault();
         console.log(lFormData)
         try {
-            const checking = await api.put(`/addorganizationmember/${userData._id}`, lFormData);
+            const checking = await api.put("/usersubscribe", lFormData);
             if (checking.data.success !== false) {
-                toast.success("Login Successfully")
-                navigate("/organisationevents/organizationmemberdetails");
+                toast.success(checking.data.data)
+                navigate("/home");
                 setLFormData({
+                    clubname: "",
                     name: "",
                     email: "",
                     pnumber: "",
                     gender: "",
                     username: "",
                     pwd: "",
-                    memberid: "",
-                    membertype: '',
-                    expiry_date: "",
-                    start_date: "",
+                    membertype: "",
                 });
-              } else {
-                toast.error(checking.data.data);
-              }
-            
+            } else {
+                toast.error(checking.data.error);
+            }
+
         }
         catch (error) {
             console.error("Error submitting form:", error);
         }
     };
 
-  return (
-    <>
-    <div><OrganizationNavbar/></div>
-     <h2 className='text-center mt-4'>Add Member</h2>
-            <div className="container mt-3 mb-3 border rounded p-0 col-md-9">
+    const fetchAllMemTypedetails = async () => {
+        try {
+            console.log(userData.username)
+            console.log(orgname)
+            const data = { "username": userData.username, "clubname": orgname }
+            const response = await api.post("/filtermemtype", data);
+            setMemType(response.data);
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error fetching details:", error);
+        }
+    };
+    useEffect(() => {
+        fetchAllMemTypedetails();
+    }, []);
+
+    return (
+        <>
+            <Navbar />
+            <h2 className='text-center mt-4'>You have to create New Account </h2>
+            <div className="container mb-3 border rounded p-3 col-md-8">
                 <form onSubmit={handleFormSubmit}>
                     <div className="row gy-3 overflow-hidden">
                         <div className="col-6">
@@ -103,27 +98,11 @@ function OrgAddMember() {
                                     id="clubname"
                                     placeholder=""
                                     name="clubname"
-                                    value={userData.clubname}
+                                    value={orgname}
                                     disabled
                                 />
                                 <label htmlFor="clubname" className="form-label">
                                     Club Name
-                                </label>
-                            </div>
-                        </div>
-                        <div className="col-6">
-                            <div className="form-floating mb-3">
-                                <input
-                                    onChange={handleInputChange}
-                                    type="text"
-                                    className="form-control"
-                                    id="memberid"
-                                    placeholder=""
-                                    name="memberid"
-                                    value={lFormData.memberid}
-                                />
-                                <label htmlFor="memberid" className="form-label">
-                                    Member ID
                                 </label>
                             </div>
                         </div>
@@ -147,7 +126,7 @@ function OrgAddMember() {
                             <div className="form-floating mb-3">
                                 <input
                                     onChange={handleInputChange}
-                                    type="text"
+                                    type="number"
                                     className="form-control"
                                     id="pnumber"
                                     placeholder=""
@@ -233,38 +212,6 @@ function OrgAddMember() {
                         </div>
                         <div className="col-6">
                             <div className="form-floating mb-3">
-                                <input
-                                    onChange={handleInputChange}
-                                    type="date"
-                                    className="form-control"
-                                    id="start_date"
-                                    placeholder=""
-                                    name="start_date"
-                                    value={formatDateForInput(lFormData.start_date)}
-                                />
-                                <label htmlFor="start_date" className="form-label">
-                                    Starting Date
-                                </label>
-                            </div>
-                        </div>
-                        <div className="col-6">
-                            <div className="form-floating mb-3">
-                                <input
-                                    onChange={handleInputChange}
-                                    type="date"
-                                    className="form-control"
-                                    id="expiry_date"
-                                    placeholder=""
-                                    name="expiry_date"
-                                    value={formatDateForInput(lFormData.expiry_date)}
-                                />
-                                <label htmlFor="expiry_date" className="form-label">
-                                    Expiry Date
-                                </label>
-                            </div>
-                        </div>
-                        <div className="col-6">
-                            <div className="form-floating mb-3">
                                 <select
                                     onChange={handleInputChange}
                                     className="form-select"
@@ -272,10 +219,10 @@ function OrgAddMember() {
                                     name="membertype"
                                     value={lFormData.membertype}
                                 >
-                                    <option>Select Type</option>
+                                    <option >Select Membership Type</option>
                                     {memType?.map((type) => (
-                                        <option key={type} value={type}>
-                                            {type}
+                                        <option key={type} value={type.type}>
+                                            {type.type}
                                         </option>
                                     ))}
                                 </select>
@@ -286,14 +233,14 @@ function OrgAddMember() {
                         </div>
                         <div className="col-12">
                             <div className="d-grid">
-                                <button style={{ color: 'white', backgroundColor: '#0e2643', border: 'none', marginLeft: '1rem', padding: '0.3rem 0.5rem 0.3rem 0.5rem', borderRadius: '0.375rem' }} type="submit">ADD MEMBER</button>
+                                <button style={{ color: 'white', backgroundColor: '#0e2643', border: 'none', marginLeft: '1rem', padding: '0.4rem 0.5rem 0.4rem 0.5rem', borderRadius: '0.375rem' }} type="submit">Submit</button>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-    </>
-  )
+        </>
+    )
 }
 
-export default OrgAddMember
+export default UserSubscribeForm

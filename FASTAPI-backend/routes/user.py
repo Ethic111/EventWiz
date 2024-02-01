@@ -26,9 +26,9 @@ async def admin_login(data:Admin):
     # print(content)
     if (len(content) != 0):
         # print(content)
-        singledict = content[0]
-        print(singledict["applied_org"])
-        singledict["applied_org"] = serializeList(singledict["applied_org"])
+        # singledict = content[0]
+        # print(singledict["applied_org"])
+        # singledict["applied_org"] = serializeList(singledict["applied_org"])
 
         return content
     else:
@@ -43,7 +43,7 @@ async def fetch_all_org():
 @event.post("/searchingorgbyname")
 async def search_org_byname(data:dict):
     search_query = data["clubname"]
-    regex_pattern = re.compile(f"{re.escape(search_query)}.*", re.IGNORECASE)
+    regex_pattern = re.compile(f"^{re.escape(search_query)}.*", re.IGNORECASE)
     result = conn.EventWiz.organisation.find({"clubname": {"$regex": regex_pattern}})
 
     result = serializeList(result)
@@ -113,7 +113,7 @@ async def adminside_orgmembertablefilter(filters:dict):
                 regex_patterns[key] = re.compile(f'^{re.escape(value)}', re.IGNORECASE)
 
         # print (regex_patterns)
-        # organisation = conn.event.organization.find_one({"_id":ObjectId(orgid)})
+        # organisation = conn.EventWiz.organisation.find_one({"_id":ObjectId(orgid)})
         membersList = filters["memberlist"]
         # if membersList:
             # org1 = serializeDict(organisation)
@@ -124,12 +124,9 @@ async def adminside_orgmembertablefilter(filters:dict):
                 if match:
                     content.append(memberdict)
             if content:
-                # for i in content:
-                #     i["expiry_date"] = i["expiry_date"].strftime("%Y-%m-%d")
-                #     i["start_date"] = i["start_date"].strftime("%Y-%m-%d")
                 return content
             else:
-                return content
+                return {"error":"No Members","success":False}
         else:
             return {"error":"No Members","success":False}
         # else:
@@ -399,7 +396,7 @@ async def adminside_acceptorg(data:dict):
     
 # rejecting org
 @event.post("/rejectingorg")
-async def adminside_acceptorg(data:dict):
+async def adminside_rejectorg(data:dict):
     # print(data["data"])
     acceptedOrg = data["data"]
     result = conn.EventWiz.rejectedorg.insert_one(acceptedOrg)
@@ -417,6 +414,7 @@ async def adminside_acceptorg(data:dict):
     else:
         return {"error":"Nothing To Update", "success":False}
     
+
 
 # /////////////////////////////////////////////////////////////////////////////
 
@@ -442,7 +440,15 @@ async def check_user(data:dict):
                 flag =1
                 d1 = singleDict
                 d1["clubname"] = data["clubname"]
+                singleDict["loggedin"] = True       
+
+                print(membersList)
+                conn.EventWiz.organisation.find_one_and_update({"clubname":d1["clubname"]},{"$set": {"members":membersList}})
+
+                del d1["loggedin"]
                 conn.EventWiz.users.insert_one(d1)
+
+                
                 return serializeDict(d1)
         if flag == 0:
             return {"error":"Invalid Username , Password and Clubname","success":False}
@@ -468,6 +474,205 @@ async def create_user(user: User):
         return dict(user)
  
 
+# Get all Post For Users
+@event.post("/fetchingallpostforuser/{uname}")
+async def fetch_all_post_userside(uname:str):
+    result = conn.EventWiz.post.find()
+    posts = []
+    if (result != []):
+        allpost = serializeList(result)
+        for i in allpost:
+            if len(i["participate"]) !=0:
+                for j in i["participate"]:
+                    if j["username"] == uname:
+                        break
+                else:
+                    i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
+                    i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
+                    posts.append(i)
+            else:
+                i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
+                i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
+                posts.append(i)
+        return (posts)
+    else:
+        return {"error":"No post found","success":False}
+
+# Post Filter for user
+@event.post("/postfilterforuser")
+async def postfilter_user(data : dict):
+    query = {}
+    print(data)
+    and_conditions = []
+
+    for field, value in data.items():
+        if field in ["event_start_date", "event_end_date"] and value != "":
+            value = datetime.strptime(value, "%Y-%m-%d")
+            if field == "event_start_date":
+                and_conditions.append({"event_start_date": {"$gte": value}})
+            if field == "event_end_date":
+                and_conditions.append({"event_start_date": {"$lte": value}})
+
+        if field in ["minprice", "maxprice"] and value != "":
+            if field == "minprice":
+                and_conditions.append({"ticket_price": {"$gte": float(value)}})
+            if field == "maxprice":
+                and_conditions.append({"ticket_price": {"$lte": float(value)}})
+
+        if field == "venue_city" and value != "":
+            regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
+            and_conditions.append({"venue_city": {"$regex": regex_pattern}})
+        
+        if field == "type" and value!="":
+            and_conditions.append({"type":value})
+        if field == "clubname" and value!="":
+            and_conditions.append({"clubname":value})
+
+    
+    if and_conditions:
+        query["$and"] = and_conditions
+
+    # Find posts based on the query
+    result = conn.EventWiz.post.find(query)
+
+    # Iterate over the result and print each post
+    response_list = serializeList(result)
+    if response_list:
+        lis = []
+        d1 = {}
+        for singleDict in response_list:
+            d1 = singleDict
+            d1["event_start_date"] = d1["event_start_date"].strftime("%d-%m-%Y")
+            d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
+            lis.append(serializeDict(d1))
+        return serializeList(lis)
+    else:
+        return {"error": "No Such Post Available", "success": False}
+
+# User Participate in Event
+@event.put("/eventparticipate/{id}")
+async def event_participate(id:str,data:dict):
+    data["age"] = int(data["age"])
+    post = conn.EventWiz.post.find_one({"_id":ObjectId(id)})
+    if post:
+        p1 = serializeDict(post)["participate"]
+        # print(p1)
+        p1.append(data)
+        conn.EventWiz.post.find_one_and_update({"_id":ObjectId(id)},{"$set": {"participate":p1}})
+        return {"data": "Partcipated Successfully"}
+    else:
+        return {"error": "Event Not Found", "success": False}
+
+# Post Search by User using Title
+@event.post("/postsearchbyuser")
+async def post_search_user(data : dict):
+    result = conn.EventWiz.post.find()
+    posts = []
+    # print(data)
+    regex_pattern = re.compile(f"^{re.escape(data['title'])}.*", re.IGNORECASE)
+    # print(re.match(regex_pattern,title))
+    
+    if (result != []):
+        allpost = serializeList(result)
+        for i in allpost:
+            if re.match(regex_pattern,i["event_title"]):
+                if len(i["participate"]) !=0:
+                    for j in i["participate"]:
+                        if j["username"] == data["uname"]:
+                            break
+                    else:
+                        i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
+                        i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
+                        posts.append(i)
+                else:
+                    i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
+                    i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
+                    posts.append(i)
+        return posts
+
+# Get All Organization for Subscribe
+@event.get("/getallorganizatonforuser")
+async def getall_organization():
+    org = conn.EventWiz.organisation.find()
+    if org:
+        org1 = serializeList(org)
+        return org1
+    else:
+        return {"error": "Organization Not Found", "success": False}
+
+    
+# User Subscribe 
+@event.put('/usersubscribe')
+async def user_subscribe(user: dict):
+    
+    appliedmem = user
+    
+    # print(appliedorg)
+    flag =0
+    orgdict = serializeDict(conn.EventWiz.organisation.find_one({"clubname":appliedmem["clubname"]}))
+    # return orgdict
+    if len(orgdict) !=0:
+        orgmem = orgdict["members"]
+        orgapplied = orgdict["memapplied"]
+        if len(orgmem) !=0:
+            for i in orgmem:
+                if i["username"] == appliedmem["username"]:
+                    return {"error":"Username already Exist", "success":False}
+            else:
+                if len(orgapplied) !=0:
+                    for j in orgapplied:
+                        if j["username"] == appliedmem["username"] and j["email"] == appliedmem["email"] and j["pnumber"] == appliedmem["pnumber"]:
+                            return {"error":"Similar Username,MemberId,Email and Phone Number are already Applied", "success":False}
+                    else:
+                        orgapplied.append(appliedmem)
+                        conn.EventWiz.organisation.update_one({"clubname":appliedmem["clubname"]}, {"$set":  {"memapplied": orgapplied}})
+                        return {"data":"Applied For Subscription Successfully.","success":True}
+                else:
+                    orgapplied.append(appliedmem)
+                    conn.EventWiz.organisation.update_one({"clubname":appliedmem["clubname"]}, {"$set":  {"memapplied": orgapplied}})
+                    return {"data":"Applied For Subscription Successfully.","success":True}
+        else:
+            orgapplied.append(appliedmem)
+            conn.EventWiz.organisation.update_one({"clubname":appliedmem["clubname"]}, {"$set":  {"memapplied": orgapplied}})
+            return {"data":"Applied For Subscription Successfully.","success":True}
+    else:
+        return {"error":"Organization Not Found", "success":False}
+
+# Get User Participated Events
+@event.post("/userparticipated/{uname}")
+async def user_participated(uname:str):
+    post = conn.EventWiz.post.find()
+    allpost=[]
+    if post:
+        postlist = serializeList(post)
+        for singlepost in postlist:
+            if len(singlepost)!=0:
+                for singlepart in singlepost["participate"]:
+                    if singlepart["username"] == uname:
+                        singlepost["event_start_date"] = singlepost["event_start_date"].strftime("%d-%m-%Y")
+                        singlepost["event_end_date"] = singlepost["event_end_date"].strftime("%d-%m-%Y")
+                        allpost.append(singlepost)
+        if len(allpost)!=0:
+            return allpost
+        else:
+            return {"error":"You are not Participated in any Event", "success":False}
+    else:
+        return {"error":"Post Not Found", "success":False}
+    
+# Get Membership Type using Clubname and Username
+@event.post("/filtermemtype")
+async def filter_memtype(data : dict):
+    org = serializeDict(conn.EventWiz.organisation.find_one({"clubname":data["clubname"]}))
+    if len(org) !=0:
+        memtype = org["memtype"]
+        # print(memtype)
+        for singlemember in org["members"]:
+            if singlemember["username"] == data["username"]:
+                memtype = [item for item in memtype if item["type"] != singlemember["membertype"]]
+        return memtype
+
+
+
 
 # //////////////////////////////////////////////////////////////////////////////
 
@@ -482,14 +687,19 @@ async def get_clubnames():
         clubname.append(i["clubname"])
     return clubname
 
-
-# #all organisations names
-# @event.get('/allorgnames')
-# async def fetch_all_organisations_names():
-    
-#     return True
-
-
+# Get all type of Membership 
+@event.get("/allmembershiptype")
+async def  all_membershiptype():
+    allmemtype =[]
+    allorg = conn.EventWiz.organisation.find({})
+    if allorg:
+        allorg1 = serializeList(allorg)
+        for i in allorg1:
+            if i["memtype"] != []:
+                for j in i["memtype"]:
+                    if j["type"] not in allmemtype:
+                        allmemtype.append(j["type"])
+    return allmemtype
 
 # organisation login
 @event.post('/organisationlogin/')
@@ -571,7 +781,7 @@ async def get_event_posts(data : dict):
             d1 = singleDict
             d1["event_start_date"] = d1["event_start_date"].strftime("%d-%m-%Y")
             d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
-            # conn.event.user.insert_one(d1)
+            # conn.EventWiz.users.insert_one(d1)
             lis.append(serializeDict(d1))
         return serializeList(lis)
         # return serializeList(response)
@@ -590,7 +800,7 @@ async def get_other_org_eventposts(data : dict):
             d1 = singleDict
             d1["event_start_date"] = d1["event_start_date"].strftime("%d-%m-%Y")
             d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
-            # conn.event.user.insert_one(d1)
+            # conn.EventWiz.users.insert_one(d1)
             lis.append(serializeDict(d1))
         return serializeList(lis)
         # return serializeList(response)
@@ -1050,35 +1260,36 @@ async def get_all_membership(data : dict):
         return {"error":"Organization Not Found","success":False}
 
 # org inserting new membership type
-@event.post("/organisationaddnewmemtype")
-async def add_new_membership_type(data : dict):
-    formdata = data["formdata"]
-    clubId = data["clubID"]
-    # print(formdata,clubId)
-    addingType = formdata["type"]
-    org = conn.EventWiz.organisation.find({"_id":ObjectId(clubId)})
-    if org:
-        org1 = serializeList(org)
-        # print(org1)
-        print("hey inside org1")
-        memtypelist = org1[0]["memtype"]
-        # print(org1["memtype"])
-        print(memtypelist)
-        for membership in memtypelist:
-            if (membership["type"] == formdata["type"]):
-                return {"error": "This Membership Type is already present", "success": False}
-        
-        memtypelist.append({
-            "type": formdata["type"],
-            "price": formdata["price"]
-        })
-        
-        # print(memtypelist)
-        # Update the club document with the modified memtype list
-        conn.EventWiz.organisation.update_one({"_id": ObjectId(clubId)}, {"$set": {"memtype": memtypelist}})
-        return memtypelist
+@event.put("/addmembership/{clubname}")
+async def add_membership(clubname : str,data : dict):
+    if type(data["price"]) == str:
+        data["price"] = int(data["price"])
+    membership = conn.EventWiz.organisation.find_one({"clubname":clubname}, {"memtype": 1, "_id": 0})
+    if membership:
+        memtype = serializeDict(membership)["memtype"]
+        for i in memtype:
+            if i["type"] == data["type"]:
+                i["price"] = data["price"]
+                conn.EventWiz.organisation.find_one_and_update({"clubname":clubname},{"$set": {"memtype":memtype}})
+                return {"data":"Membership Updated Successfully","success":True}
+        memtype.append(data)
+        conn.EventWiz.organisation.find_one_and_update({"clubname":clubname},{"$set": {"memtype":memtype}})
+        return {"data":"Membership Added Successfully","success":True}
+    else :
+        return {"error":"Organization Not Found","success":False}
+    
+# Get all Membership of Organization by Clubname
+@event.post("/getallmembership")
+async def get_all_membership(data : dict):
+    membership = conn.EventWiz.organisation.find_one({"clubname":data["clubname"]}, {"memtype": 1, "_id": 0})
+    if membership:
+        memtype = serializeDict(membership)["memtype"]
+        if len(memtype) !=0:
+            return memtype
+        else:
+            return {"error":"No Membership Type Available","success":False}
     else:
-        return {"error": "Organisation doesn't exist", "success": False}
+        return {"error":"Organization Not Found","success":False}
 
 #user side fetch all post
 @event.get("/fetchingallpostforuser")
@@ -1123,4 +1334,123 @@ async def member_sorting_userside(data:dict):
     else:
         return {"error":"Organization not Found","success":False}
     
+
+# fetch all the applied users
+@event.post("/allappliedusers")
+async def adminside_allappliedusers(data:dict):
+    clubId = data["clubid"]
+    orgData = conn.EventWiz.organisation.find({"_id":ObjectId(clubId)})
+    orgData = serializeList(orgData)
+    neworgdata = orgData[0]
+    # print(orgData[0])
+    applied_users = neworgdata["memapplied"]
+    # print("-----------------------------")
+    # for singleuser in applied_users:
+    #     print(singleuser)
+    #     print("-----------------------------")
+
+    if (len(applied_users) != 0):
+        return applied_users
+    else:
+        return {"error":"No Applied Organisation","success":False}  
+
+# accepting a user's subscription
+@event.post("/acceptingusersubscription")
+async def adminside_acceptorg(data:dict):
+    # print(data)
+
+    acceptedUser = data["data"]
+    givenmemberid = data["memberid"]
+    clubid = data["clubid"]
+
+    org = conn.EventWiz.organisation.find({"_id":ObjectId(clubid)})
+    org = serializeList(org)[0]
+
+    # print(org)
+
+    memberslists = org["members"]
+    orgappliedmemberslist = org["memapplied"]
+    # print(memberslists)
+
+    allmemberid = []
+    for singlemember in memberslists:
+        allmemberid.append(singlemember["memberid"])
+    print(allmemberid)
+
+    if (len(allmemberid) !=0):
+        if givenmemberid in allmemberid:
+            return {"error":"MemberId Already Exists","success":False,"closeform":False}
+        else:
+
+            acceptedUser["memberid"] = givenmemberid
+            
+            usersloggedindata = acceptedUser
+
+            conn.EventWiz.users.insert_one(usersloggedindata)
+            
+
+            acceptedUser["loggedin"] = True
+            # print(acceptedUser)
+
+            memberslists.append(acceptedUser)
+
+            updated_user = [i for i in orgappliedmemberslist if i["username"] != acceptedUser["username"]]
+
+            # print("Updated Member list",updated_members)
+
+            content = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(org["_id"])},{"$set": {"memapplied":updated_user,"members" : memberslists}})
+
+
+        
+            if content:
+                return True
+            else:
+                return {"error":"Nothing To Update", "success":False}
+    else:
+        acceptedUser["memberid"] = givenmemberid
+        
+        usersloggedindata = acceptedUser
+        conn.EventWiz.users.insert_one(usersloggedindata)
+            
+        acceptedUser["loggedin"] = True
+        # print(acceptedUser)
+
+        memberslists.append(acceptedUser)
+
+        updated_user = [i for i in orgappliedmemberslist if i["username"] != acceptedUser["username"]]
+
+            # print("Updated Member list",updated_members)
+
+        content = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(org["_id"])},{"$set": {"memapplied":updated_user,"members" : memberslists}})
+        
+        if content:
+            return True
+        else:
+            return {"error":"Nothing To Update", "success":False}
+      
+    
+# rejecting subscribing user 
+@event.post("/rejectingsubscribinguser")
+async def adminside_rejectorg(data:dict):
+    # print(data["data"])
+    rejectedUser = data["data"]
+
+    conn.EventWiz.rejectedusers.insert_one(rejectedUser)
+
+    orgdata = serializeDict(conn.EventWiz.organisation.find_one({"_id":ObjectId(data["clubid"])}))
+
+    
+    orgappliedmemberslist = orgdata["memapplied"]
+
+    updated_user = [i for i in orgappliedmemberslist if i["username"] != rejectedUser["username"]]
+
+
+    content = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(orgdata["_id"])},{"$set": {"memapplied":updated_user}})
+
+    if content:
+        return True
+    else:
+        return {"error":"Nothing To Update", "success":False}
+
+
 # ///////////////////////////////////////////////////////////////////////////////////

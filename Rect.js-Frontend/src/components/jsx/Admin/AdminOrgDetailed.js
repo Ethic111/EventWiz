@@ -158,7 +158,7 @@ function AdminOrgDetailed() {
         // console.log("Response=" + response.data.error);
         setMemberlist(response.data);
       } else {
-        // setMemberlist(orgData.members)
+        setMemberlist(orgData.members)
         alert(response.data.error);
       }
     } catch (error) {

@@ -1,33 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import "../css/OrganisationNavbar.css";
+// import "../css/OrganisationNavbar.css";
 
 function OrganisationNavbar() {
+  const location = useLocation();
+  const isHomeActive = location.pathname === "/organisationevents";
   const [isNavOpen, setNavOpen] = useState(false);
-  const [userData, setUserData] = useState(
-    JSON.parse(localStorage.getItem('organisers'))
+  const [orgData, setOrgData] = useState(
+    JSON.parse(localStorage.getItem("organisers"))
   );
 
-  const handleNavOpenClick = () => {
-    setNavOpen(true);
-  };
-
-  const handleNavCloseClick = () => {
-    setNavOpen(false);
-  };
-
-//   const handleaddpostbtn = () => {
-//     navigate("/organisationevents/addpost")
-//   }
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       localStorage.clear();
-      setUserData(null);
+      setOrgData(null);
       navigate("/");
-      // window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -35,41 +25,117 @@ function OrganisationNavbar() {
 
   return (
     <>
-      <div className="container">
-        <nav className={`nav ${isNavOpen ? "openNav" : ""}`}>
-          <i
-            className="uil uil-bars navOpenBtn"
-            onClick={handleNavOpenClick}
-          ></i>
-          <Link to="/organisationevents" className="logo">
-            EventWiz
-          </Link>
-          <ul className="nav-links">
-            <i
-              className="uil uil-times navCloseBtn"
-              onClick={handleNavCloseClick}
-            ></i>
-            <li>
-              <Link to="/organisationevents/orgevents">Events</Link>
-            </li>
-            {/* <li>
-              <Link to="/organisationevents/addpost"><button  className="btn addpostbtn">+</button></Link>
-            </li> */}
-            <li>
-              <Link to="/organisationevents/organizationmemberdetails">Member Data</Link>
-            </li>
-            <li>
-              <Link to="/organisationevents/organisationmemberships">Memberships</Link>
-            </li>
-            <li>
-              <Link to="/organisationevents/otherevents">Other Events</Link>
-            </li>
-            <li>
-              <Link to="/home" onClick={handleSignOut}>
-                Logout {userData.username}
-              </Link>
-            </li>
-          </ul>
+      <div>
+        <nav
+          className="navbar navbar-dark navbar-expand-lg  fixed-top "
+          style={{ backgroundColor: "#0e2643" }}
+        >
+          <div className="container-fluid">
+            <Link to="/organisationevents" className="navbar-brand ms-5">
+              EventWiz
+            </Link>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div
+              className="collapse navbar-collapse justify-content-end me-5"
+              id="navbarNav"
+            >
+              <ul className="navbar-nav">
+                {/* <li className="nav-item">
+                  <NavLink
+                    to="/organisationevents"
+                    className={`nav-link ${
+                      isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Home
+                  </NavLink>
+                </li> */}
+                {/*  */}
+                <li className="nav-item">
+                  <NavLink
+                    to="/organisationevents/orgevents"
+                    className={`nav-link ${
+                      isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Event
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/organisationevents/organizationmemberdetails"
+                    className={`nav-link ${
+                      isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Member Data
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/organisationevents/organisationmemberships"
+                    className={`nav-link ${
+                      isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Membership
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/organisationevents/authorization"
+                    className={`nav-link ${
+                      isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Authorization
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/organisationevents/otherevents"
+                    className={`nav-link ${
+                      isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Other Events
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  {orgData?.email ? (
+                    <NavLink
+                      to="/"
+                      onClick={handleSignOut}
+                      className={`nav-link ${
+                        !isHomeActive ? "font-weight-bold" : ""
+                      }`}
+                    >
+                      Logout {orgData.username}
+                    </NavLink>
+                  ) : (
+                    <NavLink
+                      to="/loginregister"
+                      className={`nav-link ${
+                        !isHomeActive ? "font-weight-bold" : ""
+                      }`}
+                    >
+                      Login/Register
+                    </NavLink>
+                  )}
+                </li>
+              </ul>
+            </div>
+          </div>
         </nav>
       </div>
     </>

@@ -23,7 +23,7 @@ function AdminLogin() {
       const response = await api.post("/adminlogin", adminform);
       if (response.data.success !== false) { 
         console.log(response.data)
-        localStorage.setItem("admin", JSON.stringify(response.data));
+        localStorage.setItem("admin", JSON.stringify(response.data[0]));
         navigate("/admin/home");
       }
       else{

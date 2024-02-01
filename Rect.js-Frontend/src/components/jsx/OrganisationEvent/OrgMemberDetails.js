@@ -94,8 +94,16 @@ function OrgMemberDetails() {
       const response = await api.post("/organizationmemberdetails/", {
         clubname: cname,
       });
-      setDetails(response.data);
-      console.log(response.data);
+      if (response.data.success !== false){
+
+        // console.log(response.data);
+        setDetails(response.data);
+      }
+      else{
+        alert(response.data.error)
+        fetchAllMemberdetails();
+      }
+      
     } catch (error) {
       console.error("Error fetching details:", error);
     }
@@ -187,8 +195,8 @@ function OrgMemberDetails() {
         console.log("Response=" + response.data.error);
         setDetails(response.data);
       } else {
-        // fetchAllMemberdetails();
         alert(response.data.error);
+        fetchAllMemberdetails();
       }
     } catch (error) {
       alert(error);

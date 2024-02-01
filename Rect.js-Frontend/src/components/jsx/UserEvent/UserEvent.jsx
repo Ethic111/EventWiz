@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
+import "../../css/UserEvent/UserEventCss.css";
 import { Link } from "react-router-dom";
-import "../../css/UserEvent/Eventpage1.css";
-import eventBackgroundImage from "../../img/Events/eventBackgroundImage.jpg";
-import AllEventpage from "./AllEventpage";
+import UserEvent1 from "./UserEvent1";
 
-function Eventpage1() {
+function UserEvent() {
   const [userData, setUserData] = useState(
     JSON.parse(localStorage.getItem("users"))
   );
-
   return (
     <>
-      <div>{<Navbar />}</div>
+      <div>
+        <Navbar />
+      </div>
       {userData ? (
-        <AllEventpage />
+        <UserEvent1 />
       ) : (
         <div className="backgroundImg">
           <div className="logoutmainEventdiv">
@@ -26,10 +26,10 @@ function Eventpage1() {
                   alt="cookies-img"
                   className="modalimg"
                 />
-                <p>
-                  You need to Login or Signup!
-                </p>
-                <Link to="/loginregister"><button className="accept">Login/Signup</button></Link>
+                <p>You need to Login or Signup!</p>
+                <Link to="/loginregister">
+                  <button className="accept">Login/Signup</button>
+                </Link>
               </div>
             </div>
           </div>
@@ -39,4 +39,4 @@ function Eventpage1() {
   );
 }
 
-export default Eventpage1;
+export default UserEvent;

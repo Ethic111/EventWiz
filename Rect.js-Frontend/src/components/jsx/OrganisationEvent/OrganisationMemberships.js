@@ -8,7 +8,8 @@ import "../../css/OrganisationEvent/OrganisationMembership.css";
 
 function OrganisationMemberships() {
   const [memTypeTable, setMemTypetable] = useState([]);
-  const [orgData, setOrgData] = useState(
+  const [bUpdate, setBUpdate] = useState(false)
+  const [userData, setUserData] = useState(
     JSON.parse(localStorage.getItem("organisers"))
   );
   const [showAddMembership, setShowAddMembership] = useState(false);
@@ -17,27 +18,28 @@ function OrganisationMemberships() {
     price: "",
   });
 
-  const navigate = useNavigate();
-
   const fetchAllMembershipdetails = async () => {
     try {
-      const cname = orgData.clubname;
-      const response = await api.post("/organisationgetallmembership/", {
-        clubname: cname,
-      });
+      const cname = userData.clubname;
+      const response = await api.post("/getallmembership/", { "clubname": cname });
       setMemTypetable(response.data);
       console.log(response.data);
     } catch (error) {
       console.error("Error fetching details:", error);
     }
   };
-
   useEffect(() => {
     fetchAllMembershipdetails();
+    // console.log(memType)
   }, []);
 
   const handleAddMembershipClick = () => {
     setShowAddMembership(!(showAddMembership));
+    setBUpdate(false)
+    setNewMembershipForm({
+      type: "",
+      price: "",
+    });
   };
 
   const handleInputChange = (e) => {
@@ -50,19 +52,14 @@ function OrganisationMemberships() {
 
   const handleAddMembershipSubmit = async (e) => {
     e.preventDefault();
-    console.log(newMembershipForm);
     try {
-      const data = {
-        formdata: newMembershipForm,
-        clubID: orgData._id,
-      };
-      const response = await api.post("/organisationaddnewmemtype", data);
-      if (response.data.success !== false){
-
+      const response = await api.put(`/addmembership/${userData.clubname}`, newMembershipForm);
+      if (response.data.success !== false) {
+        toast.success(response.data.data)
         setShowAddMembership(false);
       }
-      else{
-        alert(response.data.error)
+      else {
+        toast.error(response.data.error)
       }
       setNewMembershipForm({
         type: "",
@@ -75,6 +72,16 @@ function OrganisationMemberships() {
     }
   };
 
+  const handlememberupdate = async (data) => {
+    setShowAddMembership(!(showAddMembership));
+    setBUpdate(true)
+    setNewMembershipForm({
+      type: data["type"],
+      price: data["price"],
+    });
+
+  }
+
   return (
     <div>
       <OrganisationNavbar />
@@ -85,7 +92,7 @@ function OrganisationMemberships() {
       </div>
       <div className="container">
         {showAddMembership && (
-          <form onSubmit={handleAddMembershipSubmit}>
+          <form onSubmit={handleAddMembershipSubmit} className='m-3'>
             <div className="row gy-3 overflow-hidden">
               <div className="col-4">
                 <div className="form-floating mb-3">
@@ -96,6 +103,7 @@ function OrganisationMemberships() {
                     id="type"
                     placeholder=""
                     name="type"
+                    {...(bUpdate ? { disabled: true } : {})}
                     value={newMembershipForm.type}
                   />
                   <label htmlFor="type" className="form-label">
@@ -121,7 +129,7 @@ function OrganisationMemberships() {
               </div>
               <div className="col-4">
                 <div>
-                  <button type="submit" className="memtypesavesubmitbtn">
+                  <button style={{ color: 'white', backgroundColor: '#0e2643', border: 'none', marginTop: "10px", padding: '0.5rem 1.5rem 0.5rem 1.5rem', borderRadius: '0.375rem' }} type="submit">
                     Save
                   </button>
                 </div>
@@ -146,9 +154,9 @@ function OrganisationMemberships() {
                 <th scope="col" className="tablehead align-middle">
                   Update
                 </th>
-                <th scope="col" className="tablehead align-middle">
+                {/* <th scope="col" className="tablehead align-middle">
                   Delete
-                </th>
+                </th> */}
               </tr>
             </thead>
             <tbody>
@@ -160,19 +168,21 @@ function OrganisationMemberships() {
                   <td className="trtext">
                     <button
                       className="addmembtn"
-                      // onClick={() => handlememberupdate(type)}
+                      onClick={() => handlememberupdate(type)}
                     >
                       Update
                     </button>
                   </td>
-                  <td className="trtext">
-                    <button
-                      className="addmembtn"
-                      // onClick={() => deleteMember(type)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {/* <td className="trtext">
+                    <div class="form-check form-switch">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="flexSwitchCheckChecked"
+                      />
+                    </div>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
@@ -182,7 +192,7 @@ function OrganisationMemberships() {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 export default OrganisationMemberships;

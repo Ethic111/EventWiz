@@ -1,6 +1,6 @@
-// AdminUser
+//OrgAuthorization
 import React, { useState, useEffect } from "react";
-import AdminNavbar from "./AdminNavbar";
+import OrganisationNavbar from "../OrganisationNavbar";
 import "../../css/OrganisationEvent/memberdetails.css";
 import api from "../api";
 import { toast } from "react-toastify";
@@ -8,20 +8,25 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   IoIosArrowDropupCircle,
   IoIosArrowDropdownCircle,
+  IoMdClose,
 } from "react-icons/io";
 
-function AdminUser() {
+function OrgAuthorization() {
+    const [singleuser,setSingleuser] = useState()
   const [bvalue, setBValue] = useState(true);
-  const [shownewusers, setNewusers] = useState(false);
+  const [showmemberid,setShowMemberid] = useState(false)
+  const [memberid,setMemberid] = useState({
+    memberid: "",
+  })
+ 
   const [details, setDetails] = useState();
   const [searchForm, setSearchform] = useState({
     membername: "",
     start_date: "",
     expiry_date: "",
   });
-  // const [userData, setOrgData] = useState();
+
   const [filters, setFilters] = useState({
-    memberid: "",
     username: "",
     name: "",
     email: "",
@@ -29,6 +34,11 @@ function AdminUser() {
     gender: "",
     membertype: "",
   });
+  const [orgData, setOrgData] = useState(
+    JSON.parse(localStorage.getItem("organisers"))
+  );
+//   console.log(orgData["_id"]);
+
   // const [memType, setMemType] = useState();
 
   // const fetchAllMemtypedetails = async () => {
@@ -69,7 +79,6 @@ function AdminUser() {
 
   const handleformreset = () => {
     setFilters({
-      memberid: "",
       username: "",
       name: "",
       email: "",
@@ -87,26 +96,31 @@ function AdminUser() {
   };
 
   const fetchAllMemberdetails = async () => {
-    setNewusers(!shownewusers);
+    // setNewusers(!shownewusers);
     try {
-      const response = await api.get("/adminmemberdetails");
-      setDetails(response.data);
-      console.log(response.data);
+      const data = { clubid: orgData["_id"] };
+      const response = await api.post("/allappliedusers", data);
+      if (response.data.success !== false) {
+        setDetails(response.data);
+      } else {
+        alert(response.data.error);
+      }
+      // console.log(response.data);
     } catch (error) {
       console.error("Error fetching details:", error);
     }
   };
-  console.log(details);
-  // useEffect(() => {
-  //   fetchAllMemberdetails();
-  // }, []);
+  //   console.log(details);
   useEffect(() => {
-    // Use a timeout to wait for the user to stop typing
-    const timeoutId = setTimeout(() => {
-      fetchMembersFilters();
-    }, 100);
-    return () => clearTimeout(timeoutId);
-  }, [filters]);
+    fetchAllMemberdetails();
+  }, []);
+  //   useEffect(() => {
+  //     // Use a timeout to wait for the user to stop typing
+  //     const timeoutId = setTimeout(() => {
+  //       fetchMembersFilters();
+  //     }, 100);
+  //     return () => clearTimeout(timeoutId);
+  //   }, [filters]);
 
   const handleSearchInputChange = (event) => {
     setSearchform({
@@ -117,23 +131,23 @@ function AdminUser() {
   const handlesearchSubmit = async (event) => {
     event.preventDefault();
 
-    const data = {
-      membername: searchForm["membername"],
-      start_date: searchForm["start_date"],
-      expiry_date: searchForm["expiry_date"],
-    };
-    console.log("handle search submit");
-    console.log(data);
+    // const data = {
+    //   membername: searchForm["membername"],
+    //   start_date: searchForm["start_date"],
+    //   expiry_date: searchForm["expiry_date"],
+    // };
+    // console.log("handle search submit");
+    // console.log(data);
 
     try {
-      const response = await api.post("/usersearchform", data);
-      if (response.data.success !== false) {
-        setDetails(response.data);
-        console.log(response.data);
-      } else {
-        fetchAllMemberdetails();
-        alert(response.data.error);
-      }
+      //   const response = await api.post("/usersearchform", data);
+      //   if (response.data.success !== false) {
+      //     setDetails(response.data);
+      //     console.log(response.data);
+      //   } else {
+      //     fetchAllMemberdetails();
+      //     alert(response.data.error);
+      //   }
     } catch (error) {
       console.error("Error fetching details:", error);
     }
@@ -149,48 +163,101 @@ function AdminUser() {
 
   const fetchMembersFilters = async () => {
     try {
-      console.log("filtering details");
-      console.log(filters);
-      const tablefilters = { data: filters };
-      const response = await api.post("/adminusertablefilters", tablefilters);
-      console.log(response.data);
-      if (response.data.data_dict === "empty") {
-        fetchAllMemberdetails();
-      
-      } else if (response.data.success != false) {
-        console.log("Response=" + response.data.error);
-        // setDetails(response.data);
-      } else {
-        alert(response.data.error);
-        fetchAllMemberdetails();
-      }
-
+      //   console.log("filtering details");
+      //   console.log(filters);
+      //   const tablefilters = { data: filters };
+      //   const response = await api.post("/adminusertablefilters", tablefilters);
+      //   console.log(response.data);
+      //   if (response.data.data_dict === "empty") {
+      //     fetchAllMemberdetails();
+      //   } else if (response.data.success != false) {
+      //     console.log("Response=" + response.data.error);
+      //     // setDetails(response.data);
+      //   } else {
+      //     alert(response.data.error);
+      //     fetchAllMemberdetails();
+      //   }
     } catch (error) {
       alert(error);
     }
   };
 
-  console.log(filters);
+//   console.log(filters);
 
-  const handleshownewusers = async () => {
-    setNewusers(!shownewusers);
-    try {
-      const result = await api.get("/fetchingnewusers");
-      if (result.data.success !== false) {
-        setDetails(result.data);
-      } else {
+  
+
+  const handleAcceptUserSubmit = async (e) => {
+    e.preventDefault();
+    try{
+    
+        console.log(singleuser)
+        const data = {"data":singleuser,"memberid":memberid["memberid"], "clubid":orgData["_id"]}
+        console.log(data["memberid"])
+
+        const response = await api.post("/acceptingusersubscription",data)
+        if (response.data.success !== false){
+            setShowMemberid(false)
+        }
+        else if(response.data.closeform !== false){
+            alert(response.data.error)
+        }
+        else{
+          alert(response.data.error)
+
+        }
+        setMemberid({
+            memberid:"",
+        })
         fetchAllMemberdetails();
-        alert(result.data.error);
       }
-    } catch (error) {
-      alert(error);
+      catch(error){
+        console.log(error)
+      }
+   
+  };
+
+  const handleAcceptInputChange = (e) => {
+    const { name, value } = e.target;
+    setMemberid({
+      ...memberid,
+      [name]: value,
+    });
+  };
+
+  const closeAcceptForm = () =>{
+    setShowMemberid(false)
+  }
+  const handleorgaccept = async (user) => {
+    console.log("Accept org method");
+    setShowMemberid(true)
+    setSingleuser(user)
+  };
+
+  const handleorgreject = async (user) => {
+    console.log("Accept org method");
+    try{
+        // console.log(user)
+        const data = {"data":user, "clubid":orgData["_id"]}
+        console.log(data)
+        
+        const response = await api.post("/rejectingsubscribinguser",data)
+      if (response.data.success !== false){
+        fetchAllMemberdetails()
+      }
+      else{
+        alert(response.data.error)
+        fetchAllMemberdetails();
+      }
+    }
+    catch(error){
+      console.log(error)
     }
   };
 
   return (
     <>
       <div>
-        <AdminNavbar />
+        <OrganisationNavbar />
       </div>
       <div
         style={{
@@ -200,15 +267,7 @@ function AdminUser() {
         }}
       >
         <div>
-          {shownewusers ? (
-            <button className="addpostbtn mt-3" onClick={handleshownewusers}>
-              New Users
-            </button>
-          ) : (
-            <button className="addpostbtn mt-3" onClick={fetchAllMemberdetails}>
-              All Users
-            </button>
-          )}
+          
 
           <button className="addpostbtn mt-3" onClick={handleformreset}>
             Reset
@@ -276,6 +335,48 @@ function AdminUser() {
       <div className="row">
         <div className="col-12">
           {/* <br /> */}
+        
+          {showmemberid && (
+          <form onSubmit={handleAcceptUserSubmit}>
+            <div className="row gy-3 overflow-hidden">
+                <div className="col-4">
+                    {/* add start date and expiry date */}
+                </div>
+              <div className="col-4">
+                <div className="form-floating mb-3">
+                  <input
+                    onChange={handleAcceptInputChange}
+                    type="text"
+                    className="form-control"
+                    id="memberid"
+                    placeholder=""
+                    name="memberid"
+                    value={memberid.memberid}
+                  />
+                  <label htmlFor="memberid" className="form-label">
+                    Member ID
+                  </label>
+                </div>
+              </div>
+              <div className="col-2">
+                <div>
+                  <button type="submit" className="memtypesavesubmitbtn">
+                    Save
+                  </button>
+                </div>
+              </div>
+              <div className="col-1"></div>
+              <div className="col-1">
+                <div>
+                  <button className=" closeformbtn" onClick={closeAcceptForm}>
+                  <IoMdClose style={{height:"1.5rem", width:"1.5rem"}}/>
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+          </form>
+        )}
 
           {details && details.length ? (
             <table className="table table-bordered">
@@ -284,9 +385,7 @@ function AdminUser() {
                   <th scope="col" className="tablehead align-middle">
                     Sno
                   </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Id
-                  </th>
+
                   <th scope="col" className="tablehead align-middle">
                     Username
                   </th>
@@ -329,150 +428,44 @@ function AdminUser() {
                   <th scope="col" className="tablehead align-middle">
                     Type
                   </th>
+                  
                   <th scope="col" className="tablehead align-middle">
-                    <span>Start date </span>
-                    <p>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("start_date")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("start_date")}
-                        />
-                      </span>
-                    </p>
+                    Accept
                   </th>
-
                   <th scope="col" className="tablehead align-middle">
-                    <span>Expiry date </span>
-                    <p>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("expiry_date")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("expiry_date")}
-                        />
-                      </span>
-                    </p>
+                    Reject
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td></td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="memberid"
-                        value={filters.memberid}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="username"
-                        value={filters.username}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="name"
-                        value={filters.name}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="email"
-                        value={filters.email}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="number" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="pnumber"
-                        value={filters.pnumber}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <select
-                        onChange={handleFilterInputChange}
-                        className="trtext form-select"
-                        style={{ width: "7rem" }}
-                        id="gender"
-                        name="gender"
-                        value={filters.gender}
-                      >
-                        <option value="">Gender</option>
-                        <option value="Female">Female</option>
-                        <option value="Male">Male</option>
-                      </select>
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="membertype"
-                        value={filters.membertype}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
-                </tr>
-                {details.map((post, index) => (
+                
+                {details.map((user, index) => (
                   <tr>
                     <td className="trtext">{index + 1}</td>
-                    <td className="trtext">
-                      {post.memberid ? post.memberid : "--"}
-                    </td>
-                    <td className="trtext">{post.username}</td>
-                    <td className="trtext">{post.name}</td>
-                    <td className="trtext">{post.email}</td>
-                    <td className="trtext">{post.pnumber}</td>
-                    <td className="trtext">{post.gender}</td>
-                    <td className="trtext">
-                      {post.membertype}
-                    </td>
-                    <td className="trtext">
-                      {post.start_date ? post.start_date : "--"}
-                    </td>
-                    <td className="trtext">
-                      {post.expiry_date ? post.expiry_date : "--"}
-                    </td>
 
+                    <td className="trtext">{user.username}</td>
+                    <td className="trtext">{user.name}</td>
+                    <td className="trtext">{user.email}</td>
+                    <td className="trtext">{user.pnumber}</td>
+                    <td className="trtext">{user.gender}</td>
+                    <td className="trtext">{user.membertype}</td>
+
+                    <td className="trtext">
+                      <button
+                        className="addmembtn"
+                        onClick={() => handleorgaccept(user)}
+                      >
+                        Accept
+                      </button>
+                    </td>
+                    <td className="trtext">
+                      <button
+                        className="addmembtn"
+                        onClick={() => handleorgreject(user)}
+                      >
+                        Reject
+                      </button>
+                    </td>
                     {/* <td scope="col">{post.username}</td>
                     <td scope="col">{post.pwd}</td> */}
                   </tr>
@@ -488,4 +481,4 @@ function AdminUser() {
   );
 }
 
-export default AdminUser;
+export default OrgAuthorization;
