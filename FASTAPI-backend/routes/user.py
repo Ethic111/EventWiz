@@ -22,10 +22,15 @@ async def admin_login(data:Admin):
     adminform = dict(data)
     # print(adminform)
     adminlist = conn.EventWiz.admin.find({"$and": [{"username":adminform["username"]},{"pwd":adminform["pwd"]}]})
-    result = serializeList(adminlist)
-    if result:
-        # print(result)
-        return result[0]
+    content = serializeList(adminlist)
+    # print(content)
+    if (len(content) != 0):
+        # print(content)
+        singledict = content[0]
+        print(singledict["applied_org"])
+        singledict["applied_org"] = serializeList(singledict["applied_org"])
+
+        return content
     else:
         return {"error":"Invalid Username Password","success":False}
 

@@ -54,3 +54,4 @@ class EventPost(BaseModel):
 class Admin(BaseModel):
     username: str
     pwd: str
+    applied_org:Optional[list] = []

@@ -33,24 +33,25 @@ function OrganizeRegister1({setOBoolean}) {
       const result = await api.post("/organisationregistration", lFormData);
       if (result.data.success !== false){
         alert(result.data.message)
-        
+        document.getElementById('memtype').value = ""
+        document.getElementById('members').value = ""
+        setLFormData({
+          clubname: "",
+          ownname: "",
+          email: "",
+          address: "",
+          city: "",
+          pnumber: "",
+          desc:"",
+          memtype: [],
+          members: [],
+          username:"",
+          pwd:"",
+        });
       }
       else{
         alert(result.data.error)
       }
-      setLFormData({
-        clubname: "",
-        ownname: "",
-        email: "",
-        address: "",
-        city: "",
-        pnumber: "",
-        desc:"",
-        memtype: [],
-        members: [],
-        username:"",
-        pwd:"",
-      });
       
     } catch (error) {
       console.error("Error submitting form:", error);
