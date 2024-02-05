@@ -460,14 +460,24 @@ async def check_user(data:dict):
 @event.post('/userregistration/')
 async def create_user(user: User):
     d1 = dict(user)
-    uname = conn.EventWiz.users.find_one({"$and": 
-        [
-            {"clubname": None},
-            {"username": d1["username"]}
-        ]
-        },{"username":1,"_id":0})
-    #print(serializeDict(uname))
-    if uname:
+    # print(d1)
+    allorg = conn.EventWiz.organisation.find()
+    allorg = serializeList(allorg)
+
+    usernameList = []
+    for singleorg in allorg:
+        memberlist = singleorg["members"]
+        for i in memberlist:
+            usernameList.append(i["username"])
+    allactiveusers = conn.EventWiz.users.find()
+    allactiveusers = serializeList(allactiveusers)
+    for j in allactiveusers:
+        usernameList.append(j["username"])
+
+    uniqueusernameList = list(set(usernameList)) 
+    # print(uniqueusernameList)
+
+    if d1["username"] in uniqueusernameList:
         return {"error":"Username already exists","success":False}
     else:
         conn.EventWiz.users.insert_one(dict(user))
@@ -723,24 +733,33 @@ async def check_org(data:dict):
 # organisation registration 
 @event.post('/organisationregistration')
 async def create_org(organisation: dict):
-    
+
     appliedorg = organisation
     # print(appliedorg)
 
-    adminlist = serializeList(conn.EventWiz.admin.find())
-    # print(adminlist)
-    if adminlist:
-        for singleadmindict in adminlist:
-            appliedlist = singleadmindict["applied_org"]
-            for singleorg in appliedlist:
-                if singleorg["clubname"] == appliedorg["clubname"]:
-                    return {"error":"You Have Already Applied", "success":False}
-                    
-            singleadmindict["applied_org"].append(appliedorg)
-            conn.EventWiz.admin.update_one({"_id": ObjectId(singleadmindict["_id"])}, {"$set":  {"applied_org": singleadmindict["applied_org"]}})
-        return {"message":"Applied Successfully"}
-    else:
-        return {"error":"No Admin Available", "success":False}
+    allorg = conn.EventWiz.organisation.find()
+    allorg = serializeList(allorg)
+    orgusernameList = []
+    for i in allorg:
+        orgusernameList.append(i["username"])
+
+    if  appliedorg["username"] in orgusernameList:
+        return {"error":"Username Already Exists", "success":False}
+    else:    
+        adminlist = serializeList(conn.EventWiz.admin.find())
+        # print(adminlist)
+        if adminlist:
+            for singleadmindict in adminlist:
+                appliedlist = singleadmindict["applied_org"]
+                for singleorg in appliedlist:
+                    if singleorg["clubname"] == appliedorg  ["clubname"]:
+                        return {"error":"You Have Already   Applied", "success":False}
+
+                singleadmindict["applied_org"].append(appliedorg)
+                conn.EventWiz.admin.update_one({"_id": ObjectId (singleadmindict["_id"])}, {"$set":      {"applied_org": singleadmindict["applied_org"]}})
+            return {"message":"Applied Successfully"}
+        else:
+            return {"error":"No Admin Available",   "success":False}
     
 
     

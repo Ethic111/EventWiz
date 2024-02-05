@@ -1,6 +1,7 @@
 .adminloginmainbody {
     margin: 0;
     padding: 0;
+    padding-top:-80px;
     background: url(https://i.ibb.co/MMb4GhN/pic1.jpg) no-repeat;
     height: 100vh;
     font-family: sans-serif;

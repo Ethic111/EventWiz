@@ -1,76 +1,107 @@
 // AdminNavbar
-import React, { useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import "../../css/OrganisationNavbar.css";
+import React, { useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 function AdminNavbar() {
-  const [isNavOpen, setNavOpen] = useState(false);
-  const [adminData, setAdminData] = useState(
-    JSON.parse(localStorage.getItem('admin'))
+  const location = useLocation();
+  const isHomeActive = location.pathname === "/admin/home";
+  const [userData, setUserData] = useState(
+    JSON.parse(localStorage.getItem("admin"))
   );
-
-  const handleNavOpenClick = () => {
-    setNavOpen(true);
-  };
-
-  const handleNavCloseClick = () => {
-    setNavOpen(false);
-  };
-
-//   const handleaddpostbtn = () => {
-//     navigate("/organisationevents/addpost")
-//   }
-  const navigate = useNavigate();
-
   const handleSignOut = async () => {
     try {
       localStorage.clear();
-      setAdminData(null);
-      navigate("/");
-      // window.location.reload();
+      setUserData(null);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   return (
     <>
-      <div className="container">
-        <nav className={`nav ${isNavOpen ? "openNav" : ""}`}>
-          <i
-            className="uil uil-bars navOpenBtn"
-            onClick={handleNavOpenClick}
-          ></i>
-          <Link to="/admin/home" className="logo">
+      <nav
+        className="navbar navbar-dark navbar-expand-lg  fixed-top "
+        style={{ backgroundColor: "#0e2643" , height:"80px"}}
+      >
+        <div className="container-fluid">
+          <Link to="/admin/home" className="navbar-brand ms-5">
             EventWiz
           </Link>
-          <ul className="nav-links">
-            <i
-              className="uil uil-times navCloseBtn"
-              onClick={handleNavCloseClick}
-            ></i>
-            <li>
-              <Link to="/admin/allorg">Organisation</Link>
-            </li>
-            <li>
-              <Link to="/admin/allusers">User</Link>
-            </li>
-            <li>
-              <Link to="/admin/accepetrejectorg">Authorization</Link>
-            </li>
-            {/* <li>
-              <Link to="/organisationevents/otherevents">Other Events</Link>
-            </li> */}
-            <li>
-              <Link to="/home" onClick={handleSignOut}>
-                Logout {adminData.username}
-                
-              </Link>
-            </li>
-          </ul>
-        </nav>
-      </div>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div
+            className="collapse navbar-collapse justify-content-end me-5"
+            id="navbarNav"
+          >
+            <ul className="navbar-nav ">
+              <li className="nav-item">
+                <NavLink
+                  to="/admin/home"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Home
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/admin/allusers"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  User
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/admin/allorg"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Organisation
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/admin/accepetrejectorg"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Authorization
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                {userData?.username ? (
+                  <NavLink
+                    to="/home"
+                    onClick={handleSignOut}
+                    className={`nav-link ${
+                      !isHomeActive ? "font-weight-bold" : ""
+                    }`}
+                  >
+                    Logout {userData.username}
+                  </NavLink>
+                ) : (
+                  <NavLink to="*"></NavLink>
+                )}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
     </>
   );
 }

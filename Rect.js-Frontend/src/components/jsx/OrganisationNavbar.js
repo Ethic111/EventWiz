@@ -28,7 +28,7 @@ function OrganisationNavbar() {
       <div>
         <nav
           className="navbar navbar-dark navbar-expand-lg  fixed-top "
-          style={{ backgroundColor: "#0e2643" }}
+          style={{ backgroundColor: "#0e2643" , height:"80px"}}
         >
           <div className="container-fluid">
             <Link to="/organisationevents" className="navbar-brand ms-5">

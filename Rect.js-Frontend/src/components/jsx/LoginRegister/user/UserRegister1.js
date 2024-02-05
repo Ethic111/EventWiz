@@ -32,21 +32,21 @@ function UserRegister1({ setUserBoolean }) {
         // Use the navigate function to go to the home page
         // console.log("form data: "+ JSON.stringify(lFormData))
         localStorage.setItem("users", JSON.stringify(checking.data));
-
         navigate("/");
+        setLFormData({
+          name: "",
+          email: "",
+          pnumber: "",
+          gender: "",
+          username: "",
+          pwd: "",
+        });
       } else {
         // toast.error(checking.data.error);
         alert(checking.data.error)
       }
 
-      setLFormData({
-        name: "",
-        email: "",
-        pnumber: "",
-        gender: "",
-        username: "",
-        pwd: "",
-      });
+      
     } catch (error) {
       console.error("Error submitting form:", error);
     }

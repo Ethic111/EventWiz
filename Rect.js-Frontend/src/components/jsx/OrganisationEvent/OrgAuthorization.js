@@ -4,7 +4,7 @@ import OrganisationNavbar from "../OrganisationNavbar";
 import "../../css/OrganisationEvent/memberdetails.css";
 import api from "../api";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+// import { Link, useNavigate } from "react-router-dom";
 import {
   IoIosArrowDropupCircle,
   IoIosArrowDropdownCircle,
@@ -12,18 +12,18 @@ import {
 } from "react-icons/io";
 
 function OrgAuthorization() {
-    const [singleuser,setSingleuser] = useState()
-  const [bvalue, setBValue] = useState(true);
-  const [showmemberid,setShowMemberid] = useState(false)
-  const [memberid,setMemberid] = useState({
+  const [singleuser, setSingleuser] = useState();
+  // const [bvalue, setBValue] = useState(true);
+  const [showmemberid, setShowMemberid] = useState(false);
+  const [memberid, setMemberid] = useState({
     memberid: "",
-  })
- 
+    start_date: "",
+    expiry_date: "",
+  });
+
   const [details, setDetails] = useState();
   const [searchForm, setSearchform] = useState({
     membername: "",
-    start_date: "",
-    expiry_date: "",
   });
 
   const [filters, setFilters] = useState({
@@ -37,20 +37,6 @@ function OrgAuthorization() {
   const [orgData, setOrgData] = useState(
     JSON.parse(localStorage.getItem("organisers"))
   );
-//   console.log(orgData["_id"]);
-
-  // const [memType, setMemType] = useState();
-
-  // const fetchAllMemtypedetails = async () => {
-  //   try {
-  //     const cname = orgData.clubname;
-  //     const response = await api.post("/getmemtype/", { clubname: cname });
-  //     setMemType(response.data);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching details:", error);
-  //   }
-  // };
 
   function formatDateForInput(dateString) {
     const date = new Date(dateString);
@@ -88,10 +74,12 @@ function OrgAuthorization() {
     });
     setSearchform({
       membername: "",
+    });
+    setMemberid({
+      memberid: "",
       start_date: "",
       expiry_date: "",
     });
-
     fetchAllMemberdetails();
   };
 
@@ -182,38 +170,34 @@ function OrgAuthorization() {
     }
   };
 
-//   console.log(filters);
-
-  
+  //   console.log(filters);
 
   const handleAcceptUserSubmit = async (e) => {
     e.preventDefault();
-    try{
-    
-        console.log(singleuser)
-        const data = {"data":singleuser,"memberid":memberid["memberid"], "clubid":orgData["_id"]}
-        console.log(data["memberid"])
+    try {
+      console.log(singleuser);
+      const data = {
+        data: singleuser,
+        memberid: memberid["memberid"],
+        clubid: orgData["_id"],
+      };
+      console.log(data["memberid"]);
 
-        const response = await api.post("/acceptingusersubscription",data)
-        if (response.data.success !== false){
-            setShowMemberid(false)
-        }
-        else if(response.data.closeform !== false){
-            alert(response.data.error)
-        }
-        else{
-          alert(response.data.error)
-
-        }
-        setMemberid({
-            memberid:"",
-        })
-        fetchAllMemberdetails();
+      const response = await api.post("/acceptingusersubscription", data);
+      if (response.data.success !== false) {
+        setShowMemberid(false);
+      } else if (response.data.closeform !== false) {
+        alert(response.data.error);
+      } else {
+        alert(response.data.error);
       }
-      catch(error){
-        console.log(error)
-      }
-   
+      setMemberid({
+        memberid: "",
+      });
+      fetchAllMemberdetails();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleAcceptInputChange = (e) => {
@@ -224,33 +208,31 @@ function OrgAuthorization() {
     });
   };
 
-  const closeAcceptForm = () =>{
-    setShowMemberid(false)
-  }
+  const closeAcceptForm = () => {
+    setShowMemberid(false);
+  };
   const handleorgaccept = async (user) => {
     console.log("Accept org method");
-    setShowMemberid(true)
-    setSingleuser(user)
+    setShowMemberid(true);
+    setSingleuser(user);
   };
 
   const handleorgreject = async (user) => {
     console.log("Accept org method");
-    try{
-        // console.log(user)
-        const data = {"data":user, "clubid":orgData["_id"]}
-        console.log(data)
-        
-        const response = await api.post("/rejectingsubscribinguser",data)
-      if (response.data.success !== false){
-        fetchAllMemberdetails()
-      }
-      else{
-        alert(response.data.error)
+    try {
+      // console.log(user)
+      const data = { data: user, clubid: orgData["_id"] };
+      console.log(data);
+
+      const response = await api.post("/rejectingsubscribinguser", data);
+      if (response.data.success !== false) {
+        fetchAllMemberdetails();
+      } else {
+        alert(response.data.error);
         fetchAllMemberdetails();
       }
-    }
-    catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -267,8 +249,6 @@ function OrgAuthorization() {
         }}
       >
         <div>
-          
-
           <button className="addpostbtn mt-3" onClick={handleformreset}>
             Reset
           </button>
@@ -277,29 +257,7 @@ function OrgAuthorization() {
         <div className="mt-3">
           <form className="form-inline my-lg-0 " onSubmit={handlesearchSubmit}>
             <div className="row">
-              <div className="col-3">
-                <span>Start Date:</span>
-                <input
-                  type="date"
-                  className="trtext"
-                  name="start_date"
-                  value={formatDateForInput(searchForm.start_date)}
-                  onChange={handleSearchInputChange}
-                  style={{ width: "10rem" }}
-                />
-              </div>
-              <div className="col-3">
-                <span>Expiry Date:</span>
-                <input
-                  type="date"
-                  className="trtext"
-                  style={{ width: "10rem" }}
-                  name="expiry_date"
-                  value={formatDateForInput(searchForm.expiry_date)}
-                  onChange={handleSearchInputChange}
-                />
-              </div>
-              <div className="col-4 p-2">
+              <div className="col p-2">
                 <input
                   className="form-control"
                   name="membername"
@@ -335,48 +293,68 @@ function OrgAuthorization() {
       <div className="row">
         <div className="col-12">
           {/* <br /> */}
-        
+
           {showmemberid && (
-          <form onSubmit={handleAcceptUserSubmit}>
-            <div className="row gy-3 overflow-hidden">
-                <div className="col-4">
-                    {/* add start date and expiry date */}
+            <form onSubmit={handleAcceptUserSubmit}>
+              <div className="row gy-3 overflow-hidden">
+                <div className="col-3">
+                  <div className="form-floating mb-3">
+                    <input
+                      onChange={handleAcceptInputChange}
+                      type="text"
+                      className="form-control"
+                      id="memberid"
+                      placeholder=""
+                      name="memberid"
+                      value={memberid.memberid}
+                    />
+                    <label htmlFor="memberid" className="form-label">
+                      Member ID
+                    </label>
+                  </div>
                 </div>
-              <div className="col-4">
-                <div className="form-floating mb-3">
+                <div className="col-2">
+                  <p>Start Date:</p>
                   <input
+                    type="date"
+                    className="trtext"
+                    name="start_date"
+                    value={(memberid.start_date)}
                     onChange={handleAcceptInputChange}
-                    type="text"
-                    className="form-control"
-                    id="memberid"
-                    placeholder=""
-                    name="memberid"
-                    value={memberid.memberid}
+                    style={{ width: "10rem" }}
                   />
-                  <label htmlFor="memberid" className="form-label">
-                    Member ID
-                  </label>
+                </div>
+                <div className="col-3">
+                  <p>Expiry Date:</p>
+                  <input
+                    type="date"
+                    className="trtext"
+                    style={{ width: "10rem" }}
+                    name="expiry_date"
+                    value={(memberid.expiry_date)}
+                    onChange={handleAcceptInputChange}
+                  />
+                </div>
+                <div className="col-2">
+                  <div>
+                    <button type="submit" className="memtypesavesubmitbtn">
+                      Save
+                    </button>
+                  </div>
+                </div>
+                <div className="col-1"></div>
+                <div className="col-1">
+                  <div>
+                    <button className=" closeformbtn" onClick={closeAcceptForm}>
+                      <IoMdClose
+                        style={{ height: "1.5rem", width: "1.5rem" }}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="col-2">
-                <div>
-                  <button type="submit" className="memtypesavesubmitbtn">
-                    Save
-                  </button>
-                </div>
-              </div>
-              <div className="col-1"></div>
-              <div className="col-1">
-                <div>
-                  <button className=" closeformbtn" onClick={closeAcceptForm}>
-                  <IoMdClose style={{height:"1.5rem", width:"1.5rem"}}/>
-                  </button>
-                </div>
-              </div>
-              
-            </div>
-          </form>
-        )}
+            </form>
+          )}
 
           {details && details.length ? (
             <table className="table table-bordered">
@@ -428,7 +406,7 @@ function OrgAuthorization() {
                   <th scope="col" className="tablehead align-middle">
                     Type
                   </th>
-                  
+
                   <th scope="col" className="tablehead align-middle">
                     Accept
                   </th>
@@ -438,7 +416,6 @@ function OrgAuthorization() {
                 </tr>
               </thead>
               <tbody>
-                
                 {details.map((user, index) => (
                   <tr>
                     <td className="trtext">{index + 1}</td>
