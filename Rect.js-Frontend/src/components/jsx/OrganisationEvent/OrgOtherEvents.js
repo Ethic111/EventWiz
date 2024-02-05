@@ -6,6 +6,7 @@ import $ from "jquery";
 import OrganisationNavbar from "../OrganisationNavbar";
 import "../../css/OrganisationEvent/OrgOtherEvents.css";
 import api from "../api";
+import { toast } from "react-toastify";
 import {
   FaArrowCircleRight,
   FaArrowCircleLeft,
@@ -70,16 +71,7 @@ function OrgOtherEvents() {
     });
   };
 
-  //   const handledeletepost = async (post) => {
-  //     console.log("deleting button");
-  //     try {
-  //       const response = await api.delete(`/deleteeventposts/${post._id}`);
-  //       console.log(response);
-  //       fetchAllPostdetails();
-  //     } catch {
-  //       alert("Error in Deleting");
-  //     }
-  //   };
+
 
   // /////////////
 
@@ -133,7 +125,7 @@ function OrgOtherEvents() {
         console.log(checking.data);
         setDetails(checking.data);
       } else {
-        alert(checking.data.error);
+        toast.error(checking.data.error);
       }
 
       // Rest of your code...
@@ -168,7 +160,7 @@ function OrgOtherEvents() {
 
     const data = {
       clubname: userData["clubname"],
-      title: searchForm["event_title"],
+      title: searchForm["event_title"]
     };
     console.log("handle search submit");
     try {
@@ -187,17 +179,7 @@ function OrgOtherEvents() {
       console.error("Error fetching details:", error);
     }
   };
-  // {
-  //   "event_start_date": "",
-  //   "event_end_date": "",
-  //   "minprice": "210",
-  //   "maxprice": "6590",
-  //   "venue_city":""
-  // }
 
-  // const handleLoad = () =>{
-  //   console.log("helo")
-  // }
   return (
     <>
       <div>{<OrganisationNavbar />}</div>
@@ -260,7 +242,7 @@ function OrgOtherEvents() {
                 </div>
                 <br />
                 <div className="row">
-                  <p className="col-6 card_title">Filter</p>
+                  <p className="col-6 orgeventcard_title">Filter</p>
                   <div className="col-6">
                     <div className="d-grid">
                       <button className="addpostbtn" onClick={handleformreset}>
@@ -307,7 +289,7 @@ function OrgOtherEvents() {
                         </label>
                       </div>
                     </div>
-                    <div className="col">
+                    <div className="col-12">
                       Price
                       <div className="row">
                         <div className="col-6">

@@ -159,10 +159,10 @@ function AdminAuthorityOrgDetails() {
         setMemberlist(response.data);
       } else {
         // setMemberlist(orgData.members)
-        alert(response.data.error);
+        toast.error(response.data.error);
       }
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 

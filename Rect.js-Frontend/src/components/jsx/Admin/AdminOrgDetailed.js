@@ -1,7 +1,7 @@
 // AdminOrgDetailed.js
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import $ from "jquery";
+// import $ from "jquery";
 import AdminNavbar from "./AdminNavbar";
 import "../../css/OrganisationEvent/orgEvent.css";
 import api from "../api";
@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 
 function AdminOrgDetailed() {
   const [showmemberdatabtn, setShowmemberdatabtn] = useState(true);
+  const [showeventwiz, setShowEventWiz] = useState(false);
   const [bvalue, setBValue] = useState(true);
   // const [details, setDetails] = useState();
   const [searchForm, setSearchform] = useState({
@@ -28,7 +29,9 @@ function AdminOrgDetailed() {
   // console.log(orgData);
   const memtype = orgData.memtype;
   // console.log(memtype);
-  const [originalmemberslist, setOriginalMemberlist] = useState(orgData.members);
+  const [originalmemberslist, setOriginalMemberlist] = useState(
+    orgData.members
+  );
   const [memberslist, setMemberlist] = useState(orgData.members);
 
   const [filters, setFilters] = useState({
@@ -42,6 +45,7 @@ function AdminOrgDetailed() {
   });
 
   const handleMemberDataButtonClick = () => {
+    setShowEventWiz(false);
     setShowmemberdatabtn(!showmemberdatabtn);
   };
 
@@ -55,11 +59,16 @@ function AdminOrgDetailed() {
 
   const handlesorting = async (col) => {
     try {
-      const data = { clubname: orgData.clubname, col: col, value: bvalue };
-      const checking = await api.post("/membersortinguserside", data);
-      console.log(checking);
+      const data = {
+        clubname: orgData.clubname,
+        col: col["name"],
+        value: col["value"],
+        members: memberslist,
+      };
+      const checking = await api.post("/adminmembersorting", data);
+      // console.log(checking);
       if (checking.data.success !== false) {
-        console.log(checking.data);
+        // console.log(checking.data);
         setBValue(!bvalue);
         setMemberlist(checking.data);
       } else {
@@ -94,6 +103,7 @@ function AdminOrgDetailed() {
       expiry_date: "",
     });
     setMemberlist(orgData.members);
+    setShowEventWiz(false)
   };
 
   const handleSearchInputChange = (event) => {
@@ -148,34 +158,39 @@ function AdminOrgDetailed() {
       }
       console.log("Filtered form:");
       console.log(filteredFormData);
-      const data = { filterdict: filteredFormData, memberlist: originalmemberslist };
+      const data = {
+        filterdict: filteredFormData,
+        memberlist: originalmemberslist,
+      };
       // const data = {"name":"hi"}
       const response = await api.post("/adminorgmemberstablefilters", data);
       if (response.data.data_dict === "empty") {
-        setMemberlist(orgData.members)
-      
+        setMemberlist(orgData.members);
       } else if (response.data.success != false) {
         // console.log("Response=" + response.data.error);
         setMemberlist(response.data);
       } else {
-        setMemberlist(orgData.members)
-        alert(response.data.error);
+        setMemberlist(orgData.members);
+        toast.error(response.data.error);
       }
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 
   const handleLoggedinmembers = async () => {
+    setShowEventWiz(true);
     try {
       console.log(originalmemberslist);
-      const result = await api.post("/loggedinmembers", { data: originalmemberslist });
+      const result = await api.post("/loggedinmembers", {
+        data: originalmemberslist,
+      });
       console.log(result.data); // Log the result for debugging
       if (result.data.success !== false) {
         setMemberlist(result.data);
       } else {
         setMemberlist(orgData.members);
-        alert(result.data.error);
+        toast.error(result.data.error);
       }
     } catch (error) {
       console.error("Error in handleLoggedinmembers:", error);
@@ -183,21 +198,45 @@ function AdminOrgDetailed() {
   };
 
   const handleInactivemembers = async () => {
+    setShowEventWiz(false);
     try {
       console.log(originalmemberslist);
-      const result = await api.post("/inactivemembers", { data: originalmemberslist });
+      const result = await api.post("/inactivemembers", {
+        data: originalmemberslist,
+      });
       console.log(result.data); // Log the result for debugging
       if (result.data.success !== false) {
         setMemberlist(result.data);
       } else {
         setMemberlist(orgData.members);
-        alert(result.data.error);
+        toast.error(result.data.error);
       }
     } catch (error) {
-      console.error("Error in handleLoggedinmembers:", error);
+      console.error("Error in handleInactivemembers:", error);
     }
   };
 
+  const handleSubscribers = async () => {
+    try {
+      const result = await api.post("/subscribeusers", {
+        data: originalmemberslist,
+      });
+      if (result.data.success !== false) {
+        setMemberlist(result.data);
+      } 
+      else if (result.data.error === "empty") {
+        toast(result.data.message);
+        setShowEventWiz(false);
+      } 
+      else {
+        toast.error(result.data.error);
+        setShowEventWiz(false);
+        setMemberlist(orgData.members);
+      }
+    } catch (error) {
+      console.error("Error in handleInactivemembers:", error);
+    }
+  };
   return (
     <>
       <div>{<AdminNavbar />}</div>
@@ -231,10 +270,7 @@ function AdminOrgDetailed() {
               <button className="addpostbtn" onClick={handleLoggedinmembers}>
                 Active Members
               </button>
-              <button
-                className="addpostbtn"
-                onClick={handleInactivemembers}
-              >
+              <button className="addpostbtn" onClick={handleInactivemembers}>
                 Inactive Members
               </button>
             </>
@@ -250,7 +286,9 @@ function AdminOrgDetailed() {
             >
               <div className="row">
                 <div className="col-3">
-                  <span>Start Date:</span>
+                  <span>
+                    <strong>From:</strong>
+                  </span>
                   <input
                     type="date"
                     className="trtext"
@@ -261,7 +299,9 @@ function AdminOrgDetailed() {
                   />
                 </div>
                 <div className="col-3">
-                  <span>Expiry Date:</span>
+                  <span>
+                    <strong>To:</strong>
+                  </span>
                   <input
                     type="date"
                     className="trtext"
@@ -315,6 +355,16 @@ function AdminOrgDetailed() {
         )}
       </div>
       <hr />
+      {showeventwiz && (
+        <>
+          <div>
+            <button className="addpostbtn" onClick={handleSubscribers}>
+              EventWiz Subscribers
+            </button>
+          </div>
+          <hr />
+        </>
+      )}
       {showmemberdatabtn ? (
         <div>
           <div className="loginmainEventdiv">
@@ -328,7 +378,7 @@ function AdminOrgDetailed() {
                         <a class="postcard__img_link" href="#">
                           <img
                             class="postcard__img"
-                            src={orgData.background_image }
+                            src={orgData.background_image}
                             alt="Image Title"
                           />
                         </a>
@@ -408,12 +458,18 @@ function AdminOrgDetailed() {
                         <span>
                           <span>
                             <IoIosArrowDropupCircle
-                              onClick={() => handlesorting("name")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({ name: "name", value: true })
+                              }
                             />
                           </span>
                           <span>
                             <IoIosArrowDropdownCircle
-                              onClick={() => handlesorting("name")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({ name: "name", value: false })
+                              }
                             />
                           </span>
                         </span>
@@ -426,12 +482,18 @@ function AdminOrgDetailed() {
                         <p>
                           <span>
                             <IoIosArrowDropupCircle
-                              onClick={() => handlesorting("pnumber")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({ name: "pnumber", value: true })
+                              }
                             />
                           </span>
                           <span>
                             <IoIosArrowDropdownCircle
-                              onClick={() => handlesorting("pnumber")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({ name: "pnumber", value: false })
+                              }
                             />
                           </span>
                         </p>
@@ -447,12 +509,24 @@ function AdminOrgDetailed() {
                         <p>
                           <span>
                             <IoIosArrowDropupCircle
-                              onClick={() => handlesorting("start_date")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({
+                                  name: "start_date",
+                                  value: true,
+                                })
+                              }
                             />
                           </span>
                           <span>
                             <IoIosArrowDropdownCircle
-                              onClick={() => handlesorting("start_date")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({
+                                  name: "start_date",
+                                  value: false,
+                                })
+                              }
                             />
                           </span>
                         </p>
@@ -463,12 +537,24 @@ function AdminOrgDetailed() {
                         <p>
                           <span>
                             <IoIosArrowDropupCircle
-                              onClick={() => handlesorting("expiry_date")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({
+                                  name: "expiry_date",
+                                  value: true,
+                                })
+                              }
                             />
                           </span>
                           <span>
                             <IoIosArrowDropdownCircle
-                              onClick={() => handlesorting("expiry_date")}
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handlesorting({
+                                  name: "expiry_date",
+                                  value: false,
+                                })
+                              }
                             />
                           </span>
                         </p>

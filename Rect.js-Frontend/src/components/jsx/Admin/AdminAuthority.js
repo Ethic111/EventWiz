@@ -87,7 +87,7 @@ function AdminAuthority() {
       if (response.data.success !== false) {
         setDetails(response.data);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
       }
       // console.log(response.data);
     } catch (error) {
@@ -118,7 +118,7 @@ function AdminAuthority() {
         fetchAllMemberdetails()
       }
       else{
-        alert(response.data.error)
+        toast.error(response.data.error)
         fetchAllMemberdetails();
       }
     }
@@ -138,7 +138,7 @@ function AdminAuthority() {
         fetchAllMemberdetails()
       }
       else{
-        alert(response.data.error)
+        toast.error(response.data.error)
         fetchAllMemberdetails();
       }
     }
@@ -165,7 +165,7 @@ function AdminAuthority() {
       if (response.data.success !== false) {
         setDetails(response.data);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
       }
     } catch (error) {
       console.error("Error fetching details:", error);
@@ -193,11 +193,11 @@ function AdminAuthority() {
         console.log("Response=" + response.data.error);
         setDetails(response.data);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
     } catch (error) {
-      alert(error);
+      console.error(error);
       
     }
   };

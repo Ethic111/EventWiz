@@ -80,7 +80,21 @@ function UserSubscribeForm() {
     };
     useEffect(() => {
         fetchAllMemTypedetails();
+        if (userData.membertype == "Public"){
+            setLFormData({
+                clubname: orgname,
+                name: userData.name,
+                email: userData.email,
+                pnumber: userData.pnumber,
+                gender: userData.gender,
+                username: userData.username,
+                pwd: userData.pwd,
+                membertype: "",
+            })
+        }
     }, []);
+
+    
 
     return (
         <>
@@ -116,6 +130,7 @@ function UserSubscribeForm() {
                                     placeholder=""
                                     name="name"
                                     value={lFormData.name}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 <label htmlFor="name" className="form-label">
                                     Name
@@ -132,6 +147,7 @@ function UserSubscribeForm() {
                                     placeholder=""
                                     name="pnumber"
                                     value={lFormData.pnumber}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 <label htmlFor="pnumber" className="form-label">
                                     Number
@@ -148,6 +164,7 @@ function UserSubscribeForm() {
                                     placeholder=""
                                     name="email"
                                     value={lFormData.email}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 <label htmlFor="email" className="form-label">
                                     Email
@@ -165,6 +182,7 @@ function UserSubscribeForm() {
                                     value="Male"
                                     checked={lFormData.gender === "Male"}
                                     onChange={handleInputChange}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 Male
                                 <input
@@ -174,6 +192,7 @@ function UserSubscribeForm() {
                                     checked={lFormData.gender === "Female"}
                                     className='ms-2'
                                     onChange={handleInputChange}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 Female
                             </div>
@@ -188,6 +207,7 @@ function UserSubscribeForm() {
                                     placeholder=""
                                     name="username"
                                     value={lFormData.username}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 <label htmlFor="username" className="form-label">
                                     Username
@@ -204,6 +224,7 @@ function UserSubscribeForm() {
                                     placeholder=""
                                     name="pwd"
                                     value={lFormData.pwd}
+                                    {...(userData.membertype == "Public" ? { disabled: true } : {})}
                                 />
                                 <label htmlFor="pwd" className="form-label">
                                     Password

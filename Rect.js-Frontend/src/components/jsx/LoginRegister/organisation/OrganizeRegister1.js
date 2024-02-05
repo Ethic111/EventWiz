@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../../../css/LoginRegister/organisation/organizeRegister1.css";
 import api from "../../api"
+import { toast } from "react-toastify";
 
 function OrganizeRegister1({setOBoolean}) {
   
@@ -32,7 +33,7 @@ function OrganizeRegister1({setOBoolean}) {
     try {
       const result = await api.post("/organisationregistration", lFormData);
       if (result.data.success !== false){
-        alert(result.data.message)
+        toast.success(result.data.message)
         document.getElementById('memtype').value = ""
         document.getElementById('members').value = ""
         setLFormData({
@@ -50,7 +51,7 @@ function OrganizeRegister1({setOBoolean}) {
         });
       }
       else{
-        alert(result.data.error)
+        toast.error(result.data.error)
       }
       
     } catch (error) {

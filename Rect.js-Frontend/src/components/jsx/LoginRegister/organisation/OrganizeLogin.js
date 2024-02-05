@@ -2,6 +2,7 @@ import React,{useState,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../css/LoginRegister/user/userLogin.css";
 import api from "../../api";
+import { toast } from "react-toastify";
 
 function OrganizeLogin({ setOBoolean }) {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ function OrganizeLogin({ setOBoolean }) {
 
         navigate("/organisationevents");
       } else {
-        alert("Wrong Username & Password!");
+        toast.error("Wrong Username & Password!");
       }
       setLFormData({
         username: "",

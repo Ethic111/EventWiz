@@ -20,6 +20,7 @@ function OrgMemberDetails() {
   const [orgData, setOrgData] = useState(
     JSON.parse(localStorage.getItem("organisers"))
   );
+  const [memberslist, setMemberlist] = useState(orgData.members);
   const [filters, setFilters] = useState({
     memberid: "",
     username: "",
@@ -52,7 +53,7 @@ function OrgMemberDetails() {
 
   const handlesorting = async (col) => {
     try {
-      const data = { clubname: orgData.clubname, col: col, value: bvalue };
+      const data = { clubname: orgData.clubname, "col": col["name"], "value": col["value"],"members":details  };
       const checking = await api.post("/membersortinguserside", data);
       console.log(checking);
       if (checking.data.success !== false) {
@@ -100,7 +101,7 @@ function OrgMemberDetails() {
         setDetails(response.data);
       }
       else{
-        alert(response.data.error)
+        toast.error(response.data.error)
         fetchAllMemberdetails();
       }
       
@@ -195,11 +196,11 @@ function OrgMemberDetails() {
         console.log("Response=" + response.data.error);
         setDetails(response.data);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 
@@ -306,12 +307,14 @@ function OrgMemberDetails() {
                     <span>
                       <span>
                         <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("name")}
+                        style={{cursor:"pointer"}}
+                          onClick={() => handlesorting({"name":"name","value":true})}
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("name")}
+                        style={{cursor:"pointer"}}
+                          onClick={() => handlesorting({"name":"name","value":false})}
                         />
                       </span>
                     </span>
@@ -324,12 +327,14 @@ function OrgMemberDetails() {
                     <p>
                       <span>
                         <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("pnumber")}
+                        style={{cursor:"pointer"}}
+                          onClick={() => handlesorting({"name":"pnumber","value":true})}
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("pnumber")}
+                        style={{cursor:"pointer"}}
+                          onClick={() => handlesorting({"name":"pnumber","value":false})}
                         />
                       </span>
                     </p>
@@ -345,32 +350,18 @@ function OrgMemberDetails() {
                     <p>
                       <span>
                         <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("start_date")}
+                        style={{cursor:"pointer"}}
+                          onClick={() => handlesorting({"name":"start_date","value":true})}
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("start_date")}
+                        style={{cursor:"pointer"}}
+                          onClick={() => handlesorting({"name":"start_date","value":false})}
                         />
                       </span>
                     </p>
                   </th>
-                  {/* <th
-                    scope="col"
-                    onClick={() => handlesorting("start_date")}
-                    className="tablehead align-middle"
-                  >
-                    Start date
-                  </th> */}
-
-                  {/* <th
-                    scope="col"
-                    onClick={() => handlesorting("expiry_date")}
-                    className="tablehead align-middle"
-                  >
-                    Expiry date
-                  </th> */}
-                  {/* <th></th> */}
                   <th
                     scope="col"
                     className="tablehead align-middle"
@@ -381,10 +372,14 @@ function OrgMemberDetails() {
                       
                     >
                       <span>
-                        <IoIosArrowDropupCircle onClick={() => handlesorting("expiry_date")}/>
+                        <IoIosArrowDropupCircle 
+                        style={{cursor:"pointer"}}
+                        onClick={() => handlesorting({"name":"expiry_date","value":true})}/>
                       </span>
                       <span >
-                        <IoIosArrowDropdownCircle onClick={() => handlesorting("expiry_date")}/>
+                        <IoIosArrowDropdownCircle 
+                        style={{cursor:"pointer"}}
+                        onClick={() => handlesorting({"name":"expiry_date","value":false})}/>
                       </span>
                     </p>
                   </th>

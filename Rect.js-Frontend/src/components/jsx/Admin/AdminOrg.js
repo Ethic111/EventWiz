@@ -7,10 +7,11 @@ import api from "../api";
 import "../../css/Admin/AdminOrg.css";
 import { GrPowerReset } from "react-icons/gr";
 // import { TbClockPlay } from "react-icons/tb";
+import { toast } from "react-toastify";
 
 function AdminOrg() {
   const [details, setDetails] = useState();
-  
+
   const [searchForm, setSearchform] = useState({
     clubname: "",
   });
@@ -18,8 +19,6 @@ function AdminOrg() {
   useEffect(() => {
     fetchAllOrgdetails();
   }, []);
-
-
 
   const fetchAllOrgdetails = async () => {
     try {
@@ -36,7 +35,7 @@ function AdminOrg() {
 
   const navigate = useNavigate();
   const handleorgdetails = (org) => {
-    console.log(JSON.stringify(org))
+    // console.log(JSON.stringify(org));
     navigate("/admin/orgdetailspage", {
       state: JSON.stringify(org),
     });
@@ -62,24 +61,30 @@ function AdminOrg() {
     event.preventDefault();
 
     const data = {
-      "clubname": searchForm["clubname"],
+      clubname: searchForm["clubname"],
     };
-    console.log("handle search submit");
+    // console.log("handle search submit");
     try {
-        const response = await api.post("/searchingorgbyname", data);
-        if (response.data.success !== false){
-
-            console.log(response.data)
-            setDetails(response.data);
-
-        }
-        else{
-            alert(response.data.error)
-        }
+      const response = await api.post("/searchingorgbyname", data);
+      if (response.data.success !== false) {
+        console.log(response.data);
+        setDetails(response.data);
+      } else {
+        toast.error(response.data.error);
+      }
       // console.log(response.data);
     } catch (error) {
       console.error("Error fetching details:", error);
     }
+  };
+
+  const handleorgdelete = async (org) => {
+    console.log(org["clubname"]);
+    const deleteorgdata = { clubname: org["clubname"] };
+    console.log(deleteorgdata);
+    const response = await api.post("/admindeletesorg", deleteorgdata);
+    // console.log(response.data);
+    fetchAllOrgdetails();
   };
 
   return (
@@ -153,7 +158,7 @@ function AdminOrg() {
                           class="mx-auto my-5"
                           style={{ maxWidth: "23rem" }}
                         >
-                          <div class="card testimonial-card mt-2 mb-3">
+                          <div class="card testimonial-card mt-2 mb-3 pb-3">
                             <div class="card-up aqua-gradient"></div>
                             <div class="avatar mx-auto white">
                               <img
@@ -182,6 +187,12 @@ function AdminOrg() {
                                   {org.address}
                                 </span>
                               </p>
+                              <button
+                                className="deleteorgbtn"
+                                onClick={() => handleorgdelete(org)}
+                              >
+                                Delete
+                              </button>
                             </div>
                           </div>
                         </section>

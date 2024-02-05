@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../../../css/LoginRegister/user/userRegistration1.css";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
+import { toast } from "react-toastify";
 
 function UserRegister1({ setUserBoolean }) {
   const [lFormData, setLFormData] = useState({
@@ -43,7 +44,7 @@ function UserRegister1({ setUserBoolean }) {
         });
       } else {
         // toast.error(checking.data.error);
-        alert(checking.data.error)
+        toast.error(checking.data.error)
       }
 
       

@@ -91,7 +91,7 @@ function OrgAuthorization() {
       if (response.data.success !== false) {
         setDetails(response.data);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
       }
       // console.log(response.data);
     } catch (error) {
@@ -166,7 +166,7 @@ function OrgAuthorization() {
       //     fetchAllMemberdetails();
       //   }
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 
@@ -178,7 +178,7 @@ function OrgAuthorization() {
       console.log(singleuser);
       const data = {
         data: singleuser,
-        memberid: memberid["memberid"],
+        memberdata: memberid,
         clubid: orgData["_id"],
       };
       console.log(data["memberid"]);
@@ -186,14 +186,17 @@ function OrgAuthorization() {
       const response = await api.post("/acceptingusersubscription", data);
       if (response.data.success !== false) {
         setShowMemberid(false);
+        setMemberid({
+          memberid: "",
+          start_date:"",
+          expiry_date:"",
+        });
       } else if (response.data.closeform !== false) {
-        alert(response.data.error);
+        toast.error(response.data.error);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
       }
-      setMemberid({
-        memberid: "",
-      });
+      
       fetchAllMemberdetails();
     } catch (error) {
       console.log(error);
@@ -228,7 +231,7 @@ function OrgAuthorization() {
       if (response.data.success !== false) {
         fetchAllMemberdetails();
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
     } catch (error) {

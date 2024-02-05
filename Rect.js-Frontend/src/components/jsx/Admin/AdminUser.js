@@ -132,7 +132,7 @@ function AdminUser() {
         console.log(response.data);
       } else {
         fetchAllMemberdetails();
-        alert(response.data.error);
+        toast.error(response.data.error);
       }
     } catch (error) {
       console.error("Error fetching details:", error);
@@ -156,17 +156,15 @@ function AdminUser() {
       console.log(response.data);
       if (response.data.data_dict === "empty") {
         fetchAllMemberdetails();
-      
-      } else if (response.data.success != false) {
+      } else if (response.data.success !== false) {
         console.log("Response=" + response.data.error);
-        // setDetails(response.data);
+        setDetails(response.data);
       } else {
-        alert(response.data.error);
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
-
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
 
@@ -180,12 +178,28 @@ function AdminUser() {
         setDetails(result.data);
       } else {
         fetchAllMemberdetails();
-        alert(result.data.error);
+        toast.error(result.data.error);
       }
     } catch (error) {
-      alert(error);
+      console.error(error);
     }
   };
+
+  const handlememberdelete = async (post) => {
+    const data = {"username" : post.username}
+    try{
+
+      const response =  await api.post("/deletenewuser",data)
+      if (response){
+        fetchAllMemberdetails();
+      }
+      else{
+        toast.error("Error in deleting")
+      }
+    }catch(error){
+      console.error("Error fetching details:", error);
+    }
+  }
 
   return (
     <>
@@ -218,29 +232,7 @@ function AdminUser() {
         <div className="mt-3">
           <form className="form-inline my-lg-0 " onSubmit={handlesearchSubmit}>
             <div className="row">
-              <div className="col-3">
-                <span>Start Date:</span>
-                <input
-                  type="date"
-                  className="trtext"
-                  name="start_date"
-                  value={formatDateForInput(searchForm.start_date)}
-                  onChange={handleSearchInputChange}
-                  style={{ width: "10rem" }}
-                />
-              </div>
-              <div className="col-3">
-                <span>Expiry Date:</span>
-                <input
-                  type="date"
-                  className="trtext"
-                  style={{ width: "10rem" }}
-                  name="expiry_date"
-                  value={formatDateForInput(searchForm.expiry_date)}
-                  onChange={handleSearchInputChange}
-                />
-              </div>
-              <div className="col-4 p-2">
+              <div className="col-10 p-2">
                 <input
                   className="form-control"
                   name="membername"
@@ -284,9 +276,11 @@ function AdminUser() {
                   <th scope="col" className="tablehead align-middle">
                     Sno
                   </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Id
-                  </th>
+                  {shownewusers && (
+                    <th scope="col" className="tablehead align-middle">
+                      Id
+                    </th>
+                  )}
                   <th scope="col" className="tablehead align-middle">
                     Username
                   </th>
@@ -329,52 +323,63 @@ function AdminUser() {
                   <th scope="col" className="tablehead align-middle">
                     Type
                   </th>
-                  <th scope="col" className="tablehead align-middle">
-                    <span>Start date </span>
-                    <p>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("start_date")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("start_date")}
-                        />
-                      </span>
-                    </p>
-                  </th>
+                  {shownewusers && (
+                    <>
+                      <th scope="col" className="tablehead align-middle">
+                        <span>Start date </span>
+                        <p>
+                          <span>
+                            <IoIosArrowDropupCircle
+                              onClick={() => handlesorting("start_date")}
+                            />
+                          </span>
+                          <span>
+                            <IoIosArrowDropdownCircle
+                              onClick={() => handlesorting("start_date")}
+                            />
+                          </span>
+                        </p>
+                      </th>
 
-                  <th scope="col" className="tablehead align-middle">
-                    <span>Expiry date </span>
-                    <p>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("expiry_date")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("expiry_date")}
-                        />
-                      </span>
-                    </p>
-                  </th>
+                      <th scope="col" className="tablehead align-middle">
+                        <span>Expiry date </span>
+                        <p>
+                          <span>
+                            <IoIosArrowDropupCircle
+                              onClick={() => handlesorting("expiry_date")}
+                            />
+                          </span>
+                          <span>
+                            <IoIosArrowDropdownCircle
+                              onClick={() => handlesorting("expiry_date")}
+                            />
+                          </span>
+                        </p>
+                      </th>
+                    </>
+                  )}
+                  {!shownewusers && (
+                    <th scope="col" className="tablehead align-middle">
+                      Delete
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td></td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="memberid"
-                        value={filters.memberid}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
+                  {shownewusers && (
+                    <td>
+                      <div type="text" className="inputdiv">
+                        <input
+                          className="trtext"
+                          name="memberid"
+                          value={filters.memberid}
+                          onChange={handleFilterInputChange}
+                        />
+                      </div>
+                    </td>
+                  )}
                   <td>
                     <div type="text" className="inputdiv">
                       <input
@@ -441,40 +446,63 @@ function AdminUser() {
                       />
                     </div>
                   </td>
-                  <td>
+                  {shownewusers && (
+                    <>
+                      <td>
+                        <div type="text" className="inputdiv">
+                          --
+                        </div>
+                      </td>
+                      <td>
+                        <div type="text" className="inputdiv">
+                          --
+                        </div>
+                      </td>
+                    </>
+                  )}
+                  {!shownewusers && (
+                    <td>
                     <div type="text" className="inputdiv">
                       --
                     </div>
                   </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
+                  )}
                 </tr>
+
                 {details.map((post, index) => (
                   <tr>
                     <td className="trtext">{index + 1}</td>
-                    <td className="trtext">
-                      {post.memberid ? post.memberid : "--"}
-                    </td>
+                    {shownewusers && (
+                      <td className="trtext">
+                        {post.memberid ? post.memberid : "--"}
+                      </td>
+                    )}
                     <td className="trtext">{post.username}</td>
                     <td className="trtext">{post.name}</td>
                     <td className="trtext">{post.email}</td>
                     <td className="trtext">{post.pnumber}</td>
                     <td className="trtext">{post.gender}</td>
+                    <td className="trtext">{post.membertype}</td>
+                    {shownewusers && (
+                      <>
+                        <td className="trtext">
+                          {post.start_date ? post.start_date : "--"}
+                        </td>
+                        <td className="trtext">
+                          {post.expiry_date ? post.expiry_date : "--"}
+                        </td>
+                      </>
+                    )}
+                    {!shownewusers && (
                     <td className="trtext">
-                      {post.membertype}
-                    </td>
-                    <td className="trtext">
-                      {post.start_date ? post.start_date : "--"}
-                    </td>
-                    <td className="trtext">
-                      {post.expiry_date ? post.expiry_date : "--"}
-                    </td>
-
-                    {/* <td scope="col">{post.username}</td>
-                    <td scope="col">{post.pwd}</td> */}
+                    <button
+                      className="addmembtn"
+                      onClick={() => handlememberdelete(post)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                  )}
                   </tr>
                 ))}
               </tbody>

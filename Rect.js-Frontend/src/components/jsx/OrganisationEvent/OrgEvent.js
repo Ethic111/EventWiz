@@ -4,6 +4,7 @@ import $ from "jquery";
 import OrganisationNavbar from "../OrganisationNavbar";
 import "../../css/OrganisationEvent/orgEvent.css";
 import api from "../api";
+import { toast } from "react-toastify";
 import {
   FaArrowCircleRight,
   FaArrowCircleLeft,
@@ -73,7 +74,7 @@ function OrgEvent() {
       console.log(response);
       fetchAllPostdetails();
     } catch {
-      alert("Error in Deleting");
+      console.error("Error in Deleting");
     }
   };
 
@@ -126,7 +127,7 @@ function OrgEvent() {
         console.log(checking.data);
         setDetails(checking.data);
       } else {
-        alert(checking.data.error);
+        toast.error(checking.data.error);
       }
 
       // Rest of your code...
@@ -261,7 +262,7 @@ function OrgEvent() {
                 </div>
                 <br />
                 <div className="row">
-                  <p className="col-6 card_title">Filter</p>
+                  <p className="col-6 orgeventcard_title">Filter</p>
                   <div className="col-6">
                     <div className="d-grid">
                       <button className="addpostbtn" onClick={handleformreset}>
@@ -308,7 +309,7 @@ function OrgEvent() {
                         </label>
                       </div>
                     </div>
-                    <div className="col">
+                    <div className="col-12">
                       Price
                       <div className="row">
                         <div className="col-6">

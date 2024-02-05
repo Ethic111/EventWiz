@@ -53,7 +53,7 @@ function UserLogin({ setUserBoolean }) {
         navigate("/");
       } else {
         // toast.error(checking.data.error);
-        alert(checking.data.error)
+        toast.error(checking.data.error)
       }
       setLFormData({
         clubname: "",

@@ -142,7 +142,7 @@ function UpdateMemberDetail() {
         // });
       } else {
         // toast.error(response.error);
-        alert(response.error);
+        toast.error(response.error);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
