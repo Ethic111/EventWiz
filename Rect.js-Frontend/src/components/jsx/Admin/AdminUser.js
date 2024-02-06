@@ -12,7 +12,7 @@ import {
 
 function AdminUser() {
   const [bvalue, setBValue] = useState(true);
-  const [shownewusers, setNewusers] = useState(false);
+  const [shownewusers, setNewusers] = useState(true);
   const [details, setDetails] = useState();
   const [searchForm, setSearchform] = useState({
     membername: "",
@@ -29,18 +29,19 @@ function AdminUser() {
     gender: "",
     membertype: "",
   });
-  // const [memType, setMemType] = useState();
+  const [memType, setMemType] = useState();
 
-  // const fetchAllMemtypedetails = async () => {
-  //   try {
-  //     const cname = orgData.clubname;
-  //     const response = await api.post("/getmemtype/", { clubname: cname });
-  //     setMemType(response.data);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching details:", error);
-  //   }
-  // };
+  const fetchAllMemtypedetails = async () => {
+    console.log("hey inside fetchallmembershiptype");
+    try {
+      const response = await api.get("/allmembershiptype/");
+      setMemType(response.data);
+      console.log(memType);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching details:", error);
+    }
+  };
 
   function formatDateForInput(dateString) {
     const date = new Date(dateString);
@@ -87,7 +88,7 @@ function AdminUser() {
   };
 
   const fetchAllMemberdetails = async () => {
-    setNewusers(!shownewusers);
+    // setNewusers(!shownewusers);
     try {
       const response = await api.get("/adminmemberdetails");
       setDetails(response.data);
@@ -96,11 +97,22 @@ function AdminUser() {
       console.error("Error fetching details:", error);
     }
   };
+
+  const handleshowallusers = (value) => {
+    setNewusers(value);
+    if (value == true) {
+      fetchAllMemberdetails();
+    } else {
+      handleshownewusers();
+    }
+  };
+
   console.log(details);
   // useEffect(() => {
   //   fetchAllMemberdetails();
   // }, []);
   useEffect(() => {
+    fetchAllMemtypedetails();
     // Use a timeout to wait for the user to stop typing
     const timeoutId = setTimeout(() => {
       fetchMembersFilters();
@@ -151,7 +163,7 @@ function AdminUser() {
     try {
       console.log("filtering details");
       console.log(filters);
-      const tablefilters = { data: filters };
+      const tablefilters = { data: filters, memberlist: details };
       const response = await api.post("/adminusertablefilters", tablefilters);
       console.log(response.data);
       if (response.data.data_dict === "empty") {
@@ -171,7 +183,7 @@ function AdminUser() {
   console.log(filters);
 
   const handleshownewusers = async () => {
-    setNewusers(!shownewusers);
+    // setNewusers(!shownewusers);
     try {
       const result = await api.get("/fetchingnewusers");
       if (result.data.success !== false) {
@@ -186,20 +198,18 @@ function AdminUser() {
   };
 
   const handlememberdelete = async (post) => {
-    const data = {"username" : post.username}
-    try{
-
-      const response =  await api.post("/deletenewuser",data)
-      if (response){
+    const data = { username: post.username };
+    try {
+      const response = await api.post("/deletenewuser", data);
+      if (response) {
         fetchAllMemberdetails();
+      } else {
+        toast.error("Error in deleting");
       }
-      else{
-        toast.error("Error in deleting")
-      }
-    }catch(error){
+    } catch (error) {
       console.error("Error fetching details:", error);
     }
-  }
+  };
 
   return (
     <>
@@ -215,11 +225,17 @@ function AdminUser() {
       >
         <div>
           {shownewusers ? (
-            <button className="addpostbtn mt-3" onClick={handleshownewusers}>
+            <button
+              className="addpostbtn mt-3"
+              onClick={() => handleshowallusers(false)}
+            >
               New Users
             </button>
           ) : (
-            <button className="addpostbtn mt-3" onClick={fetchAllMemberdetails}>
+            <button
+              className="addpostbtn mt-3"
+              onClick={() => handleshowallusers(true)}
+            >
               All Users
             </button>
           )}
@@ -436,18 +452,27 @@ function AdminUser() {
                       </select>
                     </div>
                   </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="membertype"
-                        value={filters.membertype}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
                   {shownewusers && (
                     <>
+                      <td>
+                        <div type="text" className="inputdiv">
+                          <select
+                            onChange={handleFilterInputChange}
+                            className="trtext form-select"
+                            style={{ width: "10rem" }}
+                            id="membertype"
+                            name="membertype"
+                            value={filters.membertype}
+                          >
+                            <option value="">Membership-Type</option>
+                            {memType?.map((type) => (
+                              <option key={type} value={type}>
+                                {type}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
                       <td>
                         <div type="text" className="inputdiv">
                           --
@@ -462,10 +487,10 @@ function AdminUser() {
                   )}
                   {!shownewusers && (
                     <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
+                      <div type="text" className="inputdiv">
+                        --
+                      </div>
+                    </td>
                   )}
                 </tr>
 
@@ -482,7 +507,10 @@ function AdminUser() {
                     <td className="trtext">{post.email}</td>
                     <td className="trtext">{post.pnumber}</td>
                     <td className="trtext">{post.gender}</td>
-                    <td className="trtext">{post.membertype}</td>
+                    <td className="trtext">
+                      {post.membertype}
+                      {post.memberid != null && <>{", " + post.clubname}</>}
+                    </td>
                     {shownewusers && (
                       <>
                         <td className="trtext">
@@ -494,15 +522,15 @@ function AdminUser() {
                       </>
                     )}
                     {!shownewusers && (
-                    <td className="trtext">
-                    <button
-                      className="addmembtn"
-                      onClick={() => handlememberdelete(post)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                  )}
+                      <td className="trtext">
+                        <button
+                          className="addmembtn"
+                          onClick={() => handlememberdelete(post)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

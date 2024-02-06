@@ -163,7 +163,7 @@ function OrgMemberDetails() {
       // console.log(data);
       // const cname = orgData._id; //Rajpath
       // // console.log(typeof cname); //string
-      const response = await api.post("/orgmemberfilterbyname/", data);
+      const response = await api.post("/orgmemberfilter/", data);
       setDetails(response.data);
       console.log(response.data);
     } catch (error) {
@@ -231,7 +231,7 @@ function OrgMemberDetails() {
           <form className="form-inline my-lg-0 " onSubmit={handlesearchSubmit}>
             <div className="row">
               <div className="col-3">
-                <span>Start Date:</span>
+                <span><strong>From:</strong></span>
                 <input
                   type="date"
                   className="trtext"
@@ -242,7 +242,7 @@ function OrgMemberDetails() {
                 />
               </div>
               <div className="col-3">
-                <span>Expiry Date:</span>
+                <span><strong>To:</strong></span>
                 <input
                   type="date"
                   className="trtext"

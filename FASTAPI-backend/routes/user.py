@@ -350,7 +350,7 @@ async def allusers_tablefilters(data:dict):
     filtered_data = {}
     for key, value in allfiltersdata.items():
         if (value != '' or value != ""):
-            filtered_data[key] = re.escape(value)
+            filtered_data[key] = (value)
     print(filtered_data)
             
     content = []
@@ -360,30 +360,30 @@ async def allusers_tablefilters(data:dict):
         for key, value in filtered_data.items():
             if value:
                 regex_patterns[key] = re.compile(f'^{re.escape(value)}.*', re.IGNORECASE)
-        print(regex_patterns)
+        # print(regex_patterns)
         
-        membersList = serializeList(conn.EventWiz.users.find({}))
+        membersList = data["memberlist"]
 
-        print(membersList)
+        # print(membersList)
         if membersList:
             
             for memberdict in membersList:
                 match = all(regex.match(str(memberdict.get(key, ''))) for key, regex in regex_patterns.items())
                 if match:
                    content.append(memberdict)
-            print(content)
+            # print(content)
             if content:
-                for i in content:
-                    if i["expiry_date"]:
-                        i["expiry_date"] = i["expiry_date"].strftime("%Y-%m-%d")
-                    if i["start_date"]:
-                        i["start_date"] = i["start_date"].strftime("%Y-%m-%d")
+                # for i in content:
+                #     if i["expiry_date"]:
+                #         i["expiry_date"] = i["expiry_date"].strftime("%Y-%m-%d")
+                #     if i["start_date"]:
+                #         i["start_date"] = i["start_date"].strftime("%Y-%m-%d")
                 return content
             else:
                 return {"error":"No Members","success":False}
    
         else:
-            return {"error":"No members","success":False}
+            return {"error":"No members in org","success":False}
     else:
         
         return {"error":"Please enter data in filter input","success":False,"data_dict":"empty"}
@@ -823,16 +823,18 @@ async def get_clubnames():
 # Get all type of Membership 
 @event.get("/allmembershiptype")
 async def  all_membershiptype():
-    allmemtype =[]
+
     allorg = conn.EventWiz.organisation.find({})
-    if allorg:
-        allorg1 = serializeList(allorg)
-        for i in allorg1:
-            if i["memtype"] != []:
-                for j in i["memtype"]:
-                    if j["type"] not in allmemtype:
-                        allmemtype.append(j["type"])
-    return allmemtype
+    allorg = serializeList(allorg)
+    membertypes = []
+    for singleorg in allorg:
+        for i in singleorg["memtype"]:
+            membertypes.append(i["type"])
+
+    allmembtype = list(set(membertypes))
+    # print(allmembtype)
+    return allmembtype
+
 
 # organisation login
 @event.post('/organisationlogin/')
@@ -1063,6 +1065,7 @@ async def other_org_eventpost_filters(data: dict):
     else:
         return {"error": "Error, please fill the form again", "success": False}
     
+
 # organisation fetch member details 
 @event.post("/organizationmemberdetails/")
 async def organisation_member_details(data : dict):
@@ -1077,6 +1080,50 @@ async def organisation_member_details(data : dict):
     else:
         return {"data":"Member doesn't Exist","success":False}
 
+# organisation member table search 
+@event.post("/orgmemberfilter")
+async def filter_members(data:dict):
+    if (data["expiry_date"] != ''):
+        data["expiry_date"] = datetime.strptime(data["expiry_date"], "%Y-%m-%d")
+    if (data["start_date"] != ''):
+        data["start_date"] = datetime.strptime(data["start_date"], "%Y-%m-%d")
+
+    print(data)
+    filtered_data = {}
+    for key, value in data.items():
+        if (value != '' or value != ""):
+          filtered_data[key] = value
+    organisation = conn.EventWiz.organisation.find_one({"_id":ObjectId(data["cid"])})
+    result = []
+    if organisation:   
+        
+        org1 = serializeDict(organisation)
+        partial_name = data["membername"]
+        regex_pattern = re.compile(f"^{re.escape(partial_name)}.*", re.IGNORECASE)
+
+        for memberdict in org1["members"]:
+            if "name" in memberdict and re.match(regex_pattern, memberdict["name"]):
+                if data["start_date"] !="" and data["expiry_date"] !="":
+                    if memberdict["start_date"] >= filtered_data["start_date"] and memberdict["start_date"] <= filtered_data["expiry_date"]:
+                        result.append(memberdict)
+                elif data["start_date"] !="":
+                    if memberdict["start_date"] >= filtered_data["start_date"]:
+                        result.append(memberdict)
+                elif data["expiry_date"] !="":
+                    if memberdict["start_date"] <= filtered_data["expiry_date"]:
+                        result.append(memberdict)
+                else:
+                    result.append(memberdict)
+        if (result != []):
+            for singledict in result:
+                singledict["expiry_date"] = singledict["expiry_date"].strftime("%Y-%m-%d")
+                singledict["start_date"] = singledict["start_date"].strftime("%Y-%m-%d")
+             
+            return result
+        else:
+            return {"error":"Member Not Found","success":False}
+    else:
+        return {"error":"Organisation Not Found","success":False}
     
 #organisation route for fetching  member's membership-type
 @event.post("/getmemtype/")
@@ -1189,87 +1236,7 @@ async def delete_member(data : dict):
         return {"error":"Member deleted Successfully","success":True}
     else:
         return {"error":"Invalid Input","success":False}
-    
-# searching a member by name or expiry/start date
-@event.post("/orgmemberfilterbyname")
-async def fetch_details_bynameordates(data:dict):
 
-    if (data["expiry_date"] != ''):
-        # data["expiry_date"] = data["expiry_date"].strftime("%Y-%m-%d")
-        data["expiry_date"] = datetime.strptime(data["expiry_date"], "%Y-%m-%d")
-    if (data["start_date"] != ''):    
-        # data["start_date"] = data["start_date"].strftime("%Y-%m-%d")
-        data["start_date"] = datetime.strptime(data["start_date"], "%Y-%m-%d")
-
-    print(data)
-    filtered_data = {}
-    for key, value in data.items():
-        if (value != '' or value != ""):
-          filtered_data[key] = value
-    
-    # return filtered_data 
-    print(filtered_data)
-    # content = []
-    # if (len(filtered_data) != 0):
-    #     regex_patterns = {}
-    #     for key, value in data.items():
-    #         if value:
-    #             regex_patterns[key] = re.compile(f'^{re.escape(value)}', re.IGNORECASE)
-    organisation = conn.EventWiz.organisation.find_one({"_id":ObjectId(data["cid"])})
-    result = []
-    if organisation:   
-        
-        org1 = serializeDict(organisation)
-        partial_name = data["membername"]
-        regex_pattern = re.compile(f"{re.escape(partial_name)}.*", re.IGNORECASE)
-        # #print(org1)
-        # member_name = data["membername"]
-        # #print(member_name)
-        for memberdict in org1["members"]:
-            #print(memberdict["name"])
-            if "name" in memberdict and re.match(regex_pattern, memberdict["name"]):
-                if match_dates(memberdict, data):
-                    result.append(memberdict)
-                    
-        # #print(d1)
-        #print(result)
-        if (result != []):
-        #   print(result)
-          for singledict in result:
-                singledict["expiry_date"] = singledict["expiry_date"].strftime("%Y-%m-%d")
-                singledict["start_date"] = singledict["start_date"].strftime("%Y-%m-%d")
-             
-          return result
-        else:
-            return {"error":"Member Not Found","success":False}
-    else:
-        return {"error":"Organisation Not Found","success":False}
-
-#extended function for searching members by year 
-def match_dates(memberdict, data):
-    start_date = data.get("start_date")
-    expiry_date = data.get("expiry_date")
-
-    if start_date and "start_date" in memberdict:
-        if isinstance(memberdict["start_date"], datetime):
-            member_start_date = memberdict["start_date"].date()
-        else:
-            member_start_date = datetime.strptime(memberdict["start_date"]["$date"], "%Y-%m-%dT%H:%M:%S.%fZ").date()
-        
-        if start_date.year != member_start_date.year:
-            return False
-
-    if expiry_date and "expiry_date" in memberdict:
-        if isinstance(memberdict["start_date"], datetime):
-            member_expiry_date = memberdict["start_date"].date()
-        else:
-            member_expiry_date = datetime.strptime(memberdict["expiry_date"]["$date"], "%Y-%m-%dT%H:%M:%S.%fZ").date()
-
-        if expiry_date.year != member_expiry_date.year:
-            return False
-
-    return True   
-# 
 #fetching member details for updating
 @event.post("/organisationunupdatedmemberdetails")
 async def update_member_details(data: dict):
@@ -1335,7 +1302,7 @@ async def otherorg_eventpost_bytitle(data:dict):
             if (partial_name == ""):
                 return {"error":"No Title input","success":False}
             else:
-                regex_pattern = re.compile(f".*{re.escape(partial_name)}.*", re.IGNORECASE)
+                regex_pattern = re.compile(f"^{re.escape(partial_name)}.*", re.IGNORECASE)
     
                 for postdict in serializeList(posts):
                     # if postdict["event_title"] == data["title"]:

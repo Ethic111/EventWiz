@@ -173,6 +173,7 @@ function OrgOtherEvents() {
         
       } else {
         fetchAllPostdetails();
+        toast.error(response.data.error)
       }
       // console.log(response.data);
     } catch (error) {
@@ -191,7 +192,7 @@ function OrgOtherEvents() {
               <div className="col-10 p-2">
                 <input
                   className="form-control"
-                  name="otherevent_title"
+                  name="event_title"
                   type="text"
                   placeholder="Search"
                   aria-label="Search"
