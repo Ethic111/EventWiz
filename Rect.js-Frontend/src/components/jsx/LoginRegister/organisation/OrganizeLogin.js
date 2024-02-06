@@ -1,14 +1,17 @@
-import React,{useState,useEffect} from "react";
+import React, { useState } from 'react'
+import api from '../../api';
 import { useNavigate } from "react-router-dom";
-import "../../../css/LoginRegister/user/userLogin.css";
-import api from "../../api";
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
+// import {useDispatch,useSelector} from "react-redux"
+// import { orglogin,orglogout } from '../../../ReduxStore/AuthSlice';
+
 
 function OrganizeLogin({ setOBoolean }) {
+  // const auth = useSelector(state => state.data)
+  // const status = useSelector(state => state.orgstatus)
   const navigate = useNavigate();
-
-
-  const [lFormData,setLFormData] = useState({
+  // const dispatch = useDispatch()
+  const [lFormData, setLFormData] = useState({
     username: "",
     pwd: "",
   });
@@ -23,93 +26,92 @@ function OrganizeLogin({ setOBoolean }) {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      const checking = await api.post("/organisationlogin/", lFormData);
-      console.log(checking.data)
-      if (checking.data.success != false) {
-        // Use the navigate function to go to the home page
-        localStorage.setItem('organisers', JSON.stringify(checking.data));
+      const checking = await api.post("/organisationlogin", lFormData);
+      // const data = checking.data
+      // console.log(data)
 
+      if (checking.data.success !== false) {
+        localStorage.setItem("organisers", JSON.stringify(checking.data));
+        // dispatch(orglogin({data}))
+        // console.log(auth)
+        // console.log(status)
+        toast.success("Login Successfully")
+        setLFormData({
+          username: "",
+          pwd: "",
+        });
         navigate("/organisationevents");
       } else {
-        toast.error("Wrong Username & Password!");
+        toast.error(checking.data.error);
       }
-      setLFormData({
-        username: "",
-        pwd: "",
-      });
+
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
-
-
+  
   return (
     <>
-      <div className="UserloginBody">
-        <div className="container">
-          <header className="Uheader row text-center"></header>
-          <main className="Umain main row">
-            <div className="left col">
-              <img
-                src="https://img.freepik.com/premium-vector/young-woman-enjoy-sitting-reading-book-hygge-concept-vector-illustration_194708-2078.jpg"
-                alt="girl-reading-a-book"
-                className="Uimg"
-              />
-            </div>
-            <div className="right col">
-              <form className="UserForm sign-up" onSubmit={handleFormSubmit}>
-                <h4 className="Uh4">Organisation Login</h4>
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label">
-                    UserName:
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="username"
-                    placeholder="Enter your username"
-                    name="username"
-                    value={lFormData.username}
-                    onChange={handleInputChange}
-                  />
+
+      <div className="col-12 col-md-6 col-xl-5 ">
+        <div className="card border-0 rounded-4">
+          <div className="card-body p-3 p-md-4 p-xl-5">
+            <div className="row">
+              <div className="col-12">
+                <div className="mb-4">
+                  <h3>Organization Login </h3>
+                  <p>Don't have an account? <button style={{color: 'white',backgroundColor: '#0e2643',border: 'none',marginLeft: '1rem',padding: '0.3rem 0.5rem 0.3rem 0.5rem',borderRadius: '0.375rem'}} onClick={() => { setOBoolean(false) }} >Register</button></p>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="pwd" className="form-label">
-                    Password:
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="pwd"
-                    placeholder="Create a password"
-                    name="pwd"
-                    value={lFormData.pwd}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <button type="submit" className="btn submit-btn">
-                  Login
-                </button>
-              </form>
-              <div className="sign-in">
-                <p className="userP">
-                  Don't have an account?
-                  <span
-                    className="userloginstatement"
-                    onClick={() => {
-                      setOBoolean(false);
-                    }}
-                  >
-                    Register
-                  </span>
-                </p>
               </div>
             </div>
-          </main>
+            <form onSubmit={handleFormSubmit}>
+              <div className="row gy-3 overflow-hidden">
+                <div className="col-12">
+                  <div className="form-floating mb-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="username"
+                      name="username"
+                      placeholder=''
+                      value={lFormData.username}
+                      onChange={handleInputChange}
+                    />
+                    <label htmlFor="username" className="form-label">
+                      Username
+                    </label>
+                  </div>
+                </div>
+                <div className="col-12">
+                  <div className="form-floating mb-3">
+                    <input
+                      type="password"
+                      className="form-control"
+                      id="pwd"
+                      name="pwd"
+                      placeholder=''
+                      value={lFormData.pwd}
+                      onChange={handleInputChange}
+                    />
+                    <label htmlFor="pwd" className="form-label">
+                      Password
+                    </label>
+                  </div>
+                </div>
+                <div className="col-12">
+                  <div className="d-grid">
+                    <button style={{color: 'white',backgroundColor: '#0e2643',border: 'none',marginLeft: '1rem',padding: '0.3rem 0.5rem 0.3rem 0.5rem',borderRadius: '0.375rem'}} type="submit">Log in now</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+          </div>
         </div>
       </div>
     </>
-  );
+  )
 }
 
-export default OrganizeLogin;
+export default OrganizeLogin
+

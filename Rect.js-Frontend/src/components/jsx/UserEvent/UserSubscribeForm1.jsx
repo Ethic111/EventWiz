@@ -33,7 +33,7 @@ function UserSubscribeForm1() {
                 gender: userData.gender,
                 username: userData.username,
                 pwd: userData.pwd,
-                membertype: "",
+                membertype: postData.type,
             })
         }
     },[]);

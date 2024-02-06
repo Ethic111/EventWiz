@@ -1,194 +1,184 @@
-import React, { useState } from "react";
-import "../../../css/LoginRegister/user/userRegistration1.css";
-import { useNavigate } from "react-router-dom";
-import api from "../../api";
-import { toast } from "react-toastify";
+import React, { useState } from 'react'
+import api from "../../api"
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
 
-function UserRegister1({ setUserBoolean }) {
-  const [lFormData, setLFormData] = useState({
-    name: "",
-    email: "",
-    pnumber: "",
-    gender: "",
-    username: "",
-    pwd: "",
-  });
-
-  const navigate = useNavigate();
-
-  const handleInputChange = (event) => {
-    setLFormData({
-      ...lFormData,
-      [event.target.name]: event.target.value,
+function UserRegister1({ setUBoolean }) {
+    const navigate = useNavigate();
+    const [lFormData, setLFormData] = useState({
+        name: "",
+        email: "",
+        pnumber: '',
+        gender: "", 
+        username: "",
+        pwd: "",
     });
-  };
 
-  const handleFormSubmit = async (event) => {
-    console.log(lFormData)
-    event.preventDefault();
-    try {
-      const checking = await api.post("/userregistration/", lFormData);
-      console.log(checking.data)
-      if (checking.data.success != false) {
-        // Use the navigate function to go to the home page
-        // console.log("form data: "+ JSON.stringify(lFormData))
-        localStorage.setItem("users", JSON.stringify(checking.data));
-        navigate("/");
+    const handleInputChange = (event) => {
         setLFormData({
-          name: "",
-          email: "",
-          pnumber: "",
-          gender: "",
-          username: "",
-          pwd: "",
+            ...lFormData,
+            [event.target.name]: event.target.value,
         });
-      } else {
-        // toast.error(checking.data.error);
-        toast.error(checking.data.error)
-      }
+    };
 
-      
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
-  return (
-    <>
-      <div className="OrgloginBody">
-        <div className="container">
-          <header className="Orgheader row text-center"></header>
-          <main className="Orgmain main row">
-            <div className="left col">
-              <img
-                src="https://img.freepik.com/premium-vector/young-woman-enjoy-sitting-reading-book-hygge-concept-vector-illustration_194708-2078.jpg"
-                alt="girl-reading-a-book"
-                className="Orgimg"
-              />
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const checking = await api.post("/userregistration/", lFormData);
+            if (checking.data.success !== false) {
+                localStorage.setItem("users", JSON.stringify(checking.data));
+                toast.success("Signup Successfully")
+                setLFormData({
+                    name: "",
+                    email: "",
+                    pnumber: '',
+                    gender: "",
+                    username: "",
+                    pwd: "",
+                });
+                navigate("/home");
+              } else {
+                toast.error(checking.data.error);
+              }
+            
+        } catch (error) {
+            console.error("Error submitting form:", error);
+        }
+    };
+    return (
+        <>
+            <div className="col-12 col-md-6 col-xl-5">
+                <div className="card border-0 rounded-4">
+                    <div className="card-body p-3 p-md-4 p-xl-5">
+                        <div className="row">
+                            <div className="col-12">
+                                <div className="mb-4">
+                                    <h3>User Registration</h3>
+                                    <p>if you have an account? <button style={{color: 'white',backgroundColor: '#0e2643',border: 'none',marginLeft: '1rem',padding: '0.3rem 0.5rem 0.3rem 0.5rem',borderRadius: '0.375rem'}} onClick={() => {
+                                        setUBoolean(true)
+                                    }}>Login</button></p>
+                                </div>
+                            </div>
+                        </div>
+                        <form onSubmit={handleFormSubmit}>
+                            <div className="row gy-3 overflow-hidden">
+                                <div className="col-12">
+                                    <div className="form-floating">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="name"
+                                            placeholder=" "
+                                            name="name"
+                                            value={lFormData.name}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="name" className="form-label">
+                                            Name
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="form-floating">
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            id="email"
+                                            placeholder=""
+                                            name="email"
+                                            value={lFormData.email}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="email" className="form-label">
+                                            Email
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="form-floating">
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            id="pnumber"
+                                            placeholder=""
+                                            name="pnumber"
+                                            value={lFormData.pnumber}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="pnumber" className="form-label">
+                                            Phone Number
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="">
+                                        <label htmlFor="gender" className="form-label me-3">
+                                            Gender
+                                        </label>
+                                        <input
+                                            type="radio"
+                                            name="gender"
+                                            value="Male"
+                                            checked={lFormData.gender === "Male"}
+                                            onChange={handleInputChange}
+                                        />
+                                        Male
+                                        <input
+                                            type="radio"
+                                            name="gender"
+                                            value="Female"
+                                            checked={lFormData.gender === "Female"}
+                                            className='ms-2'
+                                            onChange={handleInputChange}
+                                        />
+                                        Female
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="form-floating">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="username"
+                                            placeholder=""
+                                            name="username"
+                                            value={lFormData.username}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="username" className="form-label">
+                                            Username
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="form-floating">
+                                        <input
+                                            type="password"
+                                            className="form-control"
+                                            id="pwd"
+                                            placeholder=""
+                                            name="pwd"
+                                            value={lFormData.pwd}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="pwd" className="form-label">
+                                            Password
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="d-grid">
+                                        <button style={{color: 'white',backgroundColor: '#0e2643',border: 'none',marginLeft: '1rem',padding: '0.3rem 0.5rem 0.3rem 0.5rem',borderRadius: '0.375rem'}} type="submit">Log in now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div className="right col">
-              <form className="OrgForm sign-up" onSubmit={handleFormSubmit}>
-                <h4 className="Oh4">User Registration</h4>
-                <div className="orgsign-in">
-                  <p className="orgP">
-                    Want to Login?{" "}
-                    <span
-                      onClick={() => {
-                        setUserBoolean(true);
-                      }}
-                    >
-                      <span className="orgloginstatement ">Login</span>
-                    </span>{" "}
-                  </p>
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="name"
-                    placeholder="Enter your name"
-                    name="name"
-                    value={lFormData.name}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="Enter your email"
-                    name="email"
-                    value={lFormData.email}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="pnumber" className="form-label">
-                    Phone Number:
-                  </label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="pnumber"
-                    placeholder="Enter your number"
-                    name="pnumber"
-                    value={lFormData.pnumber}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="gender" className="form-label mx-2">
-                    Gender
-                  </label>
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Male"
-                    checked={lFormData.gender === "Male"}
-                    className="mx-2"
-                    onChange={handleInputChange}
-                  />
-                  Male
-                  <input
-                    type="radio"
-                    name="gender"
-                    value="Female"
-                    checked={lFormData.gender === "Female"}
-                    className="mx-2"
-                    onChange={handleInputChange}
-                  />
-                  Female
-                </div>
+        </>
 
-                <div className="orgsign-in">
-                  <p className="orgP">Lets Create Username & Password </p>
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label">
-                    UserName:
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="username"
-                    placeholder="Enter your user name"
-                    name="username"
-                    value={lFormData.username}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="pwd" className="form-label">
-                    Password:
-                  </label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="pwd"
-                    placeholder="Enter your password"
-                    name="pwd"
-                    value={lFormData.pwd}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <button type="submit" className="btn submit-btn">
-                  Register
-                </button>
-              </form>
-            </div>
-          </main>
-        </div>
-      </div>
-    </>
-  );
+    )
 }
 
-export default UserRegister1;
+export default UserRegister1

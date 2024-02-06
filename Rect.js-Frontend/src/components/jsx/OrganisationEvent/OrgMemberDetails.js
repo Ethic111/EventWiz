@@ -11,7 +11,9 @@ import {
 
 function OrgMemberDetails() {
   const [bvalue, setBValue] = useState(true);
+  const [showeventwiz, setShowEventWiz] = useState(false);
   const [details, setDetails] = useState();
+
   const [searchForm, setSearchform] = useState({
     membername: "",
     start_date: "",
@@ -20,6 +22,7 @@ function OrgMemberDetails() {
   const [orgData, setOrgData] = useState(
     JSON.parse(localStorage.getItem("organisers"))
   );
+  
   const [memberslist, setMemberlist] = useState(orgData.members);
   const [filters, setFilters] = useState({
     memberid: "",
@@ -53,7 +56,12 @@ function OrgMemberDetails() {
 
   const handlesorting = async (col) => {
     try {
-      const data = { clubname: orgData.clubname, "col": col["name"], "value": col["value"],"members":details  };
+      const data = {
+        clubname: orgData.clubname,
+        col: col["name"],
+        value: col["value"],
+        members: details,
+      };
       const checking = await api.post("/membersortinguserside", data);
       console.log(checking);
       if (checking.data.success !== false) {
@@ -83,7 +91,7 @@ function OrgMemberDetails() {
       start_date: "",
       expiry_date: "",
     });
-
+    setShowEventWiz(false);
     fetchAllMemberdetails();
   };
 
@@ -95,16 +103,13 @@ function OrgMemberDetails() {
       const response = await api.post("/organizationmemberdetails/", {
         clubname: cname,
       });
-      if (response.data.success !== false){
-
+      if (response.data.success !== false) {
         // console.log(response.data);
         setDetails(response.data);
-      }
-      else{
-        toast.error(response.data.error)
+      } else {
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
-      
     } catch (error) {
       console.error("Error fetching details:", error);
     }
@@ -177,7 +182,6 @@ function OrgMemberDetails() {
       ...prevFilters,
       [name]: value,
     }));
- 
   };
 
   const fetchMembersFilters = async () => {
@@ -191,7 +195,6 @@ function OrgMemberDetails() {
       );
       if (response.data.data_dict === "empty") {
         fetchAllMemberdetails();
-      
       } else if (response.data.success != false) {
         console.log("Response=" + response.data.error);
         setDetails(response.data);
@@ -204,7 +207,65 @@ function OrgMemberDetails() {
     }
   };
 
-  console.log(filters);
+  // console.log(filters);
+
+  const handleLoggedinmembers = async () => {
+    setShowEventWiz(true);
+    try {
+      console.log(memberslist);
+      const result = await api.post("/loggedinmembers", {
+        data: memberslist,
+      });
+      console.log(result.data); // Log the result for debugging
+      if (result.data.success !== false) {
+        setDetails(result.data);
+      } else {
+        setDetails(memberslist);
+        toast.error(result.data.error);
+      }
+    } catch (error) {
+      console.error("Error in handleLoggedinmembers:", error);
+    }
+  };
+
+  const handleInactivemembers = async () => {
+    setShowEventWiz(false);
+    try {
+      console.log(memberslist);
+      const result = await api.post("/inactivemembers", {
+        data: memberslist,
+      });
+      console.log(result.data); // Log the result for debugging
+      if (result.data.success !== false) {
+        setDetails(result.data);
+      } else {
+        setDetails(memberslist);
+        toast.error(result.data.error);
+      }
+    } catch (error) {
+      console.error("Error in handleInactivemembers:", error);
+    }
+  };
+
+  const handleSubscribers = async () => {
+    try {
+      const result = await api.post("/subscribeusers", {
+        data: memberslist,
+      });
+      if (result.data.success !== false) {
+        setDetails(result.data);
+      } else if (result.data.error === "empty") {
+        toast(result.data.message);
+        setShowEventWiz(false);
+      } else {
+        toast.error(result.data.error);
+        setShowEventWiz(false);
+        setDetails(orgData.members);
+      }
+    } catch (error) {
+      console.error("Error in handleInactivemembers:", error);
+    }
+  };
 
   return (
     <>
@@ -231,7 +292,9 @@ function OrgMemberDetails() {
           <form className="form-inline my-lg-0 " onSubmit={handlesearchSubmit}>
             <div className="row">
               <div className="col-3">
-                <span><strong>From:</strong></span>
+                <span>
+                  <strong>From:</strong>
+                </span>
                 <input
                   type="date"
                   className="trtext"
@@ -242,7 +305,9 @@ function OrgMemberDetails() {
                 />
               </div>
               <div className="col-3">
-                <span><strong>To:</strong></span>
+                <span>
+                  <strong>To:</strong>
+                </span>
                 <input
                   type="date"
                   className="trtext"
@@ -285,6 +350,22 @@ function OrgMemberDetails() {
         </div>
       </div>
       <hr />
+      <div>
+        <button className="addpostbtn" onClick={handleLoggedinmembers}>
+          Active Members
+        </button>
+        {showeventwiz && (
+          <span>
+            <button className="addpostbtn" onClick={handleSubscribers}>
+              EventWiz Subscribers
+            </button>
+          </span>
+        )}
+        <button className="addpostbtn" onClick={handleInactivemembers}>
+          Inactive Members
+        </button>
+      </div>
+      <hr />
       <div className="row">
         <div className="col-12">
           {/* <br /> */}
@@ -307,14 +388,18 @@ function OrgMemberDetails() {
                     <span>
                       <span>
                         <IoIosArrowDropupCircle
-                        style={{cursor:"pointer"}}
-                          onClick={() => handlesorting({"name":"name","value":true})}
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "name", value: true })
+                          }
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                        style={{cursor:"pointer"}}
-                          onClick={() => handlesorting({"name":"name","value":false})}
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "name", value: false })
+                          }
                         />
                       </span>
                     </span>
@@ -327,14 +412,18 @@ function OrgMemberDetails() {
                     <p>
                       <span>
                         <IoIosArrowDropupCircle
-                        style={{cursor:"pointer"}}
-                          onClick={() => handlesorting({"name":"pnumber","value":true})}
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "pnumber", value: true })
+                          }
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                        style={{cursor:"pointer"}}
-                          onClick={() => handlesorting({"name":"pnumber","value":false})}
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "pnumber", value: false })
+                          }
                         />
                       </span>
                     </p>
@@ -350,36 +439,40 @@ function OrgMemberDetails() {
                     <p>
                       <span>
                         <IoIosArrowDropupCircle
-                        style={{cursor:"pointer"}}
-                          onClick={() => handlesorting({"name":"start_date","value":true})}
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "start_date", value: true })
+                          }
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                        style={{cursor:"pointer"}}
-                          onClick={() => handlesorting({"name":"start_date","value":false})}
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "start_date", value: false })
+                          }
                         />
                       </span>
                     </p>
                   </th>
-                  <th
-                    scope="col"
-                    className="tablehead align-middle"
-                    
-                  >
-                    <span>Expiry date{" "}</span>
-                    <p
-                      
-                    >
+                  <th scope="col" className="tablehead align-middle">
+                    <span>Expiry date </span>
+                    <p>
                       <span>
-                        <IoIosArrowDropupCircle 
-                        style={{cursor:"pointer"}}
-                        onClick={() => handlesorting({"name":"expiry_date","value":true})}/>
+                        <IoIosArrowDropupCircle
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "expiry_date", value: true })
+                          }
+                        />
                       </span>
-                      <span >
-                        <IoIosArrowDropdownCircle 
-                        style={{cursor:"pointer"}}
-                        onClick={() => handlesorting({"name":"expiry_date","value":false})}/>
+                      <span>
+                        <IoIosArrowDropdownCircle
+                          style={{ cursor: "pointer" }}
+                          onClick={() =>
+                            handlesorting({ name: "expiry_date", value: false })
+                          }
+                        />
                       </span>
                     </p>
                   </th>

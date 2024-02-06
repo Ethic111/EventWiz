@@ -196,7 +196,13 @@ async def loggedin_members(data:dict):
         if singledict["loggedin"] == True :
             logginemembers.append(singledict)
     if logginemembers:
-        # print(logginemembers)
+        print(logginemembers)
+        for i in logginemembers:
+            if (i["expiry_date"] != ''):
+                i["expiry_date"] = i["expiry_date"][0:10]
+        
+            if (i["start_date"] != ''):    
+                i["start_date"] = i["start_date"][0:10]
         return logginemembers
     else:
         return {"error":"No loggedin members","success":False}
@@ -213,6 +219,12 @@ async def inactive_members(data:dict):
             inactivemembers.append(singledict)
     if inactivemembers:
         # print(logginemembers)
+        for i in inactivemembers:
+            if (i["expiry_date"] != ''):
+                i["expiry_date"] = i["expiry_date"][0:10]
+        
+            if (i["start_date"] != ''):    
+                i["start_date"] = i["start_date"][0:10]
         return inactivemembers
     else:
         return {"error":"No loggedin members","success":False}
@@ -229,6 +241,12 @@ async def adminside_subscribedusers(data:dict):
             if user["subscribe"] == True:
                 content.append(user)
         if content:
+            for i in content:
+                if (i["expiry_date"] != ''):
+                    i["expiry_date"] = i["expiry_date"][0:10]
+        
+                if (i["start_date"] != ''):    
+                    i["start_date"] = i["start_date"][0:10]
             return content    
         else:
             return {"message":"No EventWiz Members","success":False, "error":"empty"}
@@ -837,9 +855,9 @@ async def  all_membershiptype():
 
 
 # organisation login
-@event.post('/organisationlogin/')
+@event.post('/organisationlogin')
 async def check_org(data:dict):
-    # #print(data["username"])
+    # print(data["username"])
     
     d1 = conn.EventWiz.organisation.find_one({"$and": 
     [
@@ -1019,35 +1037,33 @@ async def other_org_eventpost_filters(data: dict):
     filtereddata = data["filteredFormData"]
     clubname = data["clubname"]
     # Build the query based on the filteredFormData
-    query = {"clubname": {"$ne": clubname}}
-
+    query = {}
+    and_conditions = []
     for field, value in filtereddata.items():
 
         if field in ["event_start_date", "event_end_date"] and value != "":
             value = datetime.strptime(value, "%Y-%m-%d")
             #print(value)
             if field == "event_start_date":
-                query["event_start_date"] = {"$gte": value}
+                and_conditions.append({"event_start_date": {"$gte": value}})
                 #print(query)
             if field == "event_end_date":
-                query["event_start_date"] = {"$lte": value}
+                and_conditions.append({"event_start_date": {"$lte": value}})
                 #print(query)
 
         if field in ["minprice", "maxprice"] and value != "":
             if field == "minprice":
-                # Convert minprice to float and construct the query
-                query["ticket_price"] = {"$gte": float(value)}
-                #print(query)
+                and_conditions.append({"ticket_price": {"$gte": float(value)}})
             if field == "maxprice":
-                # Convert maxprice to float and construct the query
-                query["ticket_price"] = {"$lte": float(value)}
-                #print(query)
+                and_conditions.append({"ticket_price": {"$lte": float(value)}})
 
         if field == "venue_city" and value != "":
-            # Construct a case-insensitive regex pattern for venue_city
             regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
-            query[field] = {"$regex": regex_pattern}
+            and_conditions.append({"venue_city": {"$regex": regex_pattern}})
 
+    and_conditions.append({"clubname": {"$ne": clubname}})
+    if and_conditions:
+        query["$and"] = and_conditions
     # Find posts based on the query
     result = conn.EventWiz.post.find(query)
 
@@ -1140,36 +1156,49 @@ async def get_memtype(data:dict):
 # organisation route for adding a member
 @event.put("/addorganizationmember/{id}")
 async def add_organizaton_member(id:str,member:User):
-    data_dict = dict(member)
+    given_dict = dict(member)
     org = conn.EventWiz.organisation.find({"_id":ObjectId(id)})
 
+    allorg = conn.EventWiz.organisation.find()
+    allorg = serializeList(allorg)
+
+    for singleorg in allorg:
+        memberlist = singleorg["members"]
+        for i in memberlist:
+            if i["username"] == given_dict["username"]:
+                return {"error":"Username already exists","success":False}
     if org:
         data_dict1 = serializeList(org)[0]["members"]
         for i in data_dict1:
-            if (i["username"] == data_dict["username"]):
-                return {"data":"Username already Exists","success":False}
-            if (i["memberid"] == data_dict["memberid"]):
-                return {"data":"Member ID already Exists","success":False}
+
+            if (i["memberid"] == given_dict["memberid"]):
+                return {"error":"Member ID already Exists","success":False}
             
-    data_dict["expiry_date"] = data_dict["expiry_date"].strftime("%Y-%m-%d")
-    data_dict["expiry_date"] = datetime.strptime(data_dict["expiry_date"], "%Y-%m-%d")
-    data_dict["start_date"] = data_dict["start_date"].strftime("%Y-%m-%d")
-    data_dict["start_date"] = datetime.strptime(data_dict["start_date"], "%Y-%m-%d")
+    given_dict["expiry_date"] = given_dict["expiry_date"].strftime("%Y-%m-%d")
+    given_dict["expiry_date"] = datetime.strptime(given_dict["expiry_date"], "%Y-%m-%d")
+    given_dict["start_date"] = given_dict["start_date"].strftime("%Y-%m-%d")
+    given_dict["start_date"] = datetime.strptime(given_dict["start_date"], "%Y-%m-%d")
 
 
-    if data_dict["membertype"] == "":
-        return {"data":"Select Membership Type","success":False}
+    if given_dict["membertype"] == "":
+        return {"error":"Select Membership Type","success":False}
     d1 = conn.EventWiz.organisation.find_one({"_id":ObjectId(id)})
     if d1:
         # serializeDict(d1)["members"].append(data_dict)
         org1 = serializeDict(d1)
-        org1["members"].append(data_dict)
-        conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(id)},{"$set": {"members":org1["members"]}})
-        return {"data":"Member Added Successfully","success":True}
-    else:
-        return {"data":"Invalid Input","success":False}
-    
 
+        del given_dict["clubname"]
+        given_dict["loggedin"] = False
+        given_dict["subscribe"] = False
+
+        org1["members"].append(given_dict)
+
+        conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(id)},{"$set": {"members":org1["members"]}})
+        return {"error":"Member Added Successfully","success":True}
+    else:
+        return {"error":"Invalid Input","success":False}
+
+    
 #updating member details
 @event.put("/organizationupdatememberdetails/")   
 async def update_member_details(data: dict):
@@ -1519,14 +1548,22 @@ async def adminside_acceptorg(data:dict):
       
             usersloggedindata = acceptedUser
 
-            conn.EventWiz.users.insert_one(usersloggedindata)
+
+            # conn.EventWiz.users.insert_one(usersloggedindata)
+            if (conn.EventWiz.users.find_one({"username":acceptedUser["username"]})):
+
+                content = conn.EventWiz.users.find_one_and_update({"username":acceptedUser["username"]},{"$set": usersloggedindata})
+            else:
+                conn.EventWiz.users.insert_one(usersloggedindata)
             
 
             acceptedUser["loggedin"] = True
             acceptedUser["subscribe"] = True
             # print(acceptedUser)
             del acceptedUser["clubname"]
-            del acceptedUser["_id"]
+            print(acceptedUser)
+            if "_id" in acceptedUser:
+                del acceptedUser["_id"]
             
             memberslists.append(acceptedUser)
 
@@ -1534,8 +1571,21 @@ async def adminside_acceptorg(data:dict):
 
             content = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(org["_id"])},{"$set": {"memapplied":updated_user,"members" : memberslists}})
 
+            allorg = serializeList(conn.EventWiz.organisation.find())
+
+                        
             if content:
-                return True
+                for singleorg in allorg:
+                    memappliedlist = []
+                    for member in singleorg["memapplied"]:
+                        if ((member["username"] != acceptedUser["username"]) and (member["clubname"] != None) ):
+                            memappliedlist.append(member)
+                    content2 = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(singleorg["_id"])},{"$set": {"memapplied":memappliedlist}})
+
+                    if content2:
+                        return True
+                    else:
+                        return {"error":"Problem in updating this user in other org's applied user list", "success":False}
             else:
                 return {"error":"Nothing To Update", "success":False}
     else:
@@ -1550,7 +1600,9 @@ async def adminside_acceptorg(data:dict):
         acceptedUser["loggedin"] = True
         acceptedUser["subscribe"] = True
         del acceptedUser["clubname"]
-        del acceptedUser["_id"]
+        if "_id" in acceptedUser:
+            del acceptedUser["_id"]
+        
         # print(acceptedUser)
 
         memberslists.append(acceptedUser)
@@ -1560,6 +1612,16 @@ async def adminside_acceptorg(data:dict):
         content = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(org["_id"])},{"$set": {"memapplied":updated_user,"members" : memberslists}})
         
         if content:
+            for singleorg in allorg:
+                memappliedlist = []
+                for member in singleorg["memapplied"]:
+                    if ((member["username"] != acceptedUser["username"]) and (member["clubname"] != None) ):
+                        memappliedlist.append(member)
+                content2 = conn.EventWiz.organisation.find_one_and_update({"_id":ObjectId(singleorg["_id"])},{"$set": {"memapplied":memappliedlist}})
+                if content2:
+                    return True
+                else:
+                    return {"error":"Problem in updating this user in other org's applied user list", "success":False}
             return True
         else:
             return {"error":"Nothing To Update", "success":False}

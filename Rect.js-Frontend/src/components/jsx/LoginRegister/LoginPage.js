@@ -26,7 +26,7 @@ function LoginPage() {
   return (
     <>
       <div>{<Navbar />}</div>
-      <div className="mainbuttons">
+      <div className="mainbuttons mb-5">
         <button onClick={() => setBoolean(true)} className="choiceBtn">user</button>
         <button onClick={() => setBoolean(false)} className="choiceBtn">organisation</button>
       </div>

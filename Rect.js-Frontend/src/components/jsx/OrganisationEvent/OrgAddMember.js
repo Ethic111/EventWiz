@@ -78,7 +78,7 @@ function OrgAddMember() {
                     start_date: "",
                 });
               } else {
-                toast.error(checking.data.data);
+                toast.error(checking.data.error);
               }
             
         }

@@ -6,11 +6,11 @@
 
 .choiceBtn {
   align-items: center;
-  background-color: #f2e8e4;
-  border: 2px solid #75420e;
+  background-color: white;
+  border: 2px solid #0e2643;
   border-radius: 8px;
   box-sizing: border-box;
-  color: #75420e;
+  color: #0e2643;
   cursor: pointer;
   display: flex;
   font-family: Inter,sans-serif;
@@ -31,7 +31,7 @@
 }
 
 .choiceBtn:after {
-  background-color: #75420e;
+  background-color: #0e2643;
   border-radius: 8px;
   content: "";
   display: block;
@@ -50,7 +50,7 @@
 }
 
 .choiceBtn:active {
-  background-color: #f2e8e4;
+  background-color: whitesmoke;
   outline: 0;
 }
 
