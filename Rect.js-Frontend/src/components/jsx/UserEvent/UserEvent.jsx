@@ -2,20 +2,14 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import "../../css/UserEvent/UserEventCss.css";
 import { Link } from "react-router-dom";
-import UserEvent1 from "./UserEvent1";
 
 function UserEvent() {
-  const [userData, setUserData] = useState(
-    JSON.parse(localStorage.getItem("users"))
-  );
+  
   return (
     <>
       <div>
         <Navbar />
       </div>
-      {userData ? (
-        <UserEvent1 />
-      ) : (
         <div className="backgroundImg">
           <div className="logoutmainEventdiv">
             <div className="container d-flex align-items-center justify-content-center">
@@ -34,7 +28,6 @@ function UserEvent() {
             </div>
           </div>
         </div>
-      )}
     </>
   );
 }

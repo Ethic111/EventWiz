@@ -382,7 +382,7 @@ function AdminAuthorityOrgDetails() {
                       </th>
                       <th scope="col" className="tablehead align-middle">
                         <span>Number </span>
-                        <p>
+                        <span>
                           <span>
                             <IoIosArrowDropupCircle
                               onClick={() => handlesorting("pnumber")}
@@ -393,7 +393,7 @@ function AdminAuthorityOrgDetails() {
                               onClick={() => handlesorting("pnumber")}
                             />
                           </span>
-                        </p>
+                        </span>
                       </th>
                       <th scope="col" className="tablehead align-middle">
                         Gender
@@ -403,7 +403,7 @@ function AdminAuthorityOrgDetails() {
                       </th>
                       <th scope="col" className="tablehead align-middle">
                         <span>Start date </span>
-                        <p>
+                        <span>
                           <span>
                             <IoIosArrowDropupCircle
                               onClick={() => handlesorting("start_date")}
@@ -414,12 +414,12 @@ function AdminAuthorityOrgDetails() {
                               onClick={() => handlesorting("start_date")}
                             />
                           </span>
-                        </p>
+                        </span>
                       </th>
 
                       <th scope="col" className="tablehead align-middle">
                         <span>Expiry date </span>
-                        <p>
+                        <span>
                           <span>
                             <IoIosArrowDropupCircle
                               onClick={() => handlesorting("expiry_date")}
@@ -430,7 +430,7 @@ function AdminAuthorityOrgDetails() {
                               onClick={() => handlesorting("expiry_date")}
                             />
                           </span>
-                        </p>
+                        </span>
                       </th>
                     </tr>
                   </thead>

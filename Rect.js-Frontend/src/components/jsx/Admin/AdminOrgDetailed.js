@@ -179,7 +179,6 @@ function AdminOrgDetailed() {
   };
 
   const handleLoggedinmembers = async () => {
-    setShowEventWiz(true);
     try {
       console.log(originalmemberslist);
       const result = await api.post("/loggedinmembers", {
@@ -187,6 +186,7 @@ function AdminOrgDetailed() {
       });
       console.log(result.data); // Log the result for debugging
       if (result.data.success !== false) {
+        setShowEventWiz(true);
         setMemberlist(result.data);
       } else {
         setMemberlist(orgData.members);
@@ -208,6 +208,7 @@ function AdminOrgDetailed() {
       if (result.data.success !== false) {
         setMemberlist(result.data);
       } else {
+        setShowEventWiz(false)
         setMemberlist(orgData.members);
         toast.error(result.data.error);
       }

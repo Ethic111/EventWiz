@@ -409,7 +409,7 @@ function OrgMemberDetails() {
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     <span>Number </span>
-                    <p>
+                    <span>
                       <span>
                         <IoIosArrowDropupCircle
                           style={{ cursor: "pointer" }}
@@ -426,7 +426,7 @@ function OrgMemberDetails() {
                           }
                         />
                       </span>
-                    </p>
+                    </span>
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     Gender
@@ -436,7 +436,7 @@ function OrgMemberDetails() {
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     <span>Start date </span>
-                    <p>
+                    <span>
                       <span>
                         <IoIosArrowDropupCircle
                           style={{ cursor: "pointer" }}
@@ -453,11 +453,11 @@ function OrgMemberDetails() {
                           }
                         />
                       </span>
-                    </p>
+                    </span>
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     <span>Expiry date </span>
-                    <p>
+                    <span>
                       <span>
                         <IoIosArrowDropupCircle
                           style={{ cursor: "pointer" }}
@@ -474,7 +474,7 @@ function OrgMemberDetails() {
                           }
                         />
                       </span>
-                    </p>
+                    </span>
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     Update

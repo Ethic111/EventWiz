@@ -5,7 +5,7 @@ import Home from "./components/jsx/Home";
 import About from "./components/jsx/About";
 import NotFound from "./components/jsx/NotFound";
 // //////////////////////////////// USER //////////
-import UserEvent from "./components/jsx/UserEvent/UserEvent";
+import UserEvent1 from "./components/jsx/UserEvent/UserEvent1";
 import UserSubscribe from "./components/jsx/UserEvent/UserSubscribe";
 import UserParticipatedEvents from "./components/jsx/UserEvent/UserParticipatedEvents";
 import UserSubscribeOrgDetails from "./components/jsx/UserEvent/UserSubscribeOrgDetails";
@@ -34,6 +34,7 @@ import AdminUser from "./components/jsx/Admin/AdminUser";
 import AdminAuthority from "./components/jsx/Admin/AdminAuthority";
 import AdminAuthorityOrgDetails from "./components/jsx/Admin/AdminAuthorityOrgDetails";
 import OrgAuthorization from "./components/jsx/OrganisationEvent/OrgAuthorization";
+
 // import Admin  from "./Admin/Views/Admin";
 
 
@@ -48,7 +49,7 @@ function App() {
           <Route path="/loginregister" element={<LoginPage />} />
           <Route path="/aboutus" element={<About />} />
           {/* User -------------------------------------- */}
-          <Route path="/events" element={<UserEvent />} />
+          <Route path="/events" element={<UserEvent1 />} />
           <Route path="/subscribe" element={<UserSubscribe />} />
           <Route path="/partcipate" element={<UserParticipatedEvents />} />
           <Route path="/subscribe/orgdetails" element={<UserSubscribeOrgDetails />} />
@@ -77,6 +78,7 @@ function App() {
          <Route path="/admin/allusers" element={<AdminUser/>} />
          <Route path="/admin/accepetrejectorg" element={<AdminAuthority/>} />
          <Route path="/admin/appliedorgdetails" element={<AdminAuthorityOrgDetails/>} />
+         
          
          {/* ----------------------------------------- */}
           <Route path="*" element={<NotFound/>} />

@@ -198,7 +198,7 @@ function AdminUser() {
   };
 
   const handlememberdelete = async (post) => {
-    const data = { username: post.username };
+    const data = { data: post };
     try {
       const response = await api.post("/deletenewuser", data);
       if (response) {
@@ -320,7 +320,7 @@ function AdminUser() {
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     <span>Number </span>
-                    <p>
+                    <span>
                       <span>
                         <IoIosArrowDropupCircle
                           onClick={() => handlesorting("pnumber")}
@@ -331,46 +331,24 @@ function AdminUser() {
                           onClick={() => handlesorting("pnumber")}
                         />
                       </span>
-                    </p>
+                    </span>
                   </th>
                   <th scope="col" className="tablehead align-middle">
                     Gender
                   </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Type
-                  </th>
                   {shownewusers && (
                     <>
                       <th scope="col" className="tablehead align-middle">
+                        Type
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
                         <span>Start date </span>
-                        <p>
-                          <span>
-                            <IoIosArrowDropupCircle
-                              onClick={() => handlesorting("start_date")}
-                            />
-                          </span>
-                          <span>
-                            <IoIosArrowDropdownCircle
-                              onClick={() => handlesorting("start_date")}
-                            />
-                          </span>
-                        </p>
+                        
                       </th>
 
                       <th scope="col" className="tablehead align-middle">
                         <span>Expiry date </span>
-                        <p>
-                          <span>
-                            <IoIosArrowDropupCircle
-                              onClick={() => handlesorting("expiry_date")}
-                            />
-                          </span>
-                          <span>
-                            <IoIosArrowDropdownCircle
-                              onClick={() => handlesorting("expiry_date")}
-                            />
-                          </span>
-                        </p>
+                       
                       </th>
                     </>
                   )}
@@ -483,14 +461,18 @@ function AdminUser() {
                           --
                         </div>
                       </td>
+
                     </>
                   )}
                   {!shownewusers && (
-                    <td>
-                      <div type="text" className="inputdiv">
-                        --
-                      </div>
-                    </td>
+                    <>
+                      
+                      <td>
+                        <div type="text" className="inputdiv">
+                          --
+                        </div>
+                      </td>
+                    </>
                   )}
                 </tr>
 
@@ -507,12 +489,12 @@ function AdminUser() {
                     <td className="trtext">{post.email}</td>
                     <td className="trtext">{post.pnumber}</td>
                     <td className="trtext">{post.gender}</td>
-                    <td className="trtext">
-                      {post.membertype}
-                      {post.memberid != null && <>{", " + post.clubname}</>}
-                    </td>
                     {shownewusers && (
                       <>
+                        <td className="trtext">
+                          {post.membertype}
+                          {post.memberid != null && <>{", " + post.clubname}</>}
+                        </td>
                         <td className="trtext">
                           {post.start_date ? post.start_date : "--"}
                         </td>

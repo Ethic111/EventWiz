@@ -1,0 +1,110 @@
+[
+  {
+    "memberid": "123456789",
+    "name": "John Smith",
+    "email": "johnsmith@gmail.com",
+    "pnumber": 9856423017,
+    "gender": "Male",
+    "membertype": "Associate/Social Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "john_smith123",
+    "pwd": "password1234"
+  },
+  {
+    "memberid": "987654321",
+    "name": "Emma Johnson",
+    "email": "emmajohnson@gmail.com",
+    "pnumber": 8765432109,
+    "gender": "Female",
+    "membertype": "Full Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "emma_j5678",
+    "pwd": "password5678"
+  },
+  {
+    "memberid": "456789012",
+    "name": "Michael Brown",
+    "email": "michaelbrown@gmail.com",
+    "pnumber": 7890123456,
+    "gender": "Male",
+    "membertype": "Family Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "mike9012",
+    "pwd": "password9012"
+  },
+  {
+    "memberid": "789012345",
+    "name": "Olivia Davis",
+    "email": "oliviadavis@gmail.com",
+    "pnumber": 6543210987,
+    "gender": "Female",
+    "membertype": "Associate/Social Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "olivia3456",
+    "pwd": "password3456"
+  },
+  {
+    "memberid": "123098765",
+    "name": "David Miller",
+    "email": "davidmiller@gmail.com",
+    "pnumber": 9876543210,
+    "gender": "Male",
+    "membertype": "Family Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "david_m7890",
+    "pwd": "password7890"
+  },
+  {
+    "memberid": "567890123",
+    "name": "Sophia Turner",
+    "email": "sophiaturner@gmail.com",
+    "pnumber": 8765432109,
+    "gender": "Female",
+    "membertype": "Full Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "sophia2345",
+    "pwd": "password2345"
+  },
+  {
+    "memberid": "234567890",
+    "name": "James White",
+    "email": "jameswhite@gmail.com",
+    "pnumber": 7654321098,
+    "gender": "Male",
+    "membertype": "Full Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "james_w6789",
+    "pwd": "password6789"
+  },
+  {
+    "memberid": "890123456",
+    "name": "Isabella Brown",
+    "email": "isabellabrown@gmail.com",
+    "pnumber": 6543210987,
+    "gender": "Female",
+    "membertype": "Associate/Social Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "isabella0123",
+    "pwd": "password0123"
+  },
+  {
+    "memberid": "345678901",
+    "name": "Daniel Garcia",
+    "email": "danielgarcia@gmail.com",
+    "pnumber": 5432109876,
+    "gender": "Male",
+    "membertype": "Family Membership",
+    "start_date": "2012-03-15",
+    "expiry_date": "2012-03-15",
+    "username": "daniel4567",
+    "pwd": "password4567"
+  }
+]

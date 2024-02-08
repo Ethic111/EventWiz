@@ -13,7 +13,8 @@ import {
 
 function OrgAuthorization() {
   const [singleuser, setSingleuser] = useState();
-  // const [bvalue, setBValue] = useState(true);
+  const [noappliedusers, setNoappliedusers] = useState(false);
+  const [bvalue, setBValue] = useState(true);
   const [showmemberid, setShowMemberid] = useState(false);
   const [memberid, setMemberid] = useState({
     memberid: "",
@@ -90,8 +91,9 @@ function OrgAuthorization() {
       const response = await api.post("/allappliedusers", data);
       if (response.data.success !== false) {
         setDetails(response.data);
-      } else {
-        toast.error(response.data.error);
+      } else if (response.data.message == "empty") {
+        setNoappliedusers(true);
+        // toast.error(response.data.error);
       }
       // console.log(response.data);
     } catch (error) {
@@ -188,15 +190,15 @@ function OrgAuthorization() {
         setShowMemberid(false);
         setMemberid({
           memberid: "",
-          start_date:"",
-          expiry_date:"",
+          start_date: "",
+          expiry_date: "",
         });
       } else if (response.data.closeform !== false) {
         toast.error(response.data.error);
       } else {
         toast.error(response.data.error);
       }
-      
+
       fetchAllMemberdetails();
     } catch (error) {
       console.log(error);
@@ -322,7 +324,7 @@ function OrgAuthorization() {
                     type="date"
                     className="trtext"
                     name="start_date"
-                    value={(memberid.start_date)}
+                    value={memberid.start_date}
                     onChange={handleAcceptInputChange}
                     style={{ width: "10rem" }}
                   />
@@ -334,7 +336,7 @@ function OrgAuthorization() {
                     className="trtext"
                     style={{ width: "10rem" }}
                     name="expiry_date"
-                    value={(memberid.expiry_date)}
+                    value={memberid.expiry_date}
                     onChange={handleAcceptInputChange}
                   />
                 </div>
@@ -358,102 +360,172 @@ function OrgAuthorization() {
               </div>
             </form>
           )}
-
-          {details && details.length ? (
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th scope="col" className="tablehead align-middle">
-                    Sno
-                  </th>
-
-                  <th scope="col" className="tablehead align-middle">
-                    Username
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    <span>Name </span>
-                    <span>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("name")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("name")}
-                        />
-                      </span>
-                    </span>
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Email
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    <span>Number </span>
-                    <p>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("pnumber")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("pnumber")}
-                        />
-                      </span>
-                    </p>
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Gender
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Type
-                  </th>
-
-                  <th scope="col" className="tablehead align-middle">
-                    Accept
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Reject
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {details.map((user, index) => (
+          {noappliedusers ? (
+            <>
+              <table className="table table-bordered">
+                <thead>
                   <tr>
-                    <td className="trtext">{index + 1}</td>
+                    <th scope="col" className="tablehead align-middle">
+                      Sno
+                    </th>
 
-                    <td className="trtext">{user.username}</td>
-                    <td className="trtext">{user.name}</td>
-                    <td className="trtext">{user.email}</td>
-                    <td className="trtext">{user.pnumber}</td>
-                    <td className="trtext">{user.gender}</td>
-                    <td className="trtext">{user.membertype}</td>
+                    <th scope="col" className="tablehead align-middle">
+                      Username
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      <span>Name </span>
+                      <span>
+                        <span>
+                          <IoIosArrowDropupCircle
+                            onClick={() => handlesorting("name")}
+                          />
+                        </span>
+                        <span>
+                          <IoIosArrowDropdownCircle
+                            onClick={() => handlesorting("name")}
+                          />
+                        </span>
+                      </span>
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Email
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      <span>Number </span>
+                      <span>
+                        <span>
+                          <IoIosArrowDropupCircle />
+                        </span>
+                        <span>
+                          <IoIosArrowDropdownCircle />
+                        </span>
+                      </span>
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Gender
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Type
+                    </th>
 
-                    <td className="trtext">
-                      <button
-                        className="addmembtn"
-                        onClick={() => handleorgaccept(user)}
-                      >
-                        Accept
-                      </button>
-                    </td>
-                    <td className="trtext">
-                      <button
-                        className="addmembtn"
-                        onClick={() => handleorgreject(user)}
-                      >
-                        Reject
-                      </button>
-                    </td>
-                    {/* <td scope="col">{post.username}</td>
-                    <td scope="col">{post.pwd}</td> */}
+                    <th scope="col" className="tablehead align-middle">
+                      Accept
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Reject
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+              </table>
+              <div >
+                <h1
+                  style={{ margin: "5rem", color: "black" }}
+                  className="d-flex flex-column align-items-center"
+                >
+                  No Applied Users!
+                </h1>
+              </div>
+            </>
           ) : (
-            <p>No Records...</p>
+            <>
+              {details && details.length ? (
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="tablehead align-middle">
+                        Sno
+                      </th>
+
+                      <th scope="col" className="tablehead align-middle">
+                        Username
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        <span>Name </span>
+                        <span>
+                          <span>
+                            <IoIosArrowDropupCircle
+                              onClick={() => handlesorting("name")}
+                            />
+                          </span>
+                          <span>
+                            <IoIosArrowDropdownCircle
+                              onClick={() => handlesorting("name")}
+                            />
+                          </span>
+                        </span>
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Email
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        <span>Number </span>
+                        <span>
+                          <span>
+                            <IoIosArrowDropupCircle
+                              onClick={() => handlesorting("pnumber")}
+                            />
+                          </span>
+                          <span>
+                            <IoIosArrowDropdownCircle
+                              onClick={() => handlesorting("pnumber")}
+                            />
+                          </span>
+                        </span>
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Gender
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Type
+                      </th>
+
+                      <th scope="col" className="tablehead align-middle">
+                        Accept
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Reject
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {details.map((user, index) => (
+                      <tr>
+                        <td className="trtext">{index + 1}</td>
+
+                        <td className="trtext">{user.username}</td>
+                        <td className="trtext">{user.name}</td>
+                        <td className="trtext">{user.email}</td>
+                        <td className="trtext">{user.pnumber}</td>
+                        <td className="trtext">{user.gender}</td>
+                        <td className="trtext">{user.membertype}</td>
+
+                        <td className="trtext">
+                          <button
+                            className="addmembtn"
+                            onClick={() => handleorgaccept(user)}
+                          >
+                            Accept
+                          </button>
+                        </td>
+                        <td className="trtext">
+                          <button
+                            className="addmembtn"
+                            onClick={() => handleorgreject(user)}
+                          >
+                            Reject
+                          </button>
+                        </td>
+                        {/* <td scope="col">{post.username}</td>
+                    <td scope="col">{post.pwd}</td> */}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p>No Records...</p>
+              )}
+            </>
           )}
         </div>
       </div>

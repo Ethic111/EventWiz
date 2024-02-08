@@ -11,10 +11,10 @@ import {
 } from "react-icons/io";
 import { GrPowerReset } from "react-icons/gr";
 
-
 function AdminAuthority() {
   const [bvalue, setBValue] = useState(true);
   const [details, setDetails] = useState();
+  const [noappliedorg, setNoappliedorg] = useState(false);
   const [searchForm, setSearchform] = useState({
     clubname: "",
   });
@@ -78,7 +78,6 @@ function AdminAuthority() {
     setSearchform({
       clubname: "",
     });
-
   };
 
   const fetchAllMemberdetails = async () => {
@@ -86,8 +85,8 @@ function AdminAuthority() {
       const response = await api.get("/allappliedorg");
       if (response.data.success !== false) {
         setDetails(response.data);
-      } else {
-        toast.error(response.data.error);
+      } else if (response.data.message == "empty") {
+        setNoappliedorg(true);
       }
       // console.log(response.data);
     } catch (error) {
@@ -95,55 +94,44 @@ function AdminAuthority() {
     }
   };
 
-
-
   useEffect(() => {
-    
     const timeoutId = setTimeout(() => {
       fetchMembersFilters();
     }, 100);
     return () => clearTimeout(timeoutId);
   }, [filters]);
 
-
-  
   const handleorgaccept = async (org) => {
     console.log("Accept org method");
-    try{
-
-      console.log(org)
-      const data = {"data":org}
-      const response = await api.post("/acceptingorg",data)
-      if (response.data.success !== false){
-        fetchAllMemberdetails()
-      }
-      else{
-        toast.error(response.data.error)
+    try {
+      console.log(org);
+      const data = { data: org };
+      const response = await api.post("/acceptingorg", data);
+      if (response.data.success !== false) {
+        fetchAllMemberdetails();
+      } else {
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
-    }
-    catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const handleorgreject = async (org) => {
     console.log("Accept org method");
-    try{
-
-      console.log(org)
-      const data = {"data":org}
-      const response = await api.post("/rejectingorg",data)
-      if (response.data.success !== false){
-        fetchAllMemberdetails()
-      }
-      else{
-        toast.error(response.data.error)
+    try {
+      console.log(org);
+      const data = { data: org };
+      const response = await api.post("/rejectingorg", data);
+      if (response.data.success !== false) {
+        fetchAllMemberdetails();
+      } else {
+        toast.error(response.data.error);
         fetchAllMemberdetails();
       }
-    }
-    catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
   };
   const handleSearchInputChange = (event) => {
@@ -182,13 +170,11 @@ function AdminAuthority() {
 
   const fetchMembersFilters = async () => {
     try {
-
       const data = { data: filters };
-      const response = await api.post("/appliedorgtablefilters",data);
-      console.log(response.data)
+      const response = await api.post("/appliedorgtablefilters", data);
+      console.log(response.data);
       if (response.data.data_dict === "empty") {
         fetchAllMemberdetails();
-      
       } else if (response.data.success != false) {
         console.log("Response=" + response.data.error);
         setDetails(response.data);
@@ -198,17 +184,16 @@ function AdminAuthority() {
       }
     } catch (error) {
       console.error(error);
-      
     }
   };
 
   // console.log(filters);
   const navigate = useNavigate();
-  const handleorgreadmore = (org) =>{
+  const handleorgreadmore = (org) => {
     navigate("/admin/appliedorgdetails", {
       state: JSON.stringify(org),
     });
-  }
+  };
 
   return (
     <>
@@ -267,180 +252,177 @@ function AdminAuthority() {
           </form>
         </div>
       </div>
-      
+
       <hr />
       <div className="row">
         <div className="col-12">
           {/* <br /> */}
 
-          {details && details.length ? (
-            <table className="table table-bordered">
-              <thead>
-                <tr>
-                  <th scope="col" className="tablehead align-middle">
-                    Sno
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    <span>Org Name </span>
-                    <span>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("name")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("name")}
-                        />
-                      </span>
-                    </span>
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Username
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Owner Name
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Email
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    <span>Number </span>
-                    <p>
-                      <span>
-                        <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("pnumber")}
-                        />
-                      </span>
-                      <span>
-                        <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("pnumber")}
-                        />
-                      </span>
-                    </p>
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Read More..
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Accept
-                  </th>
-                  <th scope="col" className="tablehead align-middle">
-                    Reject
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="clubname"
-                        value={filters.clubname}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="username"
-                        value={filters.username}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="ownname"
-                        value={filters.ownname}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="email"
-                        value={filters.email}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="number" className="inputdiv">
-                      <input
-                        className="trtext"
-                        name="pnumber"
-                        value={filters.pnumber}
-                        onChange={handleFilterInputChange}
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
-                  <td>
-                    <div type="text" className="inputdiv">
-                      --
-                    </div>
-                  </td>
-                </tr>
-
-                {details.map((org, index) => (
+          {noappliedorg ? (
+            <>
+              <table className="table table-bordered">
+                <thead>
                   <tr>
-                    <td className="trtext">{index + 1} </td>
-                    <td className="trtext">{org.clubname} </td>
-                    <td className="trtext">{org.username} </td>
-                    <td className="trtext">{org.ownname} </td>
-                    <td className="trtext">{org.email} </td>
-                    <td className="trtext">{org.pnumber} </td>
-
-                    <td className="trtext">
-                      <button
-                        className="addmembtn"
-                        onClick={() => handleorgreadmore(org)}
-                      >
-                        Read More..
-                      </button>
-                    </td>
-                    <td className="trtext">
-                      <button
-                        className="addmembtn"
-                        onClick={() => handleorgaccept(org)}
-                      >
-                        Accept
-                      </button>
-                    </td>
-                    <td className="trtext">
-                      <button
-                        className="addmembtn"
-                        onClick={() => handleorgreject(org)}
-                      >
-                        Reject
-                      </button>
-                    </td>
-                    {/* <td scope="col">{post.username}</td>
-                    <td scope="col">{post.pwd}</td> */}
+                    <th scope="col" className="tablehead align-middle">
+                      Sno
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      <span>Org Name </span>
+                      <span>
+                        <span>
+                          <IoIosArrowDropupCircle />
+                        </span>
+                        <span>
+                          <IoIosArrowDropdownCircle />
+                        </span>
+                      </span>
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Username
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Owner Name
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Email
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      <span>Number </span>
+                      <span>
+                        <span>
+                          <IoIosArrowDropupCircle />
+                        </span>
+                        <span>
+                          <IoIosArrowDropdownCircle />
+                        </span>
+                      </span>
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Read More..
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Accept
+                    </th>
+                    <th scope="col" className="tablehead align-middle">
+                      Reject
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+              </table>
+              <div>
+                <h1
+                  style={{ margin: "5rem", color: "black" }}
+                  className="d-flex flex-column align-items-center"
+                >
+                  No Applied Organization!
+                </h1>
+              </div>
+            </>
           ) : (
-            <p>No Records...</p>
+            <>
+              {details && details.length ? (
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="tablehead align-middle">
+                        Sno
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        <span>Org Name </span>
+                        <span>
+                          <span>
+                            <IoIosArrowDropupCircle
+                              onClick={() => handlesorting("name")}
+                            />
+                          </span>
+                          <span>
+                            <IoIosArrowDropdownCircle
+                              onClick={() => handlesorting("name")}
+                            />
+                          </span>
+                        </span>
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Username
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Owner Name
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Email
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        <span>Number </span>
+                        <span>
+                          <span>
+                            <IoIosArrowDropupCircle
+                              onClick={() => handlesorting("pnumber")}
+                            />
+                          </span>
+                          <span>
+                            <IoIosArrowDropdownCircle
+                              onClick={() => handlesorting("pnumber")}
+                            />
+                          </span>
+                        </span>
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Read More..
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Accept
+                      </th>
+                      <th scope="col" className="tablehead align-middle">
+                        Reject
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    
+
+                    {details.map((org, index) => (
+                      <tr>
+                        <td className="trtext">{index + 1} </td>
+                        <td className="trtext">{org.clubname} </td>
+                        <td className="trtext">{org.username} </td>
+                        <td className="trtext">{org.ownname} </td>
+                        <td className="trtext">{org.email} </td>
+                        <td className="trtext">{org.pnumber} </td>
+
+                        <td className="trtext">
+                          <button
+                            className="addmembtn"
+                            onClick={() => handleorgreadmore(org)}
+                          >
+                            Read More..
+                          </button>
+                        </td>
+                        <td className="trtext">
+                          <button
+                            className="addmembtn"
+                            onClick={() => handleorgaccept(org)}
+                          >
+                            Accept
+                          </button>
+                        </td>
+                        <td className="trtext">
+                          <button
+                            className="addmembtn"
+                            onClick={() => handleorgreject(org)}
+                          >
+                            Reject
+                          </button>
+                        </td>
+                        {/* <td scope="col">{post.username}</td>
+                    <td scope="col">{post.pwd}</td> */}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p>No Records...</p>
+              )}
+            </>
           )}
         </div>
       </div>
