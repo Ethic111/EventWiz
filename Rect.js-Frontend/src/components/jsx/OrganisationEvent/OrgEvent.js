@@ -10,7 +10,8 @@ import {
   FaArrowCircleLeft,
   FaRupeeSign,
 } from "react-icons/fa";
-// import { TbClockPlay } from "react-icons/tb";
+import { CiEdit } from "react-icons/ci";
+
 
 function OrgEvent() {
   const [details, setDetails] = useState();
@@ -78,6 +79,11 @@ function OrgEvent() {
     }
   };
 
+  const [updatepriceform, setUpdatepriceform] = useState({
+    oldprice: "",
+    newprice: "",
+  });
+
   // /////////////
 
   const [lFormData, setLFormData] = useState({
@@ -120,7 +126,10 @@ function OrgEvent() {
     // Now you can use filteredFormData in your API call
     try {
       console.log("Inside try for api calling:");
-      const data = {"clubname": userData["clubname"],"filteredFormData": filteredFormData}
+      const data = {
+        clubname: userData["clubname"],
+        filteredFormData: filteredFormData,
+      };
       const checking = await api.post("/orgfilters/", data);
       console.log(checking);
       if (checking.data.success !== false) {
@@ -133,6 +142,55 @@ function OrgEvent() {
       // Rest of your code...
     } catch (error) {
       console.error("Error submitting form:", error);
+    }
+  };
+
+  const [openmodal, setOpenmodal] = useState(false);
+
+  const handlemodalclose = () => {
+    setUpdatepriceform({
+      oldprice: "",
+      newprice: "",
+    });
+  };
+
+  const handleupdatepriceformdata = (e) => {
+    const { name, value } = e.target;
+    setUpdatepriceform({
+      ...updatepriceform,
+      [name]: value,
+    });
+  };
+
+  const [clickedpost, setClickedpost] = useState();
+
+  const handleupdatepriceclicked = (post) => {
+    setOpenmodal(true);
+    // console.log(post)
+    setClickedpost(post);
+  };
+
+  const handleupdatepricesubmit = async (event) => {
+    event.preventDefault();
+    try {
+      console.log(updatepriceform);
+      console.log(clickedpost);
+      const data = { pricedata: updatepriceform, postdata: clickedpost };
+      const response = await api.put("/updatepostprice", data);
+      if (response.data.success !== false) {
+        // setOpenmodal(false)
+        toast.success(response.data.message);
+        setUpdatepriceform({
+          oldprice: "",
+          newprice: "",
+        });
+
+        fetchAllPostdetails();
+      } else {
+        toast.error(response.data.error);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -176,30 +234,98 @@ function OrgEvent() {
       console.error("Error fetching details:", error);
     }
   };
-  // {
-  //   "event_start_date": "",
-  //   "event_end_date": "",
-  //   "minprice": "210",
-  //   "maxprice": "6590",
-  //   "venue_city":""
-  // }
 
-  // const handleLoad = () =>{
-  //   console.log("helo")
-  // }
+
   return (
     <>
       <div>{<OrganisationNavbar />}</div>
+      {openmodal && (
+        <div
+          className="modal fade"
+          id="updatePriceModal"
+          tabIndex="-1"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">
+                  Update Ticket's Price:
+                </h5>
+                <button
+                  onClick={handlemodalclose}
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleupdatepricesubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="oldprice" className="col-form-label">
+                      Old Price:
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="oldprice"
+                      name="oldprice"
+                      value={updatepriceform.oldprice}
+                      onChange={handleupdatepriceformdata}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="newprice" className="col-form-label">
+                      New Price:
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      id="newprice"
+                      name="newprice"
+                      value={updatepriceform.newprice}
+                      onChange={handleupdatepriceformdata}
+                    />
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      style={{ padding: "0.8rem" }}
+                      className="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                      onClick={handlemodalclose}
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="submit"
+                      className="addpostbtn"
+                      data-bs-dismiss="modal"
+                    >
+                      Update Price
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* <div>
         <Link to="/organisationevents/addpost">
           <button className="addpostbtn">Add New Post</button>
         </Link>
       </div> */}
-      <div style={{
+      <div
+        style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-        }}>
+        }}
+      >
         <div>
           <Link to="/organisationevents/addpost">
             <button className="addpostbtn">Add New Post</button>
@@ -412,6 +538,25 @@ function OrgEvent() {
                                   <span>
                                     <FaRupeeSign />
                                     {post.ticket_price}
+
+                                    <button
+                                      type="button"
+                                      className="btn"
+                                      onClick={() =>
+                                        handleupdatepriceclicked(post)
+                                      }
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#updatePriceModal"
+                                    >
+                                      <CiEdit
+                                        style={{
+                                          color: "white",
+                                          fontSize: "1.7rem",
+                                          padding: "3px",
+                                          cursor: "pointer",
+                                        }}
+                                      />
+                                    </button>
                                   </span>
                                 </span>
                               </div>

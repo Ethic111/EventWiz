@@ -24,6 +24,7 @@ function OrgAddPost() {
     venue_city: "",
     ticket_price: "",
     event_highlight: "",
+    capacity: "",
     event_desc: "",
     event_organizer_name: "",
     event_organizer_email: "",
@@ -71,12 +72,11 @@ function OrgAddPost() {
     console.log(lFormData);
     document.getElementById("event_image").value = "";
     try {
-      const checking = await api.post("/createeventpost/", lFormData);
+      const checking = await api.post("/createeventpost", lFormData);
       console.log(checking);
 
       if (checking.data.success != false) {
-        // Use the navigate function to go to the home page
-        // console.log("form data: " + JSON.stringify(lFormData))
+        
         navigate("/organisationevents/orgevents");
         setLFormData({
           clubname: orgData.clubname,
@@ -92,6 +92,7 @@ function OrgAddPost() {
           type: "",
           ticket_price: "",
           event_highlight: "",
+          capacity: "",
           event_desc: "",
           event_organizer_name: "",
           event_organizer_email: "",
@@ -123,8 +124,8 @@ function OrgAddPost() {
       <div>
         <OrganisationNavbar />
       </div>
-      <h2 className="text-center mt-4">Hey Guys, </h2>
-      <h2 className="text-center mt-4">This page not finished yet </h2>
+      <h2 className="text-center mt-4">Add New Post</h2>
+      
 
       <form onSubmit={handleFormSubmit}>
         <div className="row gy-3 overflow-hidden">
@@ -326,7 +327,7 @@ function OrgAddPost() {
               </label>
             </div>
           </div>
-          <div className="col-12">
+          <div className="col-6">
             <div className="form-floating mb-3">
               <input
                 onChange={handleInputChange}
@@ -339,6 +340,23 @@ function OrgAddPost() {
               />
               <label htmlFor="event_highlight" className="form-label">
                 Event Highlight
+              </label>
+            </div>
+          </div>
+          <div className="col-6">
+            <div className="form-floating mb-3">
+              <input
+                onChange={handleInputChange}
+                type="number"
+                step="0.01"
+                className="form-control"
+                id="capacity"
+                placeholder=""
+                name="capacity"
+                value={lFormData.capacity}
+              />
+              <label htmlFor="capacity" className="form-label">
+                Capacity Of People
               </label>
             </div>
           </div>
@@ -407,8 +425,8 @@ function OrgAddPost() {
           </div>
           <div className="col-12">
             <div className="d-grid">
-              <button className="btn btn-primary btn-lg" type="submit">
-                UPLOAD POST
+              <button className="addpostbtn" type="submit" style={{fontSize:"1.5rem"}}>
+                Upload Post
               </button>
             </div>
           </div>

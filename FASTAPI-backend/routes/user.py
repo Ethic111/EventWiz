@@ -1346,6 +1346,9 @@ async def event_participate(id: str, data: dict):
     else:
         return {"error": "Event Not Found", "success": False}
 
+
+
+
 # Post Search by User using Title
 
 
@@ -1612,8 +1615,9 @@ async def create_org(organisation: Organisation):
 
 
 # organisation create post
-@event.post('/createeventpost/')
+@event.post("/createeventpost")
 async def create_event_post(data: EventPost):
+    # print(dict(data))
     try:
         # Directly assign datetime.date objects
         data_dict = dict(data)
@@ -2441,5 +2445,30 @@ async def adminside_rejectorg(data: dict):
     else:
         return {"error": "Nothing To Update", "success": False}
 
+
+# event post price update
+    
+
+@event.put("/updatepostprice")
+async def event_priceupdate(data:dict):
+    pricedata = data["pricedata"]
+    postdata = data["postdata"]
+    print("1")
+    print(pricedata)
+    oldprice = int(pricedata["oldprice"])
+    newprice = int(pricedata["newprice"])
+
+    if  oldprice != postdata["ticket_price"]:
+        print("2")
+        return {"error":"Old Price Doesn't Match" , "success":False}
+    
+    print("3")
+    result = conn.EventWiz.post.find_one_and_update({"_id":ObjectId(postdata["_id"])},{"$set":{"ticket_price":newprice}})
+    # print(postdata["ticket_price"])
+    print("4")
+    if result:
+        return {"message":"Successfully Updated Ticket Price", "success":True}
+    else:
+        return {"error":"Error in updating" , "success":False}
 
 # ///////////////////////////////////////////////////////////////////////////////////

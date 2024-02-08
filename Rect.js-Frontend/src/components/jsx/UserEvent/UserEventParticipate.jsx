@@ -195,7 +195,8 @@ function UserEventParticipate() {
                         
                         <div className="col-12">
                             <div className="d-grid">
-                                <button style={{ color: 'white', backgroundColor: '#0e2643', border: 'none', marginLeft: '1rem', padding: '0.3rem 0.5rem 0.3rem 0.5rem', borderRadius: '0.375rem' }} type="submit">Log in now</button>
+                                <button style={{ color: 'white', backgroundColor: '#0e2643', border: 'none', marginLeft: '1rem', padding: '0.3rem 0.5rem 0.3rem 0.5rem', borderRadius: '0.375rem' ,
+                            fontSize:"1.2rem"}} type="submit">Participate now</button>
                             </div>
                         </div>
                     </div>

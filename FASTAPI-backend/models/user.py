@@ -41,15 +41,17 @@ class EventPost(BaseModel):
     end_time: str
     venue_name: str
     venue_address: str
+    type : str
     venue_city: str
     ticket_price: float
     event_highlight: str
+    capacity: int
     event_desc: str
     event_organizer_name: str
     event_organizer_email: str
     event_organizer_pnumber: int
-    type : str
-    participate:list
+    participate: Optional[list] = []
+    
 
 class Admin(BaseModel):
     username: str

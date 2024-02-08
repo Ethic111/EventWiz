@@ -529,6 +529,10 @@ function UserEvent1() {
                                         post.clubname === userData.clubname) ||
                                       post.type === "Public" ? (
                                         <button
+                                          {...(post["capacity"] <=
+                                          post["participate"].length
+                                            ? { disabled: true }
+                                            : {})}
                                           className="deletepostbtn"
                                           onClick={() =>
                                             handleParticipate(post._id)
