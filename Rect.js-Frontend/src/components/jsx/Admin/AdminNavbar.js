@@ -84,6 +84,16 @@ function AdminNavbar() {
                 </NavLink>
               </li>
               <li className="nav-item">
+                <NavLink
+                  to="/admin/alleventposts"
+                  className={`nav-link ${
+                    isHomeActive ? "font-weight-bold" : ""
+                  }`}
+                >
+                  Events
+                </NavLink>
+              </li>
+              <li className="nav-item">
                 {userData?.username ? (
                   <NavLink
                     to="/home"

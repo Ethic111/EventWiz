@@ -34,6 +34,7 @@ import AdminUser from "./components/jsx/Admin/AdminUser";
 import AdminAuthority from "./components/jsx/Admin/AdminAuthority";
 import AdminAuthorityOrgDetails from "./components/jsx/Admin/AdminAuthorityOrgDetails";
 import OrgAuthorization from "./components/jsx/OrganisationEvent/OrgAuthorization";
+import AdminEventPosts from "./components/jsx/Admin/AdminEventPosts";
 
 // import Admin  from "./Admin/Views/Admin";
 
@@ -78,6 +79,7 @@ function App() {
          <Route path="/admin/allusers" element={<AdminUser/>} />
          <Route path="/admin/accepetrejectorg" element={<AdminAuthority/>} />
          <Route path="/admin/appliedorgdetails" element={<AdminAuthorityOrgDetails/>} />
+         <Route path="/admin/alleventposts" element={<AdminEventPosts/>} />
          
          
          {/* ----------------------------------------- */}

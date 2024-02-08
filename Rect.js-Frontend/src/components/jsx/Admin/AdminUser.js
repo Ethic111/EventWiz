@@ -205,12 +205,27 @@ function AdminUser() {
         fetchAllMemberdetails();
       } else {
         toast.error("Error in deleting");
+        fetchAllMemberdetails();
       }
     } catch (error) {
       console.error("Error fetching details:", error);
     }
   };
 
+  const handleremoveuser = async (post) => {
+    const data = { data: post };
+    try {
+      const response = await api.post("/removingmember", data);
+      if (response) {
+        fetchAllMemberdetails();
+      } else {
+        toast.error("Error in deleting");
+        fetchAllMemberdetails();
+      }
+    } catch (error) {
+      console.error("Error fetching details:", error);
+    }
+  }
   return (
     <>
       <div>
@@ -352,11 +367,11 @@ function AdminUser() {
                       </th>
                     </>
                   )}
-                  {!shownewusers && (
+                  
                     <th scope="col" className="tablehead align-middle">
                       Delete
                     </th>
-                  )}
+                 
                 </tr>
               </thead>
               <tbody>
@@ -501,6 +516,14 @@ function AdminUser() {
                         <td className="trtext">
                           {post.expiry_date ? post.expiry_date : "--"}
                         </td>
+                        <td className="trtext">
+                        <button
+                          className="addmembtn"
+                          onClick={() => handleremoveuser(post)}
+                        >
+                          Delete
+                        </button>
+                      </td>
                       </>
                     )}
                     {!shownewusers && (

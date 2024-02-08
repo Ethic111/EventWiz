@@ -99,6 +99,7 @@ def acceptinguser(data):
 
     return True
 
+
 def acceptingorg(data):
 
     clubname = data["clubname"]
@@ -141,6 +142,7 @@ def acceptingorg(data):
                message=html_content)
 
     return True
+
 
 def rejectinguser(data):
 
@@ -185,6 +187,7 @@ def rejectinguser(data):
                message=html_content)
 
     return True
+
 
 def rejectingorg(data):
 
@@ -231,6 +234,7 @@ def rejectingorg(data):
 
     return True
 
+
 def admindeletingorg(data):
 
     clubname = data["clubname"]
@@ -274,6 +278,7 @@ def admindeletingorg(data):
 
     return True
 
+
 def admindeletingnewuser(data):
 
     name = data["name"]
@@ -313,6 +318,50 @@ def admindeletingnewuser(data):
  """
 
     send_email(to=email, subject="Important Notice - Account Deletion from EventWiz",
+               message=html_content)
+
+    return True
+
+def admindeletingorgpost(data):
+
+    clubname = data["clubname"]
+    email = data["email"]
+    postname = data["postname"]
+
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }}
+        .content {{
+            margin-bottom: 20px;
+            font-size:1.5rem;
+        }}
+    </style>
+</head>
+<body>
+
+<div class="content">
+
+    <p>Dear <strong>{clubname}</strong>,</p>
+    
+    <p>We hope this message finds you well. We regret to inform you that, after careful consideration, your organization's post <strong>{postname}</strong> has been deleted from EventWiz.</p>
+    
+    <p>This decision was made based on some reasons, and we understand this news may come as a disappointment. If you have any questions or concerns regarding this decision, please feel free to reach out to us for further clarification.</p>
+    
+    <p>We appreciate your understanding and thank you for your past engagement with EventWiz.</p>
+    
+    <p>Best regards,<br>EventWiz Team</p>
+</div>
+</body>
+</html>
+
+ """
+
+    send_email(to=email, subject="Important Notice - Post Deletion from EventWiz",
                message=html_content)
 
     return True
@@ -364,6 +413,7 @@ def orgdeletingmember(data):
 
     return True
 
+
 def orgupdatingmemberdata(data):
 
     clubname = data["clubname"]
@@ -410,6 +460,7 @@ def orgupdatingmemberdata(data):
                message=html_content)
 
     return True
+
 
 
 @event.get('/')
@@ -610,7 +661,7 @@ async def adminside_orgdelete(data: dict):
     conn.EventWiz.deletedorg.insert_one(org)
     conn.EventWiz.organisation.delete_one({"clubname": clubname})
     # print(memberslist)
-    data = {"clubname":org["clubname"],"email":org["email"]}
+    data = {"clubname": org["clubname"], "email": org["email"]}
     admindeletingorg(data)
     return True
 
@@ -755,8 +806,57 @@ async def adminside_deletenewuser(data: dict):
 
     conn.EventWiz.users.find_one_and_delete({"username": givenusername})
 
-    data = {"name": data["name"],"email":data["email"]}
+    data = {"name": data["name"], "email": data["email"]}
     admindeletingnewuser(data)
+    return True
+
+# removing a website user/member
+
+
+@event.post("/removingmember")
+async def adminside_removeuser(data: dict):
+    print(data["data"])
+    data = data["data"]
+    givenusername = data["username"]
+
+    org = serializeList(conn.EventWiz.organisation.find())
+    for singleorg in org:
+        appliedlist = []
+        for singlemember in singleorg["memapplied"]:
+            if singlemember["username"] != givenusername:
+                appliedlist.append(singlemember)
+        if (len(appliedlist) != 0):
+            conn.EventWiz.organisation.find_one_and_update({"_id": ObjectId(singleorg["_id"])}, {"$set": {
+                "memapplied": appliedlist
+            }})
+        memberlist = []
+        for singlemember in singleorg["members"]:
+            if singlemember["username"] != givenusername:
+                memberlist.append(singlemember)
+        if (len(memberlist) != 0):
+            conn.EventWiz.organisation.find_one_and_update({"_id": ObjectId(singleorg["_id"])}, {"$set": {
+                "members": memberlist
+            }})
+
+    publicpost = serializeList(conn.EventWiz.post.find())
+    for singlepost in publicpost:
+        allparticipaters = []
+        for singleparticipate in singlepost["participate"]:
+            if singleparticipate["username"] != givenusername:
+                allparticipaters.append(singleparticipate)
+        if (len(allparticipaters) != 0):
+            conn.EventWiz.post.find_one_and_update({"_id": ObjectId(singlepost["_id"])}, {"$set": {
+                "participate": allparticipaters
+            }})
+
+    conn.EventWiz.deletedusers.insert_one(serializeDict(
+        conn.EventWiz.users.find_one({"username": givenusername})))
+
+    conn.EventWiz.users.find_one_and_delete({"username": givenusername})
+
+    data = {"name": data["name"], "email": data["email"]}
+    admindeletingnewuser(data)
+
     return True
 
 # searching user by name , start_date/expiry_date
@@ -1007,18 +1107,88 @@ async def adminside_rejectorg(data: dict):
         content = conn.EventWiz.admin.find_one_and_update(
             {"_id": ObjectId(singleadmin["_id"])}, {"$set": {"applied_org": updated_org}})
     if content:
-        data = {"clubname":rejectedorg["clubname"],"email":rejectedorg["email"]}
+        data = {"clubname": rejectedorg["clubname"],
+                "email": rejectedorg["email"]}
         rejectingorg(data)
         return True
     else:
         return {"error": "Nothing To Update", "success": False}
 
+# Get all Post For Users
+
+
+@event.post("/fetchingallpostforadmin")
+async def fetch_all_post_adminside():
+    result = conn.EventWiz.post.find()
+    allpost = serializeList(result)
+    # print(allpost)
+    posts = []
+    if (result != []):
+        
+        for i in allpost:
+            i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
+            i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
+            posts.append(i)
+        # print(posts)
+        return (posts)
+    else:
+        return {"error": "No post found", "success": False}
+
+
+# Post Search by User using Title
+
+
+@event.post("/postsearchbyadmin")
+async def post_search_admin(data: dict):
+    result = conn.EventWiz.post.find()
+    posts = []
+    # print(data)
+    regex_pattern = re.compile(f"^{re.escape(data['title'])}.*", re.IGNORECASE)
+    # print(re.match(regex_pattern,title))
+
+    if (result != []):
+        allpost = serializeList(result)
+        for i in allpost:
+            if re.match(regex_pattern, i["event_title"]):
+                i["event_start_date"] = i["event_start_date"].strftime(
+                    "%d-%m-%Y")
+                i["event_end_date"] = i["event_end_date"].strftime(
+                    "%d-%m-%Y")
+                posts.append(i)
+        return posts
+    
+# organisation delete post
+
+
+@event.delete("/deletepost/{id}")
+async def adminside_delete_post(id):
+
+    # print(id)
+    post1 = serializeDict(conn.EventWiz.post.find_one({"_id": ObjectId(id)}))
+   
+    conn.EventWiz.deletedposts.insert_one(post1)
+
+    response = serializeDict(
+        conn.EventWiz.post.find_one_and_delete({"_id": ObjectId(id)}))
+    
+    if response:
+
+        org1 = serializeDict(conn.EventWiz.organisation.find_one({"clubname": post1["clubname"]}))
+        # print(post1["event_title"])
+        data = {"clubname":post1["clubname"],"email":org1["email"],"postname":post1["event_title"]}
+        admindeletingorgpost(data)
+        return True
+    else:
+        return {"error": "no post found", "success": False}
+    
 
 # /////////////////////////////////////////////////////////////////////////////
 
 # //////////////////////////////////////USER////////////////////////////////////
 
 # user login
+
+
 @event.post('/userlogin/')
 async def check_user(data: dict):
     if data["clubname"] == "None" or data["clubname"] == "":
@@ -1790,7 +1960,8 @@ async def update_member_details(data: dict):
                     {"_id": ObjectId(org1["_id"])}, {"$set": {"members": org1["members"]}})
                 # #print(org1["members"])
 
-                data = {"name":formdata["name"],"email":formdata["email"],"clubname":org1["clubname"],"orgowner":org1["ownname"]}
+                data = {"name": formdata["name"], "email": formdata["email"],
+                        "clubname": org1["clubname"], "orgowner": org1["ownname"]}
                 orgupdatingmemberdata(data)
                 return True
 
@@ -1830,7 +2001,8 @@ async def delete_member(data: dict):
         conn.EventWiz.organisation.find_one_and_update(
             {"_id": ObjectId(data["orgid"])}, {"$set": {"members": updated_members}})
 
-        data = {"name":userdata["name"],"email":userdata["email"],"clubname":org1["clubname"],"orgowner":org1["ownname"]}
+        data = {"name": userdata["name"], "email": userdata["email"],
+                "clubname": org1["clubname"], "orgowner": org1["ownname"]}
 
         orgdeletingmember(data)
         return {"data": "Member deleted Successfully", "success": True}
