@@ -53,16 +53,13 @@ function AdminUser() {
 
   const handlesorting = async (col) => {
     try {
-      // const data = { clubname: orgData.clubname, col: col, value: bvalue };
-      // const checking = await api.post("/membersortinguserside", data);
-      // console.log(checking);
-      // if (checking.data.success !== false) {
-      //   console.log(checking.data);
-      //   setBValue(!bvalue);
-      //   setDetails(checking.data);
-      // } else {
-      //   toast.error(checking.data.error);
-      // }
+      const data = { col: col["name"], value: col["value"],"members":details };
+      const checking = await api.post("/adminmembersorting", data);
+      if (checking.data.success !== false) {
+        setDetails(checking.data);
+      } else {
+        toast.error(checking.data.error);
+      }
     } catch (error) {
       console.error("Error fetching details:", error);
     }
@@ -320,12 +317,14 @@ function AdminUser() {
                     <span>
                       <span>
                         <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("name")}
+                        style={{"cursor":"pointer"}}
+                          onClick={() => handlesorting({"name":"name","value":true})}
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("name")}
+                        style={{"cursor":"pointer"}}
+                          onClick={() => handlesorting({"name":"name","value":false})}
                         />
                       </span>
                     </span>
@@ -338,12 +337,14 @@ function AdminUser() {
                     <span>
                       <span>
                         <IoIosArrowDropupCircle
-                          onClick={() => handlesorting("pnumber")}
+                        style={{"cursor":"pointer"}}
+                          onClick={() => handlesorting({"name":"pnumber","value":true})}
                         />
                       </span>
                       <span>
                         <IoIosArrowDropdownCircle
-                          onClick={() => handlesorting("pnumber")}
+                        style={{"cursor":"pointer"}}
+                          onClick={() => handlesorting({"name":"pnumber","value":false})}
                         />
                       </span>
                     </span>

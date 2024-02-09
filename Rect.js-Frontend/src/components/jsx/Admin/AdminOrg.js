@@ -78,6 +78,8 @@ function AdminOrg() {
     }
   };
 
+  
+
   const handleorgdelete = async (org) => {
     console.log(org["clubname"]);
     const deleteorgdata = { clubname: org["clubname"] };

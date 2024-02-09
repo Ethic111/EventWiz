@@ -76,7 +76,12 @@ function UserEvent1() {
     setIsCol2Visible(!isCol2Visible);
   };
 
+  const [originaldata,setOriginaldata] = useState()
+
   const fetchAllPostdetails = async () => {
+    setOngoingbtn(!ongoinbtn);
+    setContent("Current Events");
+    setPastevent(false);
     console.log("fetching post function");
     try {
       console.log(userData.username);
@@ -84,6 +89,7 @@ function UserEvent1() {
         `/fetchingallpostforuser/${userData.username}`
       );
       setDetails(response.data);
+      setOriginaldata(response.data)
       //   console.log(response.data);
     } catch (error) {
       console.error("Error fetching details:", error);
@@ -135,6 +141,11 @@ function UserEvent1() {
         filteredFormData[key] = lFormData[key];
       }
     }
+    const data = {
+      "eventposts":originaldata,
+      "filteredFormData":filteredFormData,
+      "uname":userData.username
+    }
 
     console.log("Filtered form:");
     console.log(filteredFormData);
@@ -142,11 +153,12 @@ function UserEvent1() {
     // Now you can use filteredFormData in your API call
     try {
       console.log("Inside try for api calling:");
-      const checking = await api.post("/postfilterforuser", filteredFormData);
+      const checking = await api.post("/postfilterforuser", data);
       console.log(checking);
       if (checking.data.success !== false) {
         console.log(checking.data);
         setDetails(checking.data);
+        
       } else {
         toast.error(checking.data.error);
       }
@@ -200,17 +212,52 @@ function UserEvent1() {
   const handleSubscribe = async (post) => {
     navigate("/subscribe/form1", { state: JSON.stringify(post) });
   };
-  // {
-  //   "event_start_date": "",
-  //   "event_end_date": "",
-  //   "minprice": "210",
-  //   "maxprice": "6590",
-  //   "venue_city":""
-  // }
 
-  // const handleLoad = () =>{
-  //   console.log("helo")
-  // }
+  const [ongoinbtn, setOngoingbtn] = useState(true);
+  const [content, setContent] = useState("");
+
+  const handlefutureposts = async () => {
+    console.log("future posts");
+    setOngoingbtn(true);
+    setContent("Future Events");
+    setPastevent(false);
+    try {
+      const response = await api.post("/alluserfutureeventposts", {
+        uname: userData.username,
+      });
+      if (response.data.success != false) {
+        setDetails(response.data);
+        setOriginaldata(response.data)
+      } else {
+        toast.error(response.data.error);
+        fetchAllPostdetails();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const [pastevent, setPastevent] = useState(false);
+
+  const handlepastposts = async () => {
+    setPastevent(true);
+    console.log("past posts");
+    setOngoingbtn(true);
+    const cname = userData.clubname;
+    setContent("Past Events");
+    try {
+      const response = await api.get("/alluserpasteventposts");
+      if (response.data.success != false) {
+        setDetails(response.data);
+        setOriginaldata(response.data)
+      } else {
+        toast.error(response.data.error);
+        fetchAllPostdetails();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       {checkingdata ? (
@@ -218,40 +265,66 @@ function UserEvent1() {
           <div>
             <Navbar />
           </div>
-          <div>
-            <div className="mt-2 me-5 d-flex flex-column align-items-end ">
-              <form
-                className="form-inline my-lg-0"
-                onSubmit={handlesearchSubmit}
-              >
-                <div className="row">
-                  <div className="col-10 p-2">
-                    <input
-                      className="form-control"
-                      name="event_title"
-                      type="text"
-                      placeholder="Search by Title"
-                      aria-label="Search"
-                      onChange={handleSearchInputChange}
-                      value={searchForm.event_title}
-                    />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              {ongoinbtn && (
+                <button className="addpostbtn" onClick={fetchAllPostdetails}>
+                  Current Events
+                </button>
+              )}
+              <button className="addpostbtn" onClick={handlepastposts}>
+                Past Events
+              </button>
+
+              <button className="addpostbtn" onClick={handlefutureposts}>
+                Future Events
+              </button>
+              <span style={{ marginLeft: "20rem", fontSize: "2rem" }}>
+                <strong>{content}</strong>
+              </span>
+            </div>
+
+            <div>
+              <div className="mt-2 me-5 d-flex flex-column align-items-end ">
+                <form
+                  className="form-inline my-lg-0"
+                  onSubmit={handlesearchSubmit}
+                >
+                  <div className="row">
+                    <div className="col-10 p-2">
+                      <input
+                        className="form-control"
+                        name="event_title"
+                        type="text"
+                        placeholder="Search by Title"
+                        aria-label="Search"
+                        onChange={handleSearchInputChange}
+                        value={searchForm.event_title}
+                      />
+                    </div>
+                    <div className="col-2 p-2">
+                      <button className="addpostbtn pt-2 pb-2" type="submit">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-search"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                  <div className="col-2 p-2">
-                    <button className="addpostbtn pt-2 pb-2" type="submit">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-search"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
           </div>
           <hr />
@@ -276,7 +349,7 @@ function UserEvent1() {
                     </div>
                     <br />
                     <div className="row">
-                      <p className="col-6 card_title">Filter</p>
+                      <p className="col-6 orgeventcard_title">Filter</p>
                       <div className="col-6">
                         <div className="d-grid">
                           <button
@@ -519,34 +592,42 @@ function UserEvent1() {
                                         Event Dates:
                                         <strong>
                                           {" "}
-                                          {post.event_start_date}{" "}
+                                          {post.event_start_date.toString().slice(0,10)}{" "}
                                         </strong>{" "}
                                         <span> TO </span>
                                         <strong> {post.event_end_date}</strong>
                                       </p>
-
-                                      {(post.type === userData.membertype &&
-                                        post.clubname === userData.clubname) ||
-                                      post.type === "Public" ? (
-                                        <button
-                                          {...(post["capacity"] <=
-                                          post["participate"].length
-                                            ? { disabled: true }
-                                            : {})}
-                                          className="deletepostbtn"
-                                          onClick={() =>
-                                            handleParticipate(post._id)
-                                          }
-                                        >
-                                          Participate
-                                        </button>
+                                      {pastevent ? (
+                                        (<></>)
                                       ) : (
-                                        <button
-                                          className="deletepostbtn"
-                                          onClick={() => handleSubscribe(post)}
-                                        >
-                                          Subscribe
-                                        </button>
+                                        <>
+                                          {(post.type === userData.membertype &&
+                                            post.clubname ===
+                                              userData.clubname) ||
+                                          post.type === "Public" ? (
+                                            <button
+                                              {...(post["capacity"] <=
+                                              post["participate"].length
+                                                ? { disabled: true }
+                                                : {})}
+                                              className="deletepostbtn"
+                                              onClick={() =>
+                                                handleParticipate(post._id)
+                                              }
+                                            >
+                                              Participate
+                                            </button>
+                                          ) : (
+                                            <button
+                                              className="deletepostbtn"
+                                              onClick={() =>
+                                                handleSubscribe(post)
+                                              }
+                                            >
+                                              Subscribe
+                                            </button>
+                                          )}
+                                        </>
                                       )}
                                     </div>
                                   </div>

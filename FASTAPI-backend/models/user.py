@@ -17,6 +17,7 @@ class Organisation(BaseModel):
     username:str
     pwd:str
     memapplied:Optional[list] = []
+    feedback:Optional[list] = []
 
 class User(BaseModel):
     name: str
@@ -51,9 +52,12 @@ class EventPost(BaseModel):
     event_organizer_email: str
     event_organizer_pnumber: int
     participate: Optional[list] = []
+    feedback:Optional[list] = []
     
 
 class Admin(BaseModel):
     username: str
     pwd: str
     applied_org:Optional[list] = []
+    orgfeedback:Optional[list] = []
+    userfeedback:Optional[list] = []

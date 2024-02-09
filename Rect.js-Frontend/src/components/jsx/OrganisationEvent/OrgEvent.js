@@ -12,7 +12,6 @@ import {
 } from "react-icons/fa";
 import { CiEdit } from "react-icons/ci";
 
-
 function OrgEvent() {
   const [details, setDetails] = useState();
   const [userData, setUserData] = useState(
@@ -48,11 +47,19 @@ function OrgEvent() {
   };
 
   const fetchAllPostdetails = async () => {
+    setOngoingbtn(!ongoinbtn);
+    setPastevent(false);
+    setFutureevent(false);
+    setCurrentevent(true);
+    setContent("Current Events");
     try {
       console.log(userData.clubname);
       const cname = userData.clubname; //Rajpath
       console.log(typeof cname); //string
-      const response = await api.post("/geteventposts/", { clubname: cname });
+      // const response = await api.post("/geteventposts/", { "clubname": cname });
+      const response = await api.post("/allorgcurrenteventposts/", {
+        clubname: cname,
+      });
       setDetails(response.data);
       console.log(response.data);
     } catch (error) {
@@ -129,6 +136,9 @@ function OrgEvent() {
       const data = {
         clubname: userData["clubname"],
         filteredFormData: filteredFormData,
+        pastevent:pastevent,
+        currentevent:currentevent,
+        futureevent:futureevent,
       };
       const checking = await api.post("/orgfilters/", data);
       console.log(checking);
@@ -137,9 +147,16 @@ function OrgEvent() {
         setDetails(checking.data);
       } else {
         toast.error(checking.data.error);
+        if (currentevent){
+          fetchAllPostdetails();
+        }
+        else if(pastevent){
+          handlepastposts();
+        }
+        else if(futureevent){
+          handlefutureposts();
+        }
       }
-
-      // Rest of your code...
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -235,6 +252,59 @@ function OrgEvent() {
     }
   };
 
+  const [ongoinbtn, setOngoingbtn] = useState(true);
+  const [content, setContent] = useState("");
+  const [pastevent, setPastevent] = useState(false);
+  const [futureevent, setFutureevent] = useState(false);
+  const [currentevent, setCurrentevent] = useState(false);
+
+
+  const handlefutureposts = async () => {
+    console.log("future posts");
+    setOngoingbtn(true);
+    setFutureevent(true);
+    setPastevent(false);
+    setCurrentevent(false)
+    const cname = userData.clubname;
+    setContent("Future Events");
+
+    try {
+      const response = await api.post("/allorgfutureeventposts", {
+        clubname: cname,
+      });
+      if (response.data.success != false) {
+        setDetails(response.data);
+      } else {
+        toast.error(response.data.error);
+        fetchAllPostdetails();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handlepastposts = async () => {
+    console.log("past posts");
+    setOngoingbtn(true);
+    setPastevent(true);
+    setFutureevent(false);
+    setCurrentevent(false)
+    const cname = userData.clubname;
+    setContent("Past Events");
+    try {
+      const response = await api.post("/allorgpasteventposts", {
+        clubname: cname,
+      });
+      if (response.data.success != false) {
+        setDetails(response.data);
+      } else {
+        toast.error(response.data.error);
+        fetchAllPostdetails();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -330,7 +400,24 @@ function OrgEvent() {
           <Link to="/organisationevents/addpost">
             <button className="addpostbtn">Add New Post</button>
           </Link>
+
+          {ongoinbtn && (
+            <button className="addpostbtn" onClick={fetchAllPostdetails}>
+              Current Events
+            </button>
+          )}
+          <button className="addpostbtn" onClick={handlepastposts}>
+            Past Events
+          </button>
+
+          <button className="addpostbtn" onClick={handlefutureposts}>
+            Future Events
+          </button>
+          <span style={{ marginLeft: "20rem", fontSize: "2rem" }}>
+            <strong>{content}</strong>
+          </span>
         </div>
+
         <div className="mt-0">
           <form className="form-inline my-lg-0 " onSubmit={handlesearchSubmit}>
             <div className="row">
@@ -590,12 +677,16 @@ function OrgEvent() {
                                     <span> TO </span>
                                     <strong> {post.event_end_date}</strong>
                                   </p>
-                                  <button
-                                    className="deletepostbtn"
-                                    onClick={() => handledeletepost(post)}
-                                  >
-                                    Delete
-                                  </button>
+                                  {pastevent ? (
+                                    <></>
+                                  ) : (
+                                    <button
+                                      className="deletepostbtn"
+                                      onClick={() => handledeletepost(post)}
+                                    >
+                                      Delete
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>

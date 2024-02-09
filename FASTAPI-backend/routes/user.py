@@ -775,10 +775,11 @@ async def adminside_allnewusers():
 
 @event.post("/deletenewuser")
 async def adminside_deletenewuser(data: dict):
+    past_events()
+
     print(data["data"])
     data = data["data"]
     givenusername = data["username"]
-
     org = serializeList(conn.EventWiz.organisation.find())
     for singleorg in org:
         appliedlist = []
@@ -815,6 +816,7 @@ async def adminside_deletenewuser(data: dict):
 
 @event.post("/removingmember")
 async def adminside_removeuser(data: dict):
+    past_events()
     print(data["data"])
     data = data["data"]
     givenusername = data["username"]
@@ -981,7 +983,7 @@ async def adminside_searchorgbyname(data: dict):
     # clubname = data["clubname"]
     # print(clubname)
     search_org = data["clubname"]
-    regex_pattern = f".*{re.escape(search_org)}.*"
+    regex_pattern = f"^{re.escape(search_org)}.*"
     pipeline = [
         {"$unwind": "$applied_org"},
         {"$match": {"applied_org.clubname": Regex(regex_pattern, "i")}},
@@ -1119,6 +1121,7 @@ async def adminside_rejectorg(data: dict):
 
 @event.post("/fetchingallpostforadmin")
 async def fetch_all_post_adminside():
+    past_events()
     result = conn.EventWiz.post.find()
     allpost = serializeList(result)
     # print(allpost)
@@ -1140,6 +1143,7 @@ async def fetch_all_post_adminside():
 
 @event.post("/postsearchbyadmin")
 async def post_search_admin(data: dict):
+    past_events()
     result = conn.EventWiz.post.find()
     posts = []
     # print(data)
@@ -1162,7 +1166,7 @@ async def post_search_admin(data: dict):
 
 @event.delete("/deletepost/{id}")
 async def adminside_delete_post(id):
-
+    past_events()
     # print(id)
     post1 = serializeDict(conn.EventWiz.post.find_one({"_id": ObjectId(id)}))
    
@@ -1230,6 +1234,12 @@ async def check_user(data: dict):
 async def create_user(user: User):
     d1 = dict(user)
     # print(d1)
+    email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+    if re.match(email_pattern, d1["email"]) == None:
+        return {"error": "Invalid Email Format", "success": False}
+    number_pattern = r'^\d{10}$'
+    if re.match(number_pattern, str(d1["pnumber"])) == None:
+        return {"error": "Phone Number in 10 Digits", "success": False}
     allorg = conn.EventWiz.organisation.find()
     allorg = serializeList(allorg)
 
@@ -1252,88 +1262,174 @@ async def create_user(user: User):
 # Get all Post For Users
 @event.post("/fetchingallpostforuser/{uname}")
 async def fetch_all_post_userside(uname: str):
+    past_events()
     result = conn.EventWiz.post.find()
     posts = []
+    today = datetime.now()
+    allpost = serializeList(result)
+
     if (result != []):
-        allpost = serializeList(result)
+
         for i in allpost:
-            if len(i["participate"]) != 0:
-                for j in i["participate"]:
-                    if j["username"] == uname:
-                        break
+
+            eventstart = i["event_start_date"]
+            eventend = i["event_end_date"]
+
+            # Ensure 'eventstart' and 'eventend' are datetime objects
+            if isinstance(eventstart, str):
+                eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+            if isinstance(eventend, str):
+                eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+            
+            if eventstart <= today <= eventend:
+                if len(i["participate"]) != 0:
+                    for j in i["participate"]:
+                        if j["username"] == uname:
+                            break
+                    else:
+                        i["event_start_date"] = i["event_start_date"].strftime(
+                            "%d-%m-%Y")
+                        i["event_end_date"] = i["event_end_date"].strftime(
+                            "%d-%m-%Y")
+                        posts.append(i)
                 else:
                     i["event_start_date"] = i["event_start_date"].strftime(
                         "%d-%m-%Y")
-                    i["event_end_date"] = i["event_end_date"].strftime(
-                        "%d-%m-%Y")
+                    i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
                     posts.append(i)
-            else:
-                i["event_start_date"] = i["event_start_date"].strftime(
-                    "%d-%m-%Y")
-                i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
-                posts.append(i)
         return (posts)
     else:
         return {"error": "No post found", "success": False}
+
+    
+# fetching all future events post for user
+
+
+@event.post("/alluserfutureeventposts/") 
+async def future_event_posts(orgdata: dict):
+    today = datetime.now()
+    uname = orgdata["uname"]
+    clubpost = serializeList(conn.EventWiz.post.find())
+    print(uname)
+    # print(today)
+    result = []
+    
+    if clubpost:
+        for singlepost in clubpost:
+            # Assuming you have a 'event_start_date' and 'event_end_date' field in your database
+            eventstart = singlepost["event_start_date"]
+            eventend = singlepost["event_end_date"]
+
+            # Ensure 'eventstart' and 'eventend' are datetime objects
+            if isinstance(eventstart, str):
+                eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+            if isinstance(eventend, str):
+                eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+            
+            if today <= eventstart:
+                if len(singlepost["participate"]) != 0:
+                    for j in singlepost["participate"]:
+                        if j["username"] == uname:
+                            for j in singlepost["participate"]:
+                                    break
+                    else:
+                        singlepost["event_start_date"] = singlepost["event_start_date"].strftime("%d-%m-%Y")
+                        singlepost["event_end_date"] = singlepost["event_end_date"].strftime("%d-%m-%Y")
+                        result.append(singlepost)
+                else:
+                    singlepost["event_start_date"] = singlepost["event_start_date"].strftime(
+                        "%d-%m-%Y")
+                    singlepost["event_end_date"] = singlepost["event_end_date"].strftime("%d-%m-%Y")
+                    result.append(singlepost)
+                
+        # print(result)
+        if result:
+            return result
+        else:
+            return {"error": "No Future Event Posts", "success": False}
+    else:
+        return {"error": "No Event Posts", "success": False}
+
+
+# fetching all past events post for user
+
+ 
+@event.get("/alluserpasteventposts")
+async def pastevent_posts():
+    data = serializeList(conn.EventWiz.pastevent.find())
+    # print(data)
+    for i in data:
+        # print(i["event_start_date"])
+        i["event_start_date"] = i["event_start_date"].strftime("%Y-%m-%d")
+
+        i["event_end_date"] = i["event_end_date"].strftime("%Y-%m-%d")
+
+    if data:
+        return data
+    else:
+        return {"error":"No Past Events" , "success":False}
+
+    
 
 # Post Filter for user
 
 
 @event.post("/postfilterforuser")
 async def postfilter_user(data: dict):
-    query = {}
+    uname = data["uname"]
+    eventsdata = data["eventposts"]
+    data = data["filteredFormData"]
     print(data)
-    and_conditions = []
+    result = []
 
-    for field, value in data.items():
-        if field in ["event_start_date", "event_end_date"] and value != "":
-            value = datetime.strptime(value, "%Y-%m-%d")
-            if field == "event_start_date":
-                and_conditions.append({"event_start_date": {"$gte": value}})
-            if field == "event_end_date":
-                and_conditions.append({"event_start_date": {"$lte": value}})
+    for post in eventsdata:
+        for field, value in data.items():
+            if field in ["event_start_date", "event_end_date"] and value != "":
+                value = datetime.strptime(value, "%Y-%m-%d")
+                post[field] = datetime.strptime(post[field], "%Y-%m-%d")
+            if field == "event_start_date" and post["event_start_date"]< value:
+                break
+            elif field == "event_end_date" and post["event_end_date"] > value:
+                break
+            elif field == "venue_city":
+                regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
+                if re.match(post["venue_city"],regex_pattern)== None:
+                    break
+            
+            elif field == "minprice" and post["ticket_price"]<float(value):
+                break
+            elif field == "maxprice" and post["ticket_price"]>float(value):
+                break
+            elif field in ["clubname","type"] and post[field] != value:
+                break
+        
+        if len(post["participate"]) != 0:
+            for j in post["participate"]:
+                if j["username"] == uname:
+                    break
+        else:
+            result.append(post)  
+    if result:
 
-        if field in ["minprice", "maxprice"] and value != "":
-            if field == "minprice":
-                and_conditions.append({"ticket_price": {"$gte": float(value)}})
-            if field == "maxprice":
-                and_conditions.append({"ticket_price": {"$lte": float(value)}})
-
-        if field == "venue_city" and value != "":
-            regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
-            and_conditions.append({"venue_city": {"$regex": regex_pattern}})
-
-        if field == "type" and value != "":
-            and_conditions.append({"type": value})
-        if field == "clubname" and value != "":
-            and_conditions.append({"clubname": value})
-
-    if and_conditions:
-        query["$and"] = and_conditions
-
-    # Find posts based on the query
-    result = conn.EventWiz.post.find(query)
-
-    # Iterate over the result and print each post
-    response_list = serializeList(result)
-    if response_list:
-        lis = []
-        d1 = {}
-        for singleDict in response_list:
-            d1 = singleDict
-            d1["event_start_date"] = d1["event_start_date"].strftime(
-                "%d-%m-%Y")
-            d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
-            lis.append(serializeDict(d1))
-        return serializeList(lis)
+        return result
     else:
         return {"error": "No Such Post Available", "success": False}
+
 
 # User Participate in Event
 
 
 @event.put("/eventparticipate/{id}")
 async def event_participate(id: str, data: dict):
+    past_events()
+
+    email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+    if re.match(email_pattern, data["event_organizer_email"]) == None:
+        return {"error": "Invalid Email Format", "success": False}
+    number_pattern = r'^\d{10}$'
+    if re.match(number_pattern, str(data["event_organizer_pnumber"])) == None:
+        return {"error": "Phone Number in 10 Digits", "success": False}
+    
     data["age"] = int(data["age"])
     post = conn.EventWiz.post.find_one({"_id": ObjectId(id)})
     if post:
@@ -1354,6 +1450,8 @@ async def event_participate(id: str, data: dict):
 
 @event.post("/postsearchbyuser")
 async def post_search_user(data: dict):
+    past_events()
+
     result = conn.EventWiz.post.find()
     posts = []
     # print(data)
@@ -1401,6 +1499,13 @@ async def user_subscribe(user: dict):
 
     appliedmem = user
 
+    email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+    if re.match(email_pattern, appliedmem["email"]) == None:
+        return {"error": "Invalid Email Format", "success": False}
+    number_pattern = r'^\d{10}$'
+    if re.match(number_pattern, str(appliedmem["pnumber"])) == None:
+        return {"error": "Phone Number in 10 Digits", "success": False}
+    
     # print(appliedorg)
     flag = 0
     orgdict = serializeDict(conn.EventWiz.organisation.find_one(
@@ -1441,6 +1546,8 @@ async def user_subscribe(user: dict):
 
 @event.post("/userparticipated/{uname}")
 async def user_participated(uname: str):
+    past_events()
+
     post = conn.EventWiz.post.find()
     allpost = []
     if post:
@@ -1563,6 +1670,13 @@ async def create_org(organisation: Organisation):
     appliedorg = dict(organisation)
     # print(appliedorg)
 
+    email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+    if re.match(email_pattern, appliedorg["email"]) == None:
+        return {"error": "Invalid Email Format", "success": False}
+    number_pattern = r'^\d{10}$'
+    if re.match(number_pattern, str(appliedorg["pnumber"])) == None:
+        return {"error": "Phone Number in 10 Digits", "success": False}
+    
     usernamelist = []
     allorg = serializeList(conn.EventWiz.organisation.find())
     for singleorg in allorg:
@@ -1621,6 +1735,25 @@ async def create_event_post(data: EventPost):
     try:
         # Directly assign datetime.date objects
         data_dict = dict(data)
+
+        email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+        if re.match(email_pattern, data_dict["event_organizer_email"]) == None:
+            return {"error": "Invalid Email Format", "success": False}
+        number_pattern = r'^\d{10}$'
+        if re.match(number_pattern, str(data_dict["event_organizer_pnumber"])) == None:
+            return {"error": "Phone Number in 10 Digits", "success": False}
+        
+        start = data_dict["event_start_date"].strftime("%Y-%m-%d")
+        end = data_dict["event_end_date"].strftime("%Y-%m-%d")
+        start = datetime.strptime(start, "%Y-%m-%d")
+        end = datetime.strptime(end, "%Y-%m-%d")
+        if start > end:
+            return {"error": "Start Date should be less than or equal to End Date", "success": False}
+        tstart = datetime.strptime(data_dict["start_time"], "%H:%M").time()
+        tend = datetime.strptime(data_dict["end_time"], "%H:%M").time()
+        if (tstart > tend):
+            return {"error": "Start Time should be less than End Time", "success": False}
+
         if data_dict["type"] == "":
             return {"error": "Select Membership Type", "success": False}
         data_dict["event_start_date"] = data_dict["event_start_date"].strftime(
@@ -1646,6 +1779,8 @@ async def create_event_post(data: EventPost):
 
 @event.post("/geteventposts")
 async def get_event_posts(data: dict):
+    past_events()
+
     response = conn.EventWiz.post.find({"clubname": data["clubname"]})
     # #print(serializeList(response))
     if response:
@@ -1668,6 +1803,8 @@ async def get_event_posts(data: dict):
 
 @event.post("/getotherorgeventposts")
 async def get_other_org_eventposts(data: dict):
+    past_events()
+
     response = conn.EventWiz.post.find({"clubname": {"$ne": data["clubname"]}})
     # #print(serializeList(response))
     if response:
@@ -1690,6 +1827,8 @@ async def get_other_org_eventposts(data: dict):
 
 @event.delete("/deleteeventposts/{id}")
 async def delete_user(id):
+    past_events()
+
     # fetch the details using id
     # if details found execute the delete query
     # always test in swagger first
@@ -1734,28 +1873,94 @@ async def org_filters(data: dict):
     if and_conditions:
         query["$and"] = and_conditions
 
-    # Find posts based on the query
+    if data["pastevent"]:
+        result = conn.EventWiz.pastevent.find(query)
+        response_list = serializeList(result)
+        if response_list:
+            lis = []
+            d1 = {}
+            for singleDict in response_list:
+                d1 = singleDict
+                d1["event_start_date"] = d1["event_start_date"].strftime(
+                    "%d-%m-%Y")
+                d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
+                lis.append(serializeDict(d1))
+            return serializeList(lis)
+        else:
+            return {"error": "No such Post Available", "success": False}
+
+
     result = conn.EventWiz.post.find(query)
 
     # Iterate over the result and print each post
     response_list = serializeList(result)
+    today = datetime.now()
+    postresult = []
     if response_list:
-        lis = []
-        d1 = {}
-        for singleDict in response_list:
-            d1 = singleDict
-            d1["event_start_date"] = d1["event_start_date"].strftime(
-                "%d-%m-%Y")
-            d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
-            lis.append(serializeDict(d1))
-        return serializeList(lis)
+        if data["currentevent"]:
+            for singleDict in response_list:
+                eventstart = singleDict["event_start_date"]
+                eventend = singleDict["event_end_date"]
+
+                if isinstance(eventstart, str):
+                    eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+                if isinstance(eventend, str):
+                    eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+
+                if eventstart <= today <= eventend:
+                    postresult.append(singleDict)
+            print(postresult)
+            # is it past,future or current?
+            if (len(postresult) !=0):
+                response_list = postresult
+                # is it past,future or current
+                lis = []
+                d1 = {}
+                for singleDict in response_list:
+                    d1 = singleDict
+                    d1["event_start_date"] = d1["event_start_date"].strftime(
+                        "%d-%m-%Y")
+                    d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
+                    lis.append(serializeDict(d1))
+                return serializeList(lis)
+            else:
+                return {"error": "No such Post Available", "success": False}
+        if data["futureevent"]:
+            for singleDict in response_list:
+                eventstart = singleDict["event_start_date"]
+                eventend = singleDict["event_end_date"]
+
+                if isinstance(eventstart, str):
+                    eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+                if isinstance(eventend, str):
+                    eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+
+                if today <= eventstart:
+                    postresult.append(singleDict)
+            print(postresult)
+            # is it past,future or current?
+            if (len(postresult) !=0):
+                response_list = postresult
+                # is it past,future or current
+                lis = []
+                d1 = {}
+                for singleDict in response_list:
+                    d1 = singleDict
+                    d1["event_start_date"] = d1["event_start_date"].strftime(
+                        "%d-%m-%Y")
+                    d1["event_end_date"] = d1["event_end_date"].strftime("%d-%m-%Y")
+                    lis.append(serializeDict(d1))
+                return serializeList(lis)
+            else:
+                return {"error": "No such Post Available", "success": False}
     else:
         return {"error": "No such Post Available", "success": False}
-
 
 # other organisation event post filter functionality to fetch post
 @event.post("/otherorgeventpostfilters")
 async def other_org_eventpost_filters(data: dict):
+    past_events()
+
     filtereddata = data["filteredFormData"]
     clubname = data["clubname"]
     # Build the query based on the filteredFormData
@@ -1892,6 +2097,21 @@ async def get_memtype(data: dict):
 @event.put("/addorganizationmember/{id}")
 async def add_organizaton_member(id: str, member: User):
     given_dict = dict(member)
+    email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+
+    if re.match(email_pattern, given_dict["email"]) == None:
+        return {"error": "Invalid Email Format", "success": False}
+    number_pattern = r'^\d{10}$'
+    if re.match(number_pattern, str(given_dict["pnumber"])) == None:
+        return {"error": "Phone Number in 10 Digits", "success": False}
+    
+    start = given_dict["start_date"].strftime("%Y-%m-%d")
+    expiry = given_dict["expiry_date"].strftime("%Y-%m-%d")
+    start = datetime.strptime(start, "%Y-%m-%d")
+    expiry = datetime.strptime(expiry, "%Y-%m-%d")
+    if start > expiry or start == expiry:
+        return {"error": "Start Date should be less than Expiry Date", "success": False}
+    
     org = conn.EventWiz.organisation.find({"_id": ObjectId(id)})
 
     allorg = conn.EventWiz.organisation.find()
@@ -1940,13 +2160,23 @@ async def add_organizaton_member(id: str, member: User):
 @event.put("/organizationupdatememberdetails/")
 async def update_member_details(data: dict):
 
+    
+
     organisation = conn.EventWiz.organisation.find_one(
         {"clubname": data["clubname"]})
     if organisation:
 
         org1 = serializeDict(organisation)
+    
         formdata = data["formData"]
-
+        
+        email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
+        if re.match(email_pattern, formdata["email"]) == None:
+            return {"error": "Invalid Email Format", "success": False}
+        number_pattern = r'^\d{10}$'
+        if re.match(number_pattern, str(formdata["pnumber"])) == None:
+            return {"error": "Phone Number in 10 Digits", "success": False}
+    
         formdata["expiry_date"] = datetime.strptime(
             formdata["expiry_date"], "%Y-%m-%d")
         formdata["start_date"] = datetime.strptime(
@@ -2047,6 +2277,8 @@ async def update_member_details(data: dict):
 
 @event.post("/organisationeventpostsbytitle")
 async def organisation_eventpost_bytitle(data: dict):
+    past_events()
+
     clubname = data["clubname"]
     organisation = conn.EventWiz.organisation.find_one({"clubname": clubname})
     if organisation:
@@ -2076,6 +2308,8 @@ async def organisation_eventpost_bytitle(data: dict):
 
 @event.post("/otherorgeventpostsbytitle")
 async def otherorg_eventpost_bytitle(data: dict):
+    past_events()
+
     clubname = data["clubname"]
     organisation = conn.EventWiz.organisation.find_one({"clubname": clubname})
     if organisation:
@@ -2217,19 +2451,24 @@ async def get_all_membership(data: dict):
 # user side fetch all post
 
 
-@event.get("/fetchingallpostforuser")
-async def fetch_all_post_userside():
-    result = conn.EventWiz.post.find()
-    if (result != []):
-        return serializeList(result)
-    else:
-        return {"error": "No post found", "success": False}
+# @event.get("/fetchingallpostforuser")
+# async def fetch_all_post_userside():
+#     past_events()
+
+#     result = conn.EventWiz.post.find()
+#     if (result != []):
+#         return serializeList(result)
+#     else:
+#         return {"error": "No post found", "success": False}
+
 
 # user side search filter by title for post
 
 
 @event.post("/usersidesearchtitle")
 async def search_by_title(data: dict):
+    past_events()
+
     result = conn.EventWiz.post.find({"event_title": data["title"]})
     if result != []:
         return result
@@ -2297,6 +2536,10 @@ async def adminside_acceptorg(data: dict):
     expirydate = memberdata["expiry_date"]
     expirydate = datetime.strptime(expirydate, "%Y-%m-%d")
     clubid = data["clubid"]
+
+   
+    if startdate > expirydate or startdate == expirydate:
+        return {"error": "Start Date should be less than Expiry Date", "success": False}
 
     org = serializeDict(conn.EventWiz.organisation.find_one(
         {"_id": ObjectId(clubid)}))
@@ -2451,6 +2694,8 @@ async def adminside_rejectorg(data: dict):
 
 @event.put("/updatepostprice")
 async def event_priceupdate(data:dict):
+    past_events()
+
     pricedata = data["pricedata"]
     postdata = data["postdata"]
     print("1")
@@ -2470,5 +2715,109 @@ async def event_priceupdate(data:dict):
         return {"message":"Successfully Updated Ticket Price", "success":True}
     else:
         return {"error":"Error in updating" , "success":False}
+    
+
+# fetching org's past event posts
+    
+@event.post("/allorgpasteventposts")
+async def pastevent_posts(orgdata:dict):
+    data = serializeList(conn.EventWiz.pastevent.find({"clubname":orgdata["clubname"]}))
+    # print(data)
+    for i in data:
+        # print(i["event_start_date"])
+        i["event_start_date"] = i["event_start_date"].strftime("%Y-%m-%d")
+
+        i["event_end_date"] = i["event_end_date"].strftime("%Y-%m-%d")
+
+    if data:
+        return data
+    else:
+        return {"error":"No Past Events" , "success":False}
+
+        
+# to fetch org's current event's posts
+
+
+@event.post("/allorgcurrenteventposts/") 
+async def currentevent_posts(orgdata:dict):
+    today = datetime.now()
+        # Assuming you have a 'start_date' and 'end_date' field in your database
+    clubname = orgdata["clubname"]
+    clubpost = serializeList(conn.EventWiz.post.find({"clubname":clubname}))
+
+    # print(today)
+    result = []
+    if clubpost:
+        for singlepost in clubpost:
+            eventstart = singlepost["event_start_date"]
+            eventend = singlepost["event_end_date"]
+
+            if isinstance(eventstart, str):
+                eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+            if isinstance(eventend, str):
+                eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+
+            if eventstart <= today <= eventend:
+                result.append(singlepost)
+        # print(result)
+        if result:
+            return result
+        else:
+            return {"error":"No Current Event Posts" , "success":False}
+    else:
+        return {"error":"No Event Posts" , "success":False}
+
+# fetching all org's future events
+
+
+@event.post("/allorgfutureeventposts/") 
+async def future_event_posts(orgdata: dict):
+    today = datetime.now()
+    clubname = orgdata["clubname"]
+    clubpost = serializeList(conn.EventWiz.post.find({"clubname": clubname}))
+
+    # print(today)
+    result = []
+    
+    if clubpost:
+        for singlepost in clubpost:
+            # Assuming you have a 'event_start_date' and 'event_end_date' field in your database
+            eventstart = singlepost["event_start_date"]
+            eventend = singlepost["event_end_date"]
+
+            # Ensure 'eventstart' and 'eventend' are datetime objects
+            if isinstance(eventstart, str):
+                eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+            if isinstance(eventend, str):
+                eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+
+            if today <= eventstart:
+                result.append(singlepost)
+        # print(result)
+        if result:
+            return result
+        else:
+            return {"error": "No Future Event Posts", "success": False}
+    else:
+        return {"error": "No Event Posts", "success": False}
+
 
 # ///////////////////////////////////////////////////////////////////////////////////
+
+
+# //////////////General Routes/////////////////////////////////////
+
+    
+def past_events():
+    events = conn.EventWiz.post.find()
+    if events:
+        eventlist = serializeList(events)
+        today = datetime.now()
+        for i in eventlist:
+            merged_datetime = datetime.combine(i["event_end_date"], datetime.strptime(i["end_time"], "%H:%M").time())
+            if merged_datetime < today:
+                conn.EventWiz.pastevent.insert_one(i)
+                conn.EventWiz.post.find_one_and_delete({"_id": ObjectId(i["_id"])})
+
+
+# //////////////////////////////////////////////////////////////////
