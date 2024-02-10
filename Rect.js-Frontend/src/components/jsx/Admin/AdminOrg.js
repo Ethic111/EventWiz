@@ -39,6 +39,7 @@ function AdminOrg() {
     navigate("/admin/orgdetailspage", {
       state: JSON.stringify(org),
     });
+    JSON.stringify(localStorage.setItem("adminsingleorg", JSON.stringify(org)));
   };
 
   // /////////////

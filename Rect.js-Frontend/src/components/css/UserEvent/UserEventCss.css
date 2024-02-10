@@ -5,13 +5,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin-top:-50px
+  height: 95vh;
+  margin-top: -49px;
 }
 
 .backgroundImg{
 
-  background-image: url(https://i.ibb.co/x7FvxFy/eventvibe8.jpg);
+  /* background-image: url(https://i.ibb.co/x7FvxFy/eventvibe8.jpg); */
+  background-color: #0e2643;
   height: 100%; 
   position: relative;
   /* Center and scale the image nicely */

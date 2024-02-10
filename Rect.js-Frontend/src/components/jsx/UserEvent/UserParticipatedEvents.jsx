@@ -4,6 +4,7 @@ import api from "../api";
 import { FaRupeeSign } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import UserEvent from "./UserEvent";
+import { toast } from "react-toastify";
 
 function UserParticipatedEvents() {
   const [checkingdata, setCheckingdata] = useState(
@@ -13,7 +14,9 @@ function UserParticipatedEvents() {
   const [posterror, setPostError] = useState("");
 
   const userData = JSON.parse(localStorage.getItem("users"));
+
   const fetchAllPostdetails = async () => {
+    setCurrentparticipatedposts(false);
     console.log("fetching post function");
     try {
       // console.log(userData.username)
@@ -22,7 +25,7 @@ function UserParticipatedEvents() {
         // toast.success(checking.data.data)
         setPost(checking.data);
       } else {
-        setPostError(checking.data.error);
+        toast.error(checking.data.error);
       }
     } catch (error) {
       console.error("Error fetching details:", error);
@@ -38,13 +41,75 @@ function UserParticipatedEvents() {
       state: JSON.stringify(post),
     });
   };
+
+  const [showcurrentparticipatedposts, setCurrentparticipatedposts] =
+    useState(false);
+
+  const handlepastparticipatedevents = async () => {
+    console.log("fetching past post function");
+    try {
+      // console.log(userData.username)
+      const checking = await api.post(
+        `/userpastparticipated/${userData.username}`
+      );
+      if (checking.data.success !== false) {
+        // toast.success(checking.data.data)
+        setCurrentparticipatedposts(true);
+        setPost(checking.data);
+      } else {
+        toast.error(checking.data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching details:", error);
+    }
+  };
+
+  const handleeventfeedback = (post) => {
+    navigate("/event/feedback", {
+      state: JSON.stringify(post),
+    });
+  };
+  const handleorgfeedback = (post) => {
+    navigate("/organisation/feedback", {
+      state: JSON.stringify(post),
+    });
+  };
+
   return (
     <>
       {checkingdata ? (
         <>
           <div>
             <Navbar />
-            <h2 className="text-center mt-4">Participated</h2>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                // justifyContent: "space-between",
+              }}
+            >
+              {showcurrentparticipatedposts ? (
+                <button
+                  className="col-3 addpostbtn mt-2"
+                  onClick={fetchAllPostdetails}
+                >
+                  Current Participated Events
+                </button>
+              ) : (
+                <button
+                  className="col-2 addpostbtn mt-2"
+                  onClick={handlepastparticipatedevents}
+                >
+                  Past Participated Events
+                </button>
+              )}
+
+              <h2 className="col-8 text-center mt-2">
+                {showcurrentparticipatedposts
+                  ? "Past Participated Events"
+                  : "Current Participated Events"}
+              </h2>
+            </div>
             <div className="row">
               {post && post.length ? (
                 post.map((post) => (
@@ -102,6 +167,24 @@ function UserParticipatedEvents() {
                                   <span> TO </span>
                                   <strong> {post.event_end_date}</strong>
                                 </p>
+                                {showcurrentparticipatedposts ? (
+                                  <>
+                                    <button
+                                      className="addpostbtn m-2"
+                                      onClick={() => handleeventfeedback(post)}
+                                    >
+                                      Event Feedback
+                                    </button>
+                                    <button
+                                      className="addpostbtn m-2"
+                                      onClick={() => handleorgfeedback(post)}
+                                    >
+                                      Org Feedback
+                                    </button>
+                                  </>
+                                ) : (
+                                  ""
+                                )}
                               </div>
                             </div>
                           </div>
@@ -111,7 +194,7 @@ function UserParticipatedEvents() {
                   </div>
                 ))
               ) : (
-                <p>{posterror}</p>
+                <p>No Records Available</p>
               )}
             </div>
           </div>

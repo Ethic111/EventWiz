@@ -5,6 +5,7 @@ import Home from "./components/jsx/Home";
 import About from "./components/jsx/About";
 import NotFound from "./components/jsx/NotFound";
 // //////////////////////////////// USER //////////
+
 import UserEvent1 from "./components/jsx/UserEvent/UserEvent1";
 import UserSubscribe from "./components/jsx/UserEvent/UserSubscribe";
 import UserParticipatedEvents from "./components/jsx/UserEvent/UserParticipatedEvents";
@@ -35,6 +36,16 @@ import AdminAuthority from "./components/jsx/Admin/AdminAuthority";
 import AdminAuthorityOrgDetails from "./components/jsx/Admin/AdminAuthorityOrgDetails";
 import OrgAuthorization from "./components/jsx/OrganisationEvent/OrgAuthorization";
 import AdminEventPosts from "./components/jsx/Admin/AdminEventPosts";
+import UserSubscribePastEvents from "./components/jsx/UserEvent/UserSubscribePastEvents";
+import UserEventFeedback from "./components/jsx/UserEvent/UserEventFeedback";
+import UserOrgFeedback from "./components/jsx/UserEvent/UserOrgFeedback";
+import UserPlatformFeedback from "./components/jsx/UserEvent/UserPlatformFeedback";
+import OrgPlatformFeedback from "./components/jsx/OrganisationEvent/OrgPlatformFeedback";
+import OrgUserEventFeedback from "./components/jsx/OrganisationEvent/OrgUserEventFeedback";
+import OrgUsersFeedback from "./components/jsx/OrganisationEvent/OrgUsersFeedback";
+import AdminOrgFeedback from "./components/jsx/Admin/AdminOrgFeedback";
+import AdminUserEventFeedback from "./components/jsx/Admin/AdminUserEventFeedback";
+import AdminPlatformFeedback from "./components/jsx/Admin/AdminPlatformFeedback";
 
 // import Admin  from "./Admin/Views/Admin";
 
@@ -58,6 +69,10 @@ function App() {
           <Route path="/subscribe/form1" element={<UserSubscribeForm1 />} />
           <Route path="/event/details" element={<UserEventDetails />} />
           <Route path="/event/partcipate" element={<UserEventParticipate />} />
+          <Route path="/subscribe/pastevents" element={<UserSubscribePastEvents />} />
+          <Route path="/event/feedback" element={<UserEventFeedback />} />
+          <Route path="/organisation/feedback" element={<UserOrgFeedback />} />
+          <Route path="/userplatformfeedback" element={<UserPlatformFeedback />} />
           {/* Organisation----------------------------------- */}
           <Route path="/organisationevents" element={<OrganisationEvent/>} />
           <Route path="/organisationevents/addpost" element={<OrgAddPost/>} />
@@ -69,6 +84,9 @@ function App() {
           <Route path="/organisationevents/organisationmemberships" element={<OrganisationMemberships/>} />
           <Route path="//organisationevents/authorization" element={<OrgAuthorization/>} />
           <Route path="/organisationevents/otherevents" element={<OrgOtherEvents/>} />
+          <Route path="/orgplatformfeedback" element={<OrgPlatformFeedback/>} />
+          <Route path="/organisationevents/orgeventfeedback" element={<OrgUserEventFeedback/>} />
+          <Route path="/usersfeedbacks" element={<OrgUsersFeedback/>} />
           {/* ----------------------------------- */}
          
          {/* Admin------------------------------------ */}
@@ -80,6 +98,9 @@ function App() {
          <Route path="/admin/accepetrejectorg" element={<AdminAuthority/>} />
          <Route path="/admin/appliedorgdetails" element={<AdminAuthorityOrgDetails/>} />
          <Route path="/admin/alleventposts" element={<AdminEventPosts/>} />
+         <Route path="/admin/orgfeedback" element={<AdminOrgFeedback/>} />
+         <Route path="/admin/usereventfeedback" element={<AdminUserEventFeedback/>} />
+         <Route path="/admin/platformfeedback" element={<AdminPlatformFeedback/>} />
          
          
          {/* ----------------------------------------- */}

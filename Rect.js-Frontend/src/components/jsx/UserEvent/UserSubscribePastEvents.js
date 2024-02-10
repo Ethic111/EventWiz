@@ -1,40 +1,27 @@
-// AdminEventPosts
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import $ from "jquery";
-import AdminNavbar from "../Admin/AdminNavbar";
-import "../../css/UserEvent/UserEvent1Css.css";
-import api from "../api";
-// import UserEvent from "./UserEvent";
-import {
-  FaArrowCircleRight,
-  FaArrowCircleLeft,
-  FaRupeeSign,
-} from "react-icons/fa";
+import React, { useEffect } from "react";
+import { useState } from "react";
+import Navbar from "../Navbar";
+import { useNavigate,useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
+import api from "../api";
+import $ from "jquery";
+import {
+    FaArrowCircleRight,
+    FaArrowCircleLeft,
+    FaRupeeSign,
+  } from "react-icons/fa";
 
-function AdminEventPosts() {
-  const [checkingdata, setCheckingdata] = useState(true);
-  const [memType, setMemType] = useState();
-  const [details, setDetails] = useState();
-  const [clubname, setClubname] = useState([]);
-  const [userData, setUserData] = useState("admin");
+function UserSubscribePastEvents() {
+  const [orgclubname, setOrgclubname] = useState(
+    JSON.parse(localStorage.getItem("orgname"))
+  );
+const [memType, setMemType] = useState();
+const [clubname, setClubname] = useState([]);
 
-  const fetchAllMemTypedetails = async () => {
-    try {
-      const response = await api.get("/allmembershiptype");
-      setMemType(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching details:", error);
-    }
-  };
+const [details, setDetails] = useState([]);
 
-  const [searchForm, setSearchform] = useState({
-    event_title: "",
-  });
 
-  const [modalEaseIn, setModalEaseIn] = useState("");
+const [modalEaseIn, setModalEaseIn] = useState("");
 
   const fetchAllClubname = async () => {
     try {
@@ -47,11 +34,11 @@ function AdminEventPosts() {
 
   useEffect(() => {
     fetchAllClubname();
-    fetchAllPostdetails();
+    handlepastposts();
     fetchAllMemTypedetails();
     localStorage.removeItem("postid");
-    localStorage.removeItem("orgname");
-    localStorage.removeItem("memtype");
+    // localStorage.removeItem("orgname");
+    // localStorage.removeItem("memtype");
 
     $(".modal").each(function () {
       $(this).on("show.bs.modal", function () {
@@ -73,35 +60,17 @@ function AdminEventPosts() {
     setIsCol2Visible(!isCol2Visible);
   };
 
-  const [originaldata,setOriginaldata] = useState()
-
-  const fetchAllPostdetails = async () => {
-    // console.log("fetching post function");
-    setOngoingbtn(!ongoinbtn);
-    setPastevent(false);
-    setFutureevent(false);
-    setCurrentevent(true);
-    setContent("Current Events");
+  const fetchAllMemTypedetails = async () => {
     try {
-      console.log(userData.username);
-      const response = await api.post(`/fetchingallpostforadmin`);
-      setDetails(response.data);
-      setOriginaldata(response.data)
-      //   console.log(response.data);
+      const response = await api.get("/allmembershiptype");
+      setMemType(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching details:", error);
     }
   };
 
-  const navigate = useNavigate();
-  const handlepostdetails = (post) => {
-    navigate("/event/details", {
-      state: JSON.stringify(post),
-    });
-  };
-
-  // /////////////
-
+  
   const [lFormData, setLFormData] = useState({
     event_start_date: "",
     event_end_date: "",
@@ -127,8 +96,9 @@ function AdminEventPosts() {
       [name]: value,
     });
   };
+  const [originaldata,setOriginaldata] = useState()
 
-  const handleAdminFormSubmit = async (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
 
     // Filter out key-value pairs with empty values
@@ -138,21 +108,23 @@ function AdminEventPosts() {
         filteredFormData[key] = lFormData[key];
       }
     }
+    const data = {
+      "eventposts":originaldata,
+      "filteredFormData":filteredFormData
+    }
 
     console.log("Filtered form:");
     console.log(filteredFormData);
 
+    // Now you can use filteredFormData in your API call
     try {
-      // console.log("Inside try for api calling:");
-      const data = {
-        "eventposts":originaldata,
-        "filteredFormData":filteredFormData
-      }
+      console.log("Inside try for api calling:");
       const checking = await api.post("/postfilter", data);
       console.log(checking);
       if (checking.data.success !== false) {
         console.log(checking.data);
         setDetails(checking.data);
+        
       } else {
         toast.error(checking.data.error);
       }
@@ -162,6 +134,15 @@ function AdminEventPosts() {
       console.error("Error submitting form:", error);
     }
   };
+
+  
+  const navigate = useNavigate();
+  const handlepostdetails = (post) => {
+    navigate("/event/details", {
+      state: JSON.stringify(post),
+    });
+  };
+
 
   const handleformreset = () => {
     setLFormData({
@@ -173,160 +154,63 @@ function AdminEventPosts() {
       type: "",
       clubname: "",
     });
-    setSearchform({
-      event_title: "",
-    });
-    fetchAllPostdetails();
+    // setSearchform({
+    //   event_title: "",
+    // });
+    handlepastposts();
   };
 
-  const handleSearchInputChange = (e) => {
-    const { name, value } = e.target;
-    setSearchform({
-      ...searchForm,
-      [name]: value,
-    });
-  };
-  const handlesearchSubmit = async (event) => {
-    event.preventDefault();
-    const data = { title: searchForm["event_title"] };
-    console.log("handle search submit");
-    try {
-      const response = await api.post("/postsearchbyadmin", data);
-      setDetails(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching details:", error);
-    }
-  };
-
-  const handlepostdelete = async (id) => {
-    localStorage.setItem("postid", JSON.stringify(id));
-    if (futureevent === true || currentevent === true) {
-      try {
-        const response = await api.delete(`/deletepost/${id}`);
-        // console.log(response.data)
-        if (response.data.success != false) {
-          fetchAllPostdetails();
-        } else {
-          toast.error(response.data.error);
-          fetchAllPostdetails();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    } else if (pastevent === true) {
-      try {
-        const response = await api.delete(`/deletepastpost/${id}`);
-        // console.log(response.data)
-        if (response.data.success != false) {
-          handlepastposts();
-        } else {
-          toast.error(response.data.error);
-          handlepastposts();
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
-  const [ongoinbtn, setOngoingbtn] = useState(true);
-  const [content, setContent] = useState("");
-  const [pastevent, setPastevent] = useState(false);
-  const [futureevent, setFutureevent] = useState(false);
-  const [currentevent, setCurrentevent] = useState(false);
-
-  const handlefutureposts = async () => {
-    console.log("future posts");
-    setOngoingbtn(true);
-    setFutureevent(true);
-    setPastevent(false);
-    setCurrentevent(false);
-    const cname = userData.clubname;
-    setContent("Future Events");
-
-    try {
-      const response = await api.post("/allfutureeventposts", {
-        clubname: cname,
-      });
-      if (response.data.success != false) {
-        setDetails(response.data);
-        setOriginaldata(response.data)
-      } else {
-        toast.error(response.data.error);
-        fetchAllPostdetails();
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handlepastposts = async () => {
+    // setPastevent(true);
+
     console.log("past posts");
-    setOngoingbtn(true);
-    setPastevent(true);
-    setFutureevent(false);
-    setCurrentevent(false);
-    const cname = userData.clubname;
-    setContent("Past Events");
+    const cname = orgclubname;
     try {
-      const response = await api.post("/allpasteventposts", {
-        clubname: cname,
+      const response = await api.post("/allorgpasteventposts", {
+        clubname: orgclubname,
       });
       if (response.data.success != false) {
         setDetails(response.data);
         setOriginaldata(response.data)
       } else {
         toast.error(response.data.error);
-        fetchAllPostdetails();
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handlepostfeedback = (post) => {  
-    navigate("/admin/usereventfeedback", {
-      state: JSON.stringify(post),
-    });
-  };
+
 
   return (
     <>
       <div>
-        <AdminNavbar />
+        <Navbar />
       </div>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            {/* <Link to="/organisationevents/addpost">
-            <button className="addpostbtn">Add New Post</button>
-          </Link> */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <button className="addpostbtn"
+          onClick={() => navigate("/subscribe/orgdetails")}
+          >{orgclubname} Details</button>
 
-            {ongoinbtn && (
-              <button className="addpostbtn" onClick={fetchAllPostdetails}>
-                Current Events
-              </button>
-            )}
-            <button className="addpostbtn" onClick={handlepastposts}>
-              Past Events
-            </button>
+          <span style={{ marginLeft: "20rem", fontSize: "2rem" }}>
+            <strong>Past {orgclubname} Events</strong>
+          </span>
+        </div>
 
-            <button className="addpostbtn" onClick={handlefutureposts}>
-              Future Events
-            </button>
-            <span style={{ marginLeft: "20rem", fontSize: "2rem" }}>
-              <strong>{content}</strong>
-            </span>
-          </div>
-          <div className="mt-0">
-            <form className="form-inline my-lg-0" onSubmit={handlesearchSubmit}>
+        <div>
+          <div className="mt-2 me-5 d-flex flex-column align-items-end ">
+            <form
+              className="form-inline my-lg-0"
+              // onSubmit={handlesearchSubmit}
+            >
               <div className="row">
                 <div className="col-10 p-2">
                   <input
@@ -335,12 +219,13 @@ function AdminEventPosts() {
                     type="text"
                     placeholder="Search by Title"
                     aria-label="Search"
-                    onChange={handleSearchInputChange}
-                    value={searchForm.event_title}
+                    disabled
+                    // onChange={handleSearchInputChange}
+                    // value={searchForm.event_title}
                   />
                 </div>
                 <div className="col-2 p-2">
-                  <button className="addpostbtn pt-2 pb-2" type="submit">
+                  <button className="addpostbtn pt-2 pb-2" type="submit" disabled>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -390,7 +275,7 @@ function AdminEventPosts() {
                   </div>
                 </div>
 
-                <form onSubmit={handleAdminFormSubmit} style={{ margin: "0px" }}>
+                <form onSubmit={handleFormSubmit} style={{ margin: "0px" }}>
                   <div className="row gy-3 overflow-hidden">
                     <div className="col-12">
                       <div className="form-floating mb-3">
@@ -607,45 +492,15 @@ function AdminEventPosts() {
                                     Event Dates:
                                     <strong>
                                       {" "}
-                                      {post.event_start_date}{" "}
+                                      {post.event_start_date
+                                        .toString()
+                                        .slice(0, 10)}{" "}
                                     </strong>{" "}
                                     <span> TO </span>
                                     <strong> {post.event_end_date}</strong>
                                   </p>
 
-                                  <button
-                                    className="deletepostbtn"
-                                    onClick={() => handlepostdelete(post._id)}
-                                  >
-                                    Delete
-                                  </button>
-                                  {pastevent && (
-                                    <button
-                                      className="deletepostbtn"
-                                      onClick={() => handlepostfeedback(post)}
-                                    >
-                                      Feedback
-                                    </button>
-                                  )}
-                                  {/* {(post.type === userData.membertype &&
-                                    post.clubname === userData.clubname) ||
-                                  post.type === "Public" ? (
-                                    <button
-                                      className="deletepostbtn"
-                                      onClick={() =>
-                                        handleParticipate(post._id)
-                                      }
-                                    >
-                                      Participate
-                                    </button>
-                                  ) : (
-                                    <button
-                                      className="deletepostbtn"
-                                      onClick={() => handleSubscribe(post)}
-                                    >
-                                      Subscribe
-                                    </button>
-                                  )} */}
+                                  
                                 </div>
                               </div>
                             </div>
@@ -666,4 +521,4 @@ function AdminEventPosts() {
   );
 }
 
-export default AdminEventPosts;
+export default UserSubscribePastEvents;

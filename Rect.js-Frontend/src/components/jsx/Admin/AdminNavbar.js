@@ -1,6 +1,7 @@
 // AdminNavbar
 import React, { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { VscFeedback } from "react-icons/vsc";
 
 function AdminNavbar() {
   const location = useLocation();
@@ -42,12 +43,14 @@ function AdminNavbar() {
             className="collapse navbar-collapse justify-content-end me-5"
             id="navbarNav"
           >
-            <ul className="navbar-nav ">
+            <ul className="navbar-nav "
+            style={{ backgroundColor: "#0e2643", color: "white" }}
+            >
               <li className="nav-item">
                 <NavLink
                   to="/admin/home"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Home
@@ -57,7 +60,7 @@ function AdminNavbar() {
                 <NavLink
                   to="/admin/allusers"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   User
@@ -67,7 +70,7 @@ function AdminNavbar() {
                 <NavLink
                   to="/admin/allorg"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Organisation
@@ -77,7 +80,7 @@ function AdminNavbar() {
                 <NavLink
                   to="/admin/accepetrejectorg"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Authorization
@@ -87,7 +90,7 @@ function AdminNavbar() {
                 <NavLink
                   to="/admin/alleventposts"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Events
@@ -99,7 +102,7 @@ function AdminNavbar() {
                     to="/home"
                     onClick={handleSignOut}
                     className={`nav-link ${
-                      !isHomeActive ? "font-weight-bold" : ""
+                      !isHomeActive ? "" : ""
                     }`}
                   >
                     Logout {userData.username}
@@ -108,6 +111,23 @@ function AdminNavbar() {
                   <NavLink to="*"></NavLink>
                 )}
               </li>
+              {userData?.username ? (
+                  <li className="nav-item">
+                    <NavLink
+                    to="/admin/platformfeedback"
+                    className={`nav-link ${
+                      isHomeActive ? "" : ""
+                    }`}
+                  >
+                    <VscFeedback 
+                      style={{ fontSize: "1.8rem"}}
+                      />
+                  </NavLink>
+                    
+                  </li>
+                ) : (
+                  ""
+                )}
             </ul>
           </div>
         </div>

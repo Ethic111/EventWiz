@@ -35,9 +35,11 @@ function UserSubscribe() {
   const navigate = useNavigate();
   const handleorgdetails = (org) => {
     console.log(JSON.stringify(org));
+    localStorage.setItem("orgdetails", JSON.stringify(org));
     navigate("/subscribe/orgdetails", {
       state: JSON.stringify(org),
     });
+
   };
 
   const handleformreset = () => {

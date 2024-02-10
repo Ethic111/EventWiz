@@ -55,8 +55,7 @@ function OrgEvent() {
     try {
       console.log(userData.clubname);
       const cname = userData.clubname; //Rajpath
-      console.log(typeof cname); //string
-      // const response = await api.post("/geteventposts/", { "clubname": cname });
+      console.log(typeof cname); 
       const response = await api.post("/allorgcurrenteventposts/", {
         clubname: cname,
       });
@@ -305,6 +304,12 @@ function OrgEvent() {
       console.error(error);
     }
   };
+
+  const handleusereventfeedback = (post) => {
+    navigate("/organisationevents/orgeventfeedback", {
+      state: JSON.stringify(post),
+    });
+  }
 
   return (
     <>
@@ -678,7 +683,12 @@ function OrgEvent() {
                                     <strong> {post.event_end_date}</strong>
                                   </p>
                                   {pastevent ? (
-                                    <></>
+                                    <button
+                                    className="deletepostbtn"
+                                    onClick={() => handleusereventfeedback(post)}
+                                  >
+                                    See Feedback
+                                  </button>
                                   ) : (
                                     <button
                                       className="deletepostbtn"

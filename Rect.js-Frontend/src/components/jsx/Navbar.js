@@ -40,12 +40,14 @@ function Navbar() {
             className="collapse navbar-collapse justify-content-end me-5"
             id="navbarNav"
           >
-            <ul className="navbar-nav  ">
+            <ul className="navbar-nav "
+            style={{ backgroundColor: "#0e2643", color: "white" }}
+            >
               <li className="nav-item">
                 <NavLink
                   to="/home"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Home
@@ -55,7 +57,7 @@ function Navbar() {
                 <NavLink
                   to="/events"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Events
@@ -65,7 +67,7 @@ function Navbar() {
                 <NavLink
                   to="/subscribe"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Subscribe
@@ -75,19 +77,31 @@ function Navbar() {
                 <NavLink
                   to="/partcipate"
                   className={`nav-link ${
-                    isHomeActive ? "font-weight-bold" : ""
+                    isHomeActive ? "" : ""
                   }`}
                 >
                   Partcipated
                 </NavLink>
               </li>
+              {userData?.username?(
+              <li className="nav-item">
+                <NavLink
+                  to="/userplatformfeedback"
+                  className={`nav-link ${
+                    isHomeActive ? "" : ""
+                  }`}
+                >
+                  Platform Feedback
+                </NavLink>
+              </li>
+              ):("")}
               <li className="nav-item">
                 {userData?.email ? (
                   <NavLink
                     to="/"
                     onClick={handleSignOut}
                     className={`nav-link ${
-                      !isHomeActive ? "font-weight-bold" : ""
+                      !isHomeActive ? "" : ""
                     }`}
                   >
                     Logout {userData.username}
@@ -96,7 +110,7 @@ function Navbar() {
                   <NavLink
                     to="/loginregister"
                     className={`nav-link ${
-                      !isHomeActive ? "font-weight-bold" : ""
+                      !isHomeActive ? "" : ""
                     }`}
                   >
                     Login/Register

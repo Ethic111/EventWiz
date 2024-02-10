@@ -1126,17 +1126,85 @@ async def fetch_all_post_adminside():
     allpost = serializeList(result)
     # print(allpost)
     posts = []
-    if (result != []):
-        
-        for i in allpost:
-            i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
-            i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
-            posts.append(i)
-        # print(posts)
-        return (posts)
-    else:
-        return {"error": "No post found", "success": False}
+    today = datetime.now()
+    if allpost:
+        for singlepost in allpost:
+            eventstart = singlepost["event_start_date"]
+            eventend = singlepost["event_end_date"]
 
+            if isinstance(eventstart, str):
+                eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+            if isinstance(eventend, str):
+                eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+
+            if eventstart <= today <= eventend:
+                posts.append(singlepost)
+        # print(result)
+        if posts:
+            return posts
+        else:
+            return {"error":"No Current Event Posts" , "success":False}
+    else:
+        return {"error":"No Event Posts" , "success":False}
+    # if (result != []):
+        
+    #     for i in allpost:
+    #         i["event_start_date"] = i["event_start_date"].strftime("%d-%m-%Y")
+    #         i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
+    #         posts.append(i)
+    #     # print(posts)
+    #     return (posts)
+    # else:
+    #     return {"error": "No post found", "success": False}
+
+
+# fetcing all past events
+@event.post("/allpasteventposts")
+async def past_events():
+    data = serializeList(conn.EventWiz.pastevent.find())
+    # print(data)
+    for i in data:
+        # print(i["event_start_date"])
+        i["event_start_date"] = i["event_start_date"].strftime("%Y-%m-%d")
+
+        i["event_end_date"] = i["event_end_date"].strftime("%Y-%m-%d")
+
+    if data:
+        return data
+    else:
+        return {"error":"No Past Events" , "success":False}
+
+
+#  fetching all future events
+@event.post("/allfutureeventposts")
+async def future_events():
+    today = datetime.now()
+    clubpost = serializeList(conn.EventWiz.post.find())
+
+    # print(today)
+    result = []
+    
+    if clubpost:
+        for singlepost in clubpost:
+            # Assuming you have a 'event_start_date' and 'event_end_date' field in your database
+            eventstart = singlepost["event_start_date"]
+            eventend = singlepost["event_end_date"]
+
+            # Ensure 'eventstart' and 'eventend' are datetime objects
+            if isinstance(eventstart, str):
+                eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
+            if isinstance(eventend, str):
+                eventend = datetime.strptime(eventend, "%Y-%m-%d %H:%M:%S")
+
+            if today <= eventstart:
+                result.append(singlepost)
+        # print(result)
+        if result:
+            return result
+        else:
+            return {"error": "No Future Event Posts", "success": False}
+    else:
+        return {"error": "No Event Posts", "success": False}
 
 # Post Search by User using Title
 
@@ -1161,12 +1229,51 @@ async def post_search_admin(data: dict):
                 posts.append(i)
         return posts
     
+
+# filtering post for admin and user
+    
+
+@event.post("/postfilter")
+async def post_filter_admin(data: dict):
+    eventsdata = data["eventposts"]
+    data = data["filteredFormData"]
+    print(data)
+    result = []
+
+    for post in eventsdata:
+        for field, value in data.items():
+            if field in ["event_start_date", "event_end_date"] and value != "":
+                value = datetime.strptime(value, "%Y-%m-%d")
+                post[field] = datetime.strptime(post[field], "%Y-%m-%d")
+            if field == "event_start_date" and post["event_start_date"]< value:
+                break
+            elif field == "event_end_date" and post["event_end_date"] > value:
+                break
+            elif field == "venue_city":
+                regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
+                if re.match(post["venue_city"],regex_pattern)== None:
+                    break
+            
+            elif field == "minprice" and post["ticket_price"]<float(value):
+                break
+            elif field == "maxprice" and post["ticket_price"]>float(value):
+                break
+            elif field in ["clubname","type"] and post[field] != value:
+                break
+        else:
+            result.append(post) 
+    if result:
+        return result
+    else:
+        return {"error": "No Such Post Available", "success": False}
+
+
 # organisation delete post
 
 
 @event.delete("/deletepost/{id}")
 async def adminside_delete_post(id):
-    past_events()
+    # past_events()
     # print(id)
     post1 = serializeDict(conn.EventWiz.post.find_one({"_id": ObjectId(id)}))
    
@@ -1185,6 +1292,66 @@ async def adminside_delete_post(id):
     else:
         return {"error": "no post found", "success": False}
     
+@event.delete("/deletepastpost/{id}")
+async def adminside_delete_pastpost(id):
+    # past_events()
+    print(id)
+    post1 = conn.EventWiz.pastevent.find_one({"_id": id})
+    # print(post1)
+    if post1:
+        post1= serializeDict(post1)
+        del post1["_id"]
+        conn.EventWiz.deletedpastposts.insert_one(post1)
+
+    response = serializeDict(
+        conn.EventWiz.pastevent.find_one_and_delete({"_id": id}))
+    
+    if response:
+        # for email
+        # org1 = serializeDict(conn.EventWiz.organisation.find_one({"clubname": post1["clubname"]}))
+        # # print(post1["event_title"])
+        # data = {"clubname":post1["clubname"],"email":org1["email"],"postname":post1["event_title"]}
+        # admindeletingorgpost(data)
+
+        return True
+    else:
+        return {"error": "no post found", "success": False}
+    
+
+# fetching admin details
+@event.get("/admin/getadmin")
+async def get_admin():
+    result = conn.EventWiz.admin.find_one()
+    return serializeDict(result)        
+
+
+# deleting user's platform feedback
+
+
+@event.delete("/admin/deleteuserfeedback")
+async def adminside_delete_userfeedback(data: dict):
+    print(data["userfeedback"])
+    response = conn.EventWiz.admin.find_one_and_update({},{"$set":{"userfeedback":data["userfeedback"]} })
+    if response:
+        admindata = serializeList(conn.EventWiz.admin.find({}))
+        return admindata[0]
+    else:
+        return {"error": "No feedback found", "success": False}
+    
+
+# deleting org's platform feedback
+    
+
+@event.delete("/admin/deleteorgfeedback")
+async def adminside_delete_orgfeedback(data: dict):
+    print(data["orgfeedback"])
+    response = conn.EventWiz.admin.find_one_and_update({},{"$set":{"orgfeedback":data["orgfeedback"]} })
+    if response:
+        admindata = serializeList(conn.EventWiz.admin.find({}))
+        return admindata[0]
+    else:
+        return {"error": "No feedback found", "success": False}
+
 
 # /////////////////////////////////////////////////////////////////////////////
 
@@ -1267,15 +1434,14 @@ async def fetch_all_post_userside(uname: str):
     posts = []
     today = datetime.now()
     allpost = serializeList(result)
-
+    # print(allpost)
     if (result != []):
 
         for i in allpost:
-
+            print(i["event_end_date"])
             eventstart = i["event_start_date"]
             eventend = i["event_end_date"]
 
-            # Ensure 'eventstart' and 'eventend' are datetime objects
             if isinstance(eventstart, str):
                 eventstart = datetime.strptime(eventstart, "%Y-%m-%d %H:%M:%S")
             if isinstance(eventend, str):
@@ -1297,7 +1463,8 @@ async def fetch_all_post_userside(uname: str):
                         "%d-%m-%Y")
                     i["event_end_date"] = i["event_end_date"].strftime("%d-%m-%Y")
                     posts.append(i)
-        return (posts)
+                    
+        return posts
     else:
         return {"error": "No post found", "success": False}
 
@@ -1370,50 +1537,6 @@ async def pastevent_posts():
         return {"error":"No Past Events" , "success":False}
 
     
-
-# Post Filter for user
-
-
-@event.post("/postfilterforuser")
-async def postfilter_user(data: dict):
-    uname = data["uname"]
-    eventsdata = data["eventposts"]
-    data = data["filteredFormData"]
-    print(data)
-    result = []
-
-    for post in eventsdata:
-        for field, value in data.items():
-            if field in ["event_start_date", "event_end_date"] and value != "":
-                value = datetime.strptime(value, "%Y-%m-%d")
-                post[field] = datetime.strptime(post[field], "%Y-%m-%d")
-            if field == "event_start_date" and post["event_start_date"]< value:
-                break
-            elif field == "event_end_date" and post["event_end_date"] > value:
-                break
-            elif field == "venue_city":
-                regex_pattern = re.compile(f"^{re.escape(value)}", re.IGNORECASE)
-                if re.match(post["venue_city"],regex_pattern)== None:
-                    break
-            
-            elif field == "minprice" and post["ticket_price"]<float(value):
-                break
-            elif field == "maxprice" and post["ticket_price"]>float(value):
-                break
-            elif field in ["clubname","type"] and post[field] != value:
-                break
-        
-        if len(post["participate"]) != 0:
-            for j in post["participate"]:
-                if j["username"] == uname:
-                    break
-        else:
-            result.append(post)  
-    if result:
-
-        return result
-    else:
-        return {"error": "No Such Post Available", "success": False}
 
 
 # User Participate in Event
@@ -1530,8 +1653,7 @@ async def user_subscribe(user: dict):
                         return {"data": "Applied For Subscription Successfully.", "success": True}
                 else:
                     orgapplied.append(appliedmem)
-                    conn.EventWiz.organisation.update_one({"clubname": appliedmem["clubname"]}, {
-                                                          "$set":  {"memapplied": orgapplied}})
+                    conn.EventWiz.organisation.update_one({"clubname": appliedmem["clubname"]}, {"$set":  {"memapplied": orgapplied}})
                     return {"data": "Applied For Subscription Successfully.", "success": True}
         else:
             orgapplied.append(appliedmem)
@@ -1567,6 +1689,33 @@ async def user_participated(uname: str):
             return {"error": "You are not Participated in any Event", "success": False}
     else:
         return {"error": "Post Not Found", "success": False}
+
+
+#  fetching user past participated events
+@event.post("/userpastparticipated/{uname}")
+async def user_pastparticipated(uname: str):
+    past_events()
+    post = conn.EventWiz.pastevent.find()
+    allpost = []
+    if post:
+        postlist = serializeList(post)
+        for singlepost in postlist:
+            if len(singlepost) != 0:
+                for singlepart in singlepost["participate"]:
+                    if singlepart["username"] == uname:
+                        singlepost["event_start_date"] = singlepost["event_start_date"].strftime(
+                            "%d-%m-%Y")
+                        singlepost["event_end_date"] = singlepost["event_end_date"].strftime(
+                            "%d-%m-%Y")
+                        allpost.append(singlepost)
+        if len(allpost) != 0:
+            return allpost
+        else:
+            return {"error": "You are not Participated in any Event", "success": False}
+    else:
+        return {"error": "Post Not Found", "success": False}
+
+
 
 # Get Membership Type using Clubname and Username
 
@@ -1610,6 +1759,81 @@ async def member_sorting(data: dict):
 
     else:
         return {"error": "Organization not Found", "success": False}
+    
+
+# event feedback
+@event.post("/eventfeedback")
+async def event_feedback(data: dict):
+    print(data["lFormData"])
+    feedbackform = data["lFormData"]
+    postData = data["postData"]
+    print(postData["_id"])
+    post = conn.EventWiz.pastevent.find_one({"_id": postData["_id"]})
+    feedback = []
+
+    if post:
+        
+        post = serializeDict(post)
+        if len(post["feedback"]) !=0:
+            
+            feedback = post["feedback"]
+            feedback.append(feedbackform)
+            
+            result = conn.EventWiz.pastevent.find_one_and_update({"_id": postData["_id"]}, {"$set": {"feedback": feedback}})
+            
+            if result:
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+        else:   
+            feedback.append(feedbackform)
+            result = conn.EventWiz.pastevent.find_one_and_update({"_id": postData["_id"]}, {"$set": {"feedback": feedback}})
+            print("7")
+            if result:
+
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+    else:   
+        return {"error": "Post Not Found", "success": False}
+
+# user platform feedback
+@event.post("/userplatformfeedback")
+async def event_feedback(data: dict):
+    print(data["lFormData"])
+    feedbackform = data["lFormData"]
+    admindata = conn.EventWiz.admin.find()
+    feedback = []
+
+    if admindata:
+        
+        admindata = serializeList(admindata)[0]
+        if len(admindata["userfeedback"]) !=0:
+            
+            feedback = admindata["userfeedback"]
+            feedback.append(feedbackform)
+            
+            result = conn.EventWiz.admin.find_one_and_update({}, {"$set": {"userfeedback": feedback}})
+            
+            if result:
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+        else: 
+
+            feedback.append(feedbackform)
+            result = conn.EventWiz.admin.find_one_and_update({}, {"$set": {"userfeedback": feedback}})
+
+            if result:
+
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+    else:   
+        return {"error": "Post Not Found", "success": False}
+    
+
+  
 
 # //////////////////////////////////////////////////////////////////////////////
 
@@ -1649,12 +1873,7 @@ async def all_membershiptype():
 async def check_org(data: dict):
     # print(data["username"])
 
-    d1 = conn.EventWiz.organisation.find_one({"$and":
-                                              [
-                                                  {"username": data["username"]},
-                                                  {"pwd": data["pwd"]}
-                                              ]
-                                              })
+    d1 = conn.EventWiz.organisation.find_one({"$and":[{"username": data["username"]},{"pwd": data["pwd"]}]})
     # #print(d1["username"],d1["pwd"])
     if d1:
         # #print(d1)
@@ -2800,6 +3019,82 @@ async def future_event_posts(orgdata: dict):
             return {"error": "No Future Event Posts", "success": False}
     else:
         return {"error": "No Event Posts", "success": False}
+
+
+
+# org feedback
+@event.post("/orgfeedback")
+async def event_feedback(data: dict):
+    print(data["lFormData"])
+    feedbackform = data["lFormData"]
+    postData = data["postData"]
+    print(postData["_id"])
+    org = conn.EventWiz.organisation.find_one({"clubname": postData["clubname"]})
+    feedback = []
+
+    if org:
+        
+        org = serializeDict(org)
+        if len(org["feedback"]) !=0:
+            
+            feedback = org["feedback"]
+            feedback.append(feedbackform)
+            
+            result = conn.EventWiz.organisation.find_one_and_update({"clubname": postData["clubname"]}, {"$set": {"feedback": feedback}})
+            
+            if result:
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+        else:   
+            feedback.append(feedbackform)
+            result = conn.EventWiz.organisation.find_one_and_update({"clubname": postData["clubname"]}, {"$set": {"feedback": feedback}})
+            
+            if result:
+
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+    else:   
+        return {"error": "Post Not Found", "success": False}
+
+
+
+# org platform feedback
+@event.post("/orgplatformfeedback")
+async def event_feedback(data: dict):
+    print(data["lFormData"])
+    feedbackform = data["lFormData"]
+    admindata = conn.EventWiz.admin.find()
+    feedback = []
+
+    if admindata:
+        
+        admindata = serializeList(admindata)[0]
+        if len(admindata["orgfeedback"]) !=0:
+            
+            feedback = admindata["orgfeedback"]
+            feedback.append(feedbackform)
+            
+            result = conn.EventWiz.admin.find_one_and_update({}, {"$set": {"orgfeedback": feedback}})
+            
+            if result:
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+        else: 
+
+            feedback.append(feedbackform)
+            result = conn.EventWiz.admin.find_one_and_update({}, {"$set": {"orgfeedback": feedback}})
+
+            if result:
+
+                return True
+            else:
+                return {"error": "Feedback Not Submitted", "success": False}
+    else:   
+        return {"error": "Post Not Found", "success": False}
+  
 
 
 # ///////////////////////////////////////////////////////////////////////////////////

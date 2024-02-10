@@ -25,7 +25,10 @@ function AdminOrgDetailed() {
   });
 
   const location = useLocation();
-  const [orgData, setOrgData] = useState(JSON.parse(location.state));
+  // const [orgData, setOrgData] = useState(JSON.parse(location.state));
+  const [orgData, setOrgData] = useState(
+    JSON.parse(localStorage.getItem("adminsingleorg"))
+  );
   // console.log(orgData);
   const memtype = orgData.memtype;
   // console.log(memtype);
@@ -103,7 +106,7 @@ function AdminOrgDetailed() {
       expiry_date: "",
     });
     setMemberlist(orgData.members);
-    setShowEventWiz(false)
+    setShowEventWiz(false);
   };
 
   const handleSearchInputChange = (event) => {
@@ -208,7 +211,7 @@ function AdminOrgDetailed() {
       if (result.data.success !== false) {
         setMemberlist(result.data);
       } else {
-        setShowEventWiz(false)
+        setShowEventWiz(false);
         setMemberlist(orgData.members);
         toast.error(result.data.error);
       }
@@ -224,12 +227,10 @@ function AdminOrgDetailed() {
       });
       if (result.data.success !== false) {
         setMemberlist(result.data);
-      } 
-      else if (result.data.error === "empty") {
+      } else if (result.data.error === "empty") {
         toast(result.data.message);
         setShowEventWiz(false);
-      } 
-      else {
+      } else {
         toast.error(result.data.error);
         setShowEventWiz(false);
         setMemberlist(orgData.members);
@@ -237,6 +238,12 @@ function AdminOrgDetailed() {
     } catch (error) {
       console.error("Error in handleInactivemembers:", error);
     }
+  };
+  const navigate = useNavigate();
+  const handleorgfeedback = () => {
+    navigate("/admin/orgfeedback", {
+      state: JSON.stringify(orgData),
+    });
   };
   return (
     <>
@@ -254,12 +261,17 @@ function AdminOrgDetailed() {
             <button className="addpostbtn">Member Data</button>
           </Link> */}
           {showmemberdatabtn ? (
-            <button
-              className="addpostbtn"
-              onClick={handleMemberDataButtonClick}
-            >
-              Member Data
-            </button>
+            <>
+              <button
+                className="addpostbtn"
+                onClick={handleMemberDataButtonClick}
+              >
+                Member Data
+              </button>
+              <button className="addpostbtn" onClick={handleorgfeedback}>
+                {orgData.clubname}'s Feedback
+              </button>
+            </>
           ) : (
             <>
               <button

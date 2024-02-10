@@ -6,7 +6,6 @@ import "../../css/UserEvent/UserEvent1Css.css";
 import api from "../api";
 import UserEvent from "./UserEvent";
 import {
-  FaArrowCircleRight,
   FaArrowCircleLeft,
   FaRupeeSign,
 } from "react-icons/fa";
@@ -49,9 +48,9 @@ function UserEvent1() {
   };
 
   useEffect(() => {
-    fetchAllClubname();
     fetchAllPostdetails();
     fetchAllMemTypedetails();
+    fetchAllClubname();
     localStorage.removeItem("postid");
     localStorage.removeItem("orgname");
     localStorage.removeItem("memtype");
@@ -81,13 +80,13 @@ function UserEvent1() {
   const fetchAllPostdetails = async () => {
     setOngoingbtn(!ongoinbtn);
     setContent("Current Events");
-    setPastevent(false);
     console.log("fetching post function");
     try {
       console.log(userData.username);
       const response = await api.post(
         `/fetchingallpostforuser/${userData.username}`
       );
+      console.log(response.data);
       setDetails(response.data);
       setOriginaldata(response.data)
       //   console.log(response.data);
@@ -134,7 +133,6 @@ function UserEvent1() {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Filter out key-value pairs with empty values
     const filteredFormData = {};
     for (const key in lFormData) {
       if (lFormData[key] !== "") {
@@ -143,17 +141,15 @@ function UserEvent1() {
     }
     const data = {
       "eventposts":originaldata,
-      "filteredFormData":filteredFormData,
-      "uname":userData.username
+      "filteredFormData":filteredFormData
     }
 
     console.log("Filtered form:");
     console.log(filteredFormData);
 
-    // Now you can use filteredFormData in your API call
     try {
       console.log("Inside try for api calling:");
-      const checking = await api.post("/postfilterforuser", data);
+      const checking = await api.post("/postfilter", data);
       console.log(checking);
       if (checking.data.success !== false) {
         console.log(checking.data);
@@ -163,7 +159,6 @@ function UserEvent1() {
         toast.error(checking.data.error);
       }
 
-      // Rest of your code...
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -220,7 +215,7 @@ function UserEvent1() {
     console.log("future posts");
     setOngoingbtn(true);
     setContent("Future Events");
-    setPastevent(false);
+
     try {
       const response = await api.post("/alluserfutureeventposts", {
         uname: userData.username,
@@ -237,27 +232,7 @@ function UserEvent1() {
     }
   };
 
-  const [pastevent, setPastevent] = useState(false);
-
-  const handlepastposts = async () => {
-    setPastevent(true);
-    console.log("past posts");
-    setOngoingbtn(true);
-    const cname = userData.clubname;
-    setContent("Past Events");
-    try {
-      const response = await api.get("/alluserpasteventposts");
-      if (response.data.success != false) {
-        setDetails(response.data);
-        setOriginaldata(response.data)
-      } else {
-        toast.error(response.data.error);
-        fetchAllPostdetails();
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+ 
   return (
     <>
       {checkingdata ? (
@@ -278,9 +253,9 @@ function UserEvent1() {
                   Current Events
                 </button>
               )}
-              <button className="addpostbtn" onClick={handlepastposts}>
+              {/* <button className="addpostbtn" onClick={handlepastposts}>
                 Past Events
-              </button>
+              </button> */}
 
               <button className="addpostbtn" onClick={handlefutureposts}>
                 Future Events
@@ -597,10 +572,8 @@ function UserEvent1() {
                                         <span> TO </span>
                                         <strong> {post.event_end_date}</strong>
                                       </p>
-                                      {pastevent ? (
-                                        (<></>)
-                                      ) : (
-                                        <>
+                              
+                                        
                                           {(post.type === userData.membertype &&
                                             post.clubname ===
                                               userData.clubname) ||
@@ -627,8 +600,8 @@ function UserEvent1() {
                                               Subscribe
                                             </button>
                                           )}
-                                        </>
-                                      )}
+                                        
+                                      
                                     </div>
                                   </div>
                                 </div>

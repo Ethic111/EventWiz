@@ -1,14 +1,19 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+// UserPlatformFeedback
+import React from "react";
+import Navbar from "../Navbar";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import api from "../api";
+import { toast } from "react-toastify";
 
-function AdminLogin() {
-  const navigate = useNavigate();
-
+function UserPlatformFeedback() {
+  const location = useLocation();
+  const [userdata, setUserdata] = useState(
+    JSON.parse(localStorage.getItem("users"))
+  );
   const [lFormData, setLFormData] = useState({
-    username: "",
-    pwd: "",
+    username: userdata.username,
+    feedbackdata: "",
   });
 
   const handleInputChange = (event) => {
@@ -21,16 +26,15 @@ function AdminLogin() {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      const checking = await api.post("/adminlogin/", lFormData);
-
+      const feedbackform = { lFormData: lFormData};
+      console.log(feedbackform);
+      const checking = await api.post("/userplatformfeedback", feedbackform);
       if (checking.data.success !== false) {
-        localStorage.setItem("admin", JSON.stringify(checking.data[0]));
-        toast.success("Login Successfully");
+        toast.success("Feedback Submitted Successfully");
         setLFormData({
-          username: "",
-          pwd: "",
+          username: userdata.username,
+          feedbackdata: "",
         });
-        navigate("/admin/home");
       } else {
         toast.error(checking.data.error);
       }
@@ -41,7 +45,10 @@ function AdminLogin() {
 
   return (
     <>
-      <section className="p-3 p-md-4 p-xl-5">
+      <div>
+        <Navbar />
+      </div>
+      <section>
         <div className="container">
           <div className="row">
             <div className="col-12 col-md-6 bsb-tpl-bg-platinum">
@@ -49,7 +56,7 @@ function AdminLogin() {
                 {/* <h3 className="m-0">Welcome!</h3> */}
                 <img
                   className="img-fluid rounded mx-auto "
-                  src="https://img.freepik.com/free-vector/tablet-login-concept-illustration_114360-7883.jpg?w=740&t=st=1706529733~exp=1706530333~hmac=e294cf3ddb40c7cfdb91565f09d19d6771116dba97922030183962a816cfd0d8"
+                  src="https://i.ibb.co/Hgrnv9Y/feedbacksvg1.webp"
                   alt=""
                   width="545"
                 />
@@ -59,8 +66,8 @@ function AdminLogin() {
               <div className="p-3 p-md-4 p-xl-5">
                 <div className="row">
                   <div className="col-12">
-                    <div className="mb-5">
-                      <h3>Admin Login</h3>
+                    <div className="mb-2">
+                      <h3>EventWiz Platform Feedback</h3>
                     </div>
                   </div>
                 </div>
@@ -74,8 +81,9 @@ function AdminLogin() {
                           id="username"
                           name="username"
                           placeholder=""
-                          value={lFormData.username}
-                          onChange={handleInputChange}
+                          disabled
+                          value={userdata.username}
+                          // onChange={handleInputChange}
                         />
                         <label htmlFor="username" className="form-label">
                           Username
@@ -84,17 +92,19 @@ function AdminLogin() {
                     </div>
                     <div className="col-12">
                       <div className="form-floating mb-3">
-                        <input
-                          type="password"
+                        <textarea
                           className="form-control"
-                          id="pwd"
-                          name="pwd"
+                          id="feedbackdata"
+                          name="feedbackdata"
                           placeholder=""
-                          value={lFormData.pwd}
+                          rows="10"
+                          cols="10"
+                          style={{ width: "100%", height: "100px" }}
+                          value={lFormData.feedbackdata}
                           onChange={handleInputChange}
-                        />
-                        <label htmlFor="pwd" className="form-label">
-                          Password
+                        ></textarea>
+                        <label htmlFor="feedbackdata" className="form-label">
+                          Your Feedback
                         </label>
                       </div>
                     </div>
@@ -111,7 +121,7 @@ function AdminLogin() {
                           }}
                           type="submit"
                         >
-                          Log in now
+                          Submit Feedback
                         </button>
                       </div>
                     </div>
@@ -126,4 +136,4 @@ function AdminLogin() {
   );
 }
 
-export default AdminLogin;
+export default UserPlatformFeedback;
