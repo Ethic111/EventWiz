@@ -1353,6 +1353,51 @@ async def adminside_delete_orgfeedback(data: dict):
         return {"error": "No feedback found", "success": False}
 
 
+# deleting user's org feedback
+    
+
+@event.put("/admin/deleteuserorgfeedback")
+async def adminside_delete_orgfeedback(data: dict):
+    print(data["orguserfeedback"])
+    orguserfeedback = data["orguserfeedback"]
+    clubname = data["clubname"]
+    response = conn.EventWiz.organisation.find_one_and_update({"clubname": clubname},{"$set":{"feedback":orguserfeedback}})
+    if response:
+        return True
+    else:
+        return {"error": "No feedback found", "success": False}
+
+    
+    
+# fetching single org data for admin
+    
+
+@event.post("/admin/fetchingsingleorgpostfeedback")
+async def fetch_single_org(data: dict):
+    # print("hey data")
+    # print(data["clubname"])
+    result = conn.EventWiz.organisation.find_one({"clubname": data["clubname"]})
+    if result:
+        print(result)
+        result = serializeDict(result)
+        event_feedback = result["feedback"]
+        return event_feedback
+    else:
+        return {"error": "No such Organisation found", "success": False}
+    
+# deleting post feedback by admin
+@event.put("/admin/deleteorgeventfeedback")
+async def adminside_delete_postfeedback(data: dict):
+    print(data["postfeedback"])
+    postfeedback = data["postfeedback"]
+    postid = data["postid"]
+    print(postid)
+    response = conn.EventWiz.pastevent.find_one_and_update({"_id": postid},{"$set":{"feedback":postfeedback}})
+    if response:
+        return True
+    else:
+        return {"error": "No feedback found", "success": False}
+
 # /////////////////////////////////////////////////////////////////////////////
 
 # //////////////////////////////////////USER////////////////////////////////////
@@ -1547,10 +1592,10 @@ async def event_participate(id: str, data: dict):
     past_events()
 
     email_pattern = r'^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$'
-    if re.match(email_pattern, data["event_organizer_email"]) == None:
+    if re.match(email_pattern, data["email"]) == None:
         return {"error": "Invalid Email Format", "success": False}
     number_pattern = r'^\d{10}$'
-    if re.match(number_pattern, str(data["event_organizer_pnumber"])) == None:
+    if re.match(number_pattern, str(data["pnumber"])) == None:
         return {"error": "Phone Number in 10 Digits", "success": False}
     
     data["age"] = int(data["age"])
@@ -1838,6 +1883,7 @@ async def event_feedback(data: dict):
 # //////////////////////////////////////////////////////////////////////////////
 
 # ////////////////////////////////////////ORGANISATION///////////////////////////////////
+
 
 # fetching all clubname
 

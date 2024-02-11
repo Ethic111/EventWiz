@@ -289,6 +289,7 @@ function AdminEventPosts() {
     navigate("/admin/usereventfeedback", {
       state: JSON.stringify(post),
     });
+    JSON.stringify(localStorage.setItem("adminsinglepostfeedback", JSON.stringify(post["feedback"])))
   };
 
   return (
