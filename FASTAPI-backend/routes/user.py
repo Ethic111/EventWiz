@@ -1368,22 +1368,32 @@ async def adminside_delete_orgfeedback(data: dict):
         return {"error": "No feedback found", "success": False}
 
     
-    
+# fetching org details of admin
+@event.post("/admin/fetchingsingleorg")
+async def fetch_org_details(data: dict):
+    # print(data["clubname"])
+    result = conn.EventWiz.organisation.find_one({"clubname": data["clubname"]})
+    if result:
+        return serializeDict(result)
+    else:
+        return {"error": "No such Organisation found", "success": False}
+
+
 # fetching single org data for admin
     
 
 @event.post("/admin/fetchingsingleorgpostfeedback")
 async def fetch_single_org(data: dict):
     # print("hey data")
-    # print(data["clubname"])
-    result = conn.EventWiz.organisation.find_one({"clubname": data["clubname"]})
+    print(data["eventid"])
+    result = conn.EventWiz.pastevent.find_one({"_id": data["eventid"]})
     if result:
         print(result)
         result = serializeDict(result)
         event_feedback = result["feedback"]
         return event_feedback
     else:
-        return {"error": "No such Organisation found", "success": False}
+        return {"error": "No such Post found", "success": False}
     
 # deleting post feedback by admin
 @event.put("/admin/deleteorgeventfeedback")
@@ -1397,6 +1407,221 @@ async def adminside_delete_postfeedback(data: dict):
         return True
     else:
         return {"error": "No feedback found", "success": False}
+
+
+import math 
+# fetchin the cards data for org dashboard
+
+@event.post("/admindashboardcards")
+async def org_dashboard_cards():
+    # clubname = data["clubname"]
+    org = conn.EventWiz.organisation.find()
+    users = conn.EventWiz.users.find()
+    currentevents = conn.EventWiz.post.find()
+    pastevents = conn.EventWiz.pastevent.find()
+    result= [] 
+    if currentevents:
+        currentevents = serializeList(currentevents)
+        currenteventscounts = len(currentevents) 
+    else:
+        currenteventscounts = 0
+    if pastevents:
+        pastevents = serializeList(pastevents)
+        pasteventscounts = len(pastevents)
+    else:
+        pasteventscounts = 0
+
+    totalposts = currenteventscounts + pasteventscounts
+    result.append({"totalposts":totalposts})
+
+    totalevents = []
+    for i in currentevents:
+        totalevents.append(i)
+    for i in pastevents:
+        totalevents.append(i)
+    
+    if users:
+        users = serializeList(users)
+        totalusers = len(users)
+        result.append({"totalusers":totalusers})
+    else:
+        result.append({"totalusers":0})
+    
+    if org:
+        org = serializeList(org)
+        totalorg = len(org)
+        result.append({"totalorg":totalorg})
+    else:
+        result.append({"totalorg":0})
+
+    totalparticipants = []
+    for i in totalevents:
+        for j in i["participate"]:
+            totalparticipants.append(j)
+    totalparticipants = len(totalparticipants)
+    avgparticipants = math.ceil(totalparticipants / totalposts)
+    result.append({"avgparticipants":avgparticipants})
+
+
+    totalprofit = 0
+
+    for i in org:
+        for j in i["members"]:
+            if j["subscribe"] == True:
+                
+                for memtypes in i["memtype"]:
+                    if j["membertype"] == memtypes["type"]:
+                        totalprofit = totalprofit + memtypes["price"]
+    print(totalprofit)
+    
+    
+        
+    totalprofit = totalprofit * 0.12
+    totalprofit = math.ceil(totalprofit)
+    print(totalprofit)
+    result.append({"totalprofit":totalprofit})
+
+    if result:
+        print(result)
+        return result
+    else:
+        return {"error": "No Data Found", "success": False}
+
+       
+# fetching the cards data of popular events for admin
+    
+
+@event.post("/admindashboardpopulareventcards")
+async def admin_dashboard_popularevents():
+    allevents = conn.EventWiz.post.find()
+    events = []
+    if allevents:
+        allevents = serializeList(allevents)
+        for i in allevents:
+            events.append(i)
+    allpastevents = conn.EventWiz.pastevent.find()
+    if allpastevents:
+        allpastevents = serializeList(allpastevents)
+
+        for i in allpastevents:
+            events.append(i)
+
+    events = sorted(events, key = lambda i: len(i["participate"]),reverse=True)
+        # print(allevents)
+    popularevents = []
+    for count in range(3):
+        events[count]["event_start_date"] = events[count]["event_start_date"].strftime("%d-%m-%Y")
+        events[count]["event_end_date"] = events[count]["event_end_date"].strftime("%d-%m-%Y")     
+        # print(count)
+        # print(events[count]["event_title"])
+        popularevents.append(events[count])
+
+    if popularevents:
+        return popularevents
+    else:
+        return {"error": "No Data Found", "success": False}
+
+    
+# Total Profit by Subscribe Users Yearly
+@event.get("/subscribeprofitadmin")
+async def total_profit_yearly_Admin():
+    profit = {}
+    tprofit = []
+    result = []
+    org = serializeList(conn.EventWiz.organisation.find())
+    if len(org):
+        for singleorg in org:
+            memtype = singleorg["memtype"]
+            for singlemember in singleorg["members"]:
+                if singlemember["subscribe"] :
+                    for singlememtype in memtype:
+                        if singlemember["membertype"] == singlememtype["type"]:
+                            if singlemember["start_date"].year in profit:
+                                profit[int(singlemember["start_date"].year)] += singlememtype["price"]
+                            else:
+                                profit[int(singlemember["start_date"].year)] = singlememtype["price"]
+        profit = dict(sorted(profit.items()))
+        for key, value in profit.items():
+            tprofit.append({"year": key, "Subscribers": value * 0.12})
+        return tprofit
+    else:
+        return {"error": "No Organization", "success": False}
+
+# Total Profit by Events Yearly
+@event.get("/eventprofitadmin")
+async def event_profit_admin():
+    post1 = conn.EventWiz.post.find()
+    post2  = conn.EventWiz.pastevent.find()
+    profit = {}
+    tprofit = []
+    result = []
+    if post1:
+        for singlepost in post1:
+            totalparticipate = len(singlepost["participate"])
+            totalprofit = totalparticipate * singlepost["ticket_price"]
+            if singlepost["event_start_date"].year in profit:
+                profit[int(singlepost["event_start_date"].year)] += totalprofit
+            else:
+                profit[int(singlepost["event_start_date"].year)] = totalprofit
+    if post2:
+        for singlepost in post2:
+            totalparticipate = len(singlepost["participate"])
+            totalprofit = totalparticipate * singlepost["ticket_price"]
+            if singlepost["event_start_date"].year in profit:
+                profit[int(singlepost["event_start_date"].year)] += totalprofit
+            else:
+                profit[int(singlepost["event_start_date"].year)] = totalprofit
+    # result.append(profit)
+    profit = dict(sorted(profit.items()))
+    for key, value in profit.items():
+        tprofit.append({"year": key, "Events": int(value * 0.04)})
+    return tprofit
+                    
+# Total Profit per Organization
+@event.post("/profitperorg")
+async def profit_per_org(data:dict):
+    profit = {}
+    eventprofit = {}
+    tprofit = []
+    org  = conn.EventWiz.organisation.find_one({"clubname":data["clubname"]})
+    if org:
+        orgevent1  = conn.EventWiz.post.find({"clubname":data["clubname"]})
+        orgevent2  = conn.EventWiz.pastevent.find({"clubname":data["clubname"]})
+        memtype = org["memtype"]
+        for singlemember in org["members"]:
+            for singlememtype in memtype:
+                if singlemember["subscribe"] and singlemember["membertype"] == singlememtype["type"]:
+                    if singlemember["start_date"].year in profit:
+                        profit[int(singlemember["start_date"].year)] += singlememtype["price"] * 0.12
+                    else:
+                        profit[int(singlemember["start_date"].year)] = singlememtype["price"] * 0.12
+        for singlepost in orgevent1:
+            totalparticipate = len(singlepost["participate"])
+            totalprofit = totalparticipate * singlepost["ticket_price"]
+            if singlepost["event_start_date"].year in eventprofit:
+                eventprofit[int(singlepost["event_start_date"].year)] += totalprofit
+            else:
+                eventprofit[int(singlepost["event_start_date"].year)] = totalprofit
+        for singlepost in orgevent2:
+            totalparticipate = len(singlepost["participate"])
+            totalprofit = totalparticipate * singlepost["ticket_price"]
+            if singlepost["event_start_date"].year in eventprofit:
+                eventprofit[int(singlepost["event_start_date"].year)] += totalprofit
+            else:
+                eventprofit[int(singlepost["event_start_date"].year)] = totalprofit
+        for key, value in eventprofit.items():
+            if key in profit:
+                profit[key] += value * 0.04
+            else:
+                profit[key] = value * 0.04
+        profit = dict(sorted(profit.items()))
+        for key, value in profit.items():
+            tprofit.append({"year": key, "Revenue": int(value)})
+        return tprofit
+    
+
+
+
 
 # /////////////////////////////////////////////////////////////////////////////
 
@@ -1877,6 +2102,7 @@ async def event_feedback(data: dict):
     else:   
         return {"error": "Post Not Found", "success": False}
     
+
 
   
 
@@ -3141,6 +3367,335 @@ async def event_feedback(data: dict):
     else:   
         return {"error": "Post Not Found", "success": False}
   
+  # get all year in which member is subscribed
+
+# fetching all years of subscribed members
+
+@event.post("/getallsubscribedyear")
+async def get_all_subscribed_year(data: dict):
+    org = serializeDict(conn.EventWiz.organisation.find_one(
+        {"clubname": data["clubname"]}))
+    years=[]
+    if len(org) != 0:
+        subscribers = []
+
+        for singlemember in org["members"]:
+            if singlemember["start_date"].year not in years and singlemember["subscribe"] == True:
+                years.append(singlemember["start_date"].year)
+        years.sort(reverse=True)
+        return years
+
+
+from collections import defaultdict
+# # org dashboard graph data
+# @event.post("/orgdashboardgraph")
+# async def org_dashboard_graph(data: dict):
+
+#     clubname = data["clubname"]
+#     org = conn.EventWiz.organisation.find_one({"clubname": clubname})
+#     datayear = data["datayear"]
+#     maindata =[]
+
+#     if org:
+#         org = serializeDict(org)
+#         nonsubscribers = []
+#         subscribers = []
+
+#         for i in org["members"]:
+#             if i["subscribe"]:
+#                 subscribers.append(i)
+#             else:
+#                 nonsubscribers.append(i)
+
+#         month_names = [
+#             "January", "February", "March", "April",
+#             "May", "June", "July", "August",
+#             "September", "October", "November", "December"
+#         ]
+
+#         all_months = set(range(1, 13))
+#         month_counts = defaultdict(int)
+#         year_month_counts = defaultdict(lambda: defaultdict(int))
+
+#         for i in subscribers:
+#             startdate = i["start_date"]
+#             year_month_counts[startdate.year][startdate.month] += 1
+
+#         result = []
+
+#         for year, month_counts in sorted(year_month_counts.items()):
+#             year_data = [{"name": month_names[month-1], "subcribers": month_counts[month]} for month in all_months]
+#             result.append({int(year): year_data})
+#             result.sort(reverse=True, key=lambda x: list(x.keys())[0])
+#         # print(result)
+#         if result:
+            
+#             for i in result:
+#                 for key, value in i.items():
+#                     if key == datayear:
+#                         maindata.append(value)
+#             # print(maindata)
+#             if maindata:
+#                 # print(maindata[0])
+
+#             # print(result)
+#                 return maindata[0]
+#             else:
+#                 return {"error": "No Data Found", "success": False}
+#         else:
+#             return {"error": "No Data Found", "success": False}
+#     else:
+#         return {"error": "Organisation Not Found", "success": False}
+
+
+
+# org dashboard graph data
+@event.post("/orgdashboardgraph")
+
+async def org_dashboard_graph(data: dict):
+    clubname = data["clubname"]
+    org = conn.EventWiz.organisation.find_one({"clubname": clubname})
+    
+    if org:
+       
+        org = serializeDict(org)
+        memtype = org["memtype"]
+        nonsubscribers = []
+        subscribers = []
+        for i in org["members"]:
+            if i["subscribe"] and i["start_date"].year == data["datayear"]:
+                subscribers.append(i)
+            else:
+                nonsubscribers.append(i)    
+        month_names = [
+            "Jan", "Feb", "March", "April",
+            "May", "June", "July", "Aug",
+            "Sept", "Oct", "Nov", "Dec"
+        ]
+        
+        totalmembers = {}
+        totalprofit = {}
+        tmembers = []
+        tprofit = []
+        
+        result = []
+        
+        for i in subscribers:
+            # Code For total Members in a month
+            if month_names[i["start_date"].month-1] in totalmembers:
+                totalmembers[month_names[i["start_date"].month-1]] += 1
+            else:
+                totalmembers[month_names[i["start_date"].month-1]] = 1
+            # Code For total Profit in a month
+            for j in memtype:
+                if j["type"] == i["membertype"]:
+                    if month_names[i["start_date"].month-1] in totalprofit:
+                        totalprofit[month_names[i["start_date"].month-1]] += j["price"]
+                    else:
+                        totalprofit[month_names[i["start_date"].month-1]] = j["price"]
+                    break
+             
+        for i in month_names:
+            if i not in totalmembers:
+                totalmembers[i] = 0
+            if i not in totalprofit:
+                totalprofit[i] = 0
+            
+        for key, value in totalmembers.items():
+            tmembers.append({"month": key, "subscribers": value})
+        tmembers = sorted(tmembers, key=lambda x: month_names.index(x['month']))
+        
+        for key, value in totalprofit.items():
+            tprofit.append({"month": key, "profit": value})
+
+        tprofit = sorted(tprofit, key=lambda x: month_names.index(x['month']))
+        
+        
+        
+        result.append(tmembers)
+        result.append(tprofit) 
+         
+        print(result)
+        return result
+    else:
+        return {"error": "Organisation Not Found", "success": False}
+
+
+import math 
+# fetchin the cards data for org dashboard
+
+@event.post("/orgdashboardcards")
+async def org_dashboard_cards(data: dict):
+    clubname = data["clubname"]
+    org = conn.EventWiz.organisation.find_one({"clubname": clubname})
+    result= []
+    if org:
+        org = serializeDict(org)
+        nonsubscribers = []
+        subscribers = []
+        membertypelist = []
+
+        for i in org["members"]:
+
+
+            if i["subscribe"]:
+
+                membertypelist.append(i["membertype"])
+                subscribers.append(i)
+            else:
+                nonsubscribers.append(i)
+
+        totalmembers = len(org["members"])
+        totalsubscribers = len(subscribers)
+        totalnonsubscribers = len(nonsubscribers)
+
+        card1data = {
+            "totalmembers": totalmembers,
+            "totalsubscribers": totalsubscribers,
+            "totalnonsubscribers": totalnonsubscribers
+        }
+
+        result.append(card1data)
+        print("hello")
+        print(result)
+
+        total = 0
+        for i in org["memtype"]:
+
+            membertype = i["type"]
+            membertypecount = membertypelist.count(membertype)
+
+            total = total + ( membertypecount *  i["price"])
+
+        print(total)
+        card2data = {
+            "totalprofit" : total
+        }
+        result.append(card2data)
+
+        allposts = conn.EventWiz.post.find({"clubname": clubname})
+        allposts = serializeList(allposts)
+        totalposts = len(allposts)
+
+        card3data = {
+            "totalposts": totalposts
+        }
+        result.append(card3data)
+
+        totalparticipants = []
+        for i in allposts:
+            for j in i["participate"]:
+                totalparticipants.append(j)
+
+        if len(totalparticipants)!=0 and totalposts:
+            averageparticipants = len(totalparticipants) / totalposts
+        else:
+            averageparticipants = 0
+
+        card4data = {
+            "averageparticipants": math.ceil(averageparticipants)
+        }
+  
+        result.append(card4data)
+
+        if result:
+            print(result)
+            return result
+        else:
+            return {"error": "No Data Found", "success": False}
+
+    else:
+        return {"error": "Organisation Not Found", "success": False}   
+    
+# get all year in which Event posts
+@event.post("/getalleventyear")
+async def get_all_event_year(data: dict):
+    post1 = serializeList(conn.EventWiz.post.find({"clubname": data["clubname"]}))
+    post2 = serializeList(conn.EventWiz.pastevent.find({"clubname": data["clubname"]}))
+    years=[]
+    if len(post1):
+        for singlepost in post1:
+            if singlepost["event_start_date"].year not in years:
+                years.append(singlepost["event_start_date"].year)
+    if len(post2):
+        for singlepost in post2:
+            if singlepost["event_start_date"].year not in years:
+                years.append(singlepost["event_start_date"].year)
+    years.sort(reverse=True)
+    return years
+
+# get all event post by year
+@event.post("/geteventpostbyyear")
+async def get_event_post_by_year(data: dict):
+    month_names = [
+            "Jan", "Feb", "March", "April",
+            "May", "June", "July", "Aug",
+            "Sept", "Oct", "Nov", "Dec"
+        ]
+    post1 = serializeList(conn.EventWiz.post.find({"clubname": data["clubname"]}))
+    post2 = serializeList(conn.EventWiz.pastevent.find({"clubname": data["clubname"]}))
+    result = []
+    totalevents = {}
+    tevents = []
+    for i in post1:
+        if i["event_start_date"].year == data["year"]:
+            if month_names[i["event_start_date"].month-1] in totalevents:
+                totalevents[month_names[i["event_start_date"].month-1]] += 1
+            else:
+                totalevents[month_names[i["event_start_date"].month-1]] = 1
+    for i in post2:
+        if i["event_start_date"].year == data["year"]:
+            if month_names[i["event_start_date"].month-1] in totalevents:
+                totalevents[month_names[i["event_start_date"].month-1]] += 1
+            else:
+                totalevents[month_names[i["event_start_date"].month-1]] = 1
+    for i in month_names:
+            if i not in totalevents:
+                totalevents[i] = 0
+    for key, value in totalevents.items():
+        tevents.append({"month": key, "events": value})
+    tevents = sorted(tevents, key=lambda x: month_names.index(x['month']))
+    result.append(tevents)
+    return result      
+
+
+     
+# fetching the cards data of popular events for admin
+    
+    
+@event.post("/orgdashboardpopulareventcards")
+async def admin_dashboard_popularevents(data:dict):
+    allevents = conn.EventWiz.post.find({"clubname": data["clubname"]})
+    events = []
+    if allevents:
+        allevents = serializeList(allevents)
+        for i in allevents:
+            events.append(i)
+    allpastevents = conn.EventWiz.pastevent.find({"clubname": data["clubname"]})
+    if allpastevents:
+        allpastevents = serializeList(allpastevents)
+
+        for i in allpastevents:
+            events.append(i)
+
+    if len(events) != 0:
+        events = sorted(events, key = lambda i: len(i["participate"]),reverse=True)
+            # print(allevents)
+        popularevents = []
+        for count in range(3):
+            events[count]["event_start_date"] = events[count]["event_start_date"].strftime("%d-%m-%Y")
+            events[count]["event_end_date"] = events[count]["event_end_date"].strftime("%d-%m-%Y")     
+            # print(count)
+            # print(events[count]["event_title"])
+            popularevents.append(events[count])
+
+        if popularevents:
+            print(popularevents)
+            return popularevents
+        else:
+            return {"error": "No Event Found", "success": False}
+    else:
+        return {"error": "No Event Found", "success": False}
 
 
 # ///////////////////////////////////////////////////////////////////////////////////
@@ -3159,6 +3714,11 @@ def past_events():
             if merged_datetime < today:
                 conn.EventWiz.pastevent.insert_one(i)
                 conn.EventWiz.post.find_one_and_delete({"_id": ObjectId(i["_id"])})
+
+
+ 
+
+    
 
 
 # //////////////////////////////////////////////////////////////////

@@ -22,7 +22,7 @@ function Navbar() {
         style={{ backgroundColor: "#0e2643" , height:"80px"}}
       >
         <div className="container-fluid" style={{fontSize:"1.2rem"}}>
-          <Link to="/home" className="navbar-brand ms-5">
+          <Link to="/" className="navbar-brand ms-5">
             EventWiz
           </Link>
           <button
@@ -45,7 +45,7 @@ function Navbar() {
             >
               <li className="nav-item">
                 <NavLink
-                  to="/home"
+                  to="/"
                   className={`nav-link ${
                     isHomeActive ? "" : ""
                   }`}

@@ -18,7 +18,7 @@ function AdminOrgFeedback() {
     // setOrgData(JSON.parse(localStorage.getItem("adminsingleorg")));
     console.log("inside fetchdata");
     try {
-      const data = { clubname: orgclub.clubname };
+      const data = { "clubname": orgclub.clubname };
       console.log("inside fetchdata try");
       const response = await api.post("/admin/fetchingsingleorg", data);
       if (response.data.success !== false) {

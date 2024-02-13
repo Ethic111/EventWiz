@@ -40,7 +40,7 @@ function OrganizeLogin({ setOBoolean }) {
           username: "",
           pwd: "",
         });
-        navigate("/organisationevents");
+        navigate("/organisationdashboard");
       } else {
         toast.error(checking.data.error);
       }

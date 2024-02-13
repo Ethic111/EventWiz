@@ -10,19 +10,18 @@ import { toast } from "react-toastify";
 function AdminUserEventFeedback() {
   const location = useLocation();
   const [post, setPost] = useState(JSON.parse(location.state));
-  // const [postdata, setPostdata] = useState(
-  //   JSON.parse(localStorage.getItem("adminsinglepostfeedback"))
-  // );
-  const [postdata, setPostdata] = useState(post.feedback);
+
+  const [postdata, setPostdata] = useState();
 
   const fetchdata = async () => {
     // setOrgData(JSON.parse(localStorage.getItem("adminsingleorg")));
     console.log("inside fetchdata");
     try {
-      const data = { clubname: post.clubname };
+      const data = { clubname: post.clubname, eventid: post._id };
       console.log("inside fetchdata try");
       const response = await api.post("/admin/fetchingsingleorgpostfeedback", data);
       if (response.data.success !== false) {
+        console.log(response.data);
         setPostdata(response.data);
       } else {
         toast.error(response.data.error);
@@ -52,6 +51,11 @@ function AdminUserEventFeedback() {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    fetchdata();
+  }
+  , []);
 
   return (
     <>

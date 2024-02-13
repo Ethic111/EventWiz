@@ -17,7 +17,7 @@ import UserEventParticipate from "./components/jsx/UserEvent/UserEventParticipat
 
 // ///////////////////////  /////////////
 import LoginPage from "./components/jsx/LoginRegister/LoginPage";
-import OrganisationEvent from "./components/jsx/OrganisationEvent/OrganisationEvent";
+// import OrganisationEvent from "./components/jsx/OrganisationEvent/OrganisationEvent";
 import OrgAddPost from "./components/jsx/OrganisationEvent/OrgAddPost"
 import OrgEvent from "./components/jsx/OrganisationEvent/OrgEvent";
 import { ToastContainer } from "react-toastify";
@@ -46,6 +46,11 @@ import OrgUsersFeedback from "./components/jsx/OrganisationEvent/OrgUsersFeedbac
 import AdminOrgFeedback from "./components/jsx/Admin/AdminOrgFeedback";
 import AdminUserEventFeedback from "./components/jsx/Admin/AdminUserEventFeedback";
 import AdminPlatformFeedback from "./components/jsx/Admin/AdminPlatformFeedback";
+import OrgDashboard from "./components/jsx/OrganisationEvent/OrgDashboard";
+import OrgDashboardSec1 from "./components/jsx/OrganisationEvent/OrgDashboardSec1";
+import AdminDashboardSec1 from "./components/jsx/Admin/AdminDashboardSec1";
+import AdminDashboardSec2 from "./components/jsx/Admin/AdminDashboardSec2";
+import OrgDashboardSec2 from "./components/jsx/OrganisationEvent/OrgDashboardSec2";
 
 // import Admin  from "./Admin/Views/Admin";
 
@@ -74,7 +79,7 @@ function App() {
           <Route path="/organisation/feedback" element={<UserOrgFeedback />} />
           <Route path="/userplatformfeedback" element={<UserPlatformFeedback />} />
           {/* Organisation----------------------------------- */}
-          <Route path="/organisationevents" element={<OrganisationEvent/>} />
+          <Route path="/organisationdashboard" element={<OrgDashboard/>} />
           <Route path="/organisationevents/addpost" element={<OrgAddPost/>} />
           <Route path="/organisationevents/orgevents" element={<OrgEvent/>} />
           <Route path="/organisationevents/detailedview" element={<EventDetailedView/>} />
@@ -87,6 +92,10 @@ function App() {
           <Route path="/orgplatformfeedback" element={<OrgPlatformFeedback/>} />
           <Route path="/organisationevents/orgeventfeedback" element={<OrgUserEventFeedback/>} />
           <Route path="/usersfeedbacks" element={<OrgUsersFeedback/>} />
+          <Route path="/organisationdashboardsec1" element={<OrgDashboardSec1/>} />
+          <Route path="/organisationdashboardsec2" element={<OrgDashboardSec2/>} />
+
+
           {/* ----------------------------------- */}
          
          {/* Admin------------------------------------ */}
@@ -101,6 +110,8 @@ function App() {
          <Route path="/admin/orgfeedback" element={<AdminOrgFeedback/>} />
          <Route path="/admin/usereventfeedback" element={<AdminUserEventFeedback/>} />
          <Route path="/admin/platformfeedback" element={<AdminPlatformFeedback/>} />
+         <Route path="/admin/homecards" element={<AdminDashboardSec1/>} />
+         <Route path="/admin/homecarousels" element={<AdminDashboardSec2/>} />
          
          
          {/* ----------------------------------------- */}

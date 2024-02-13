@@ -32,7 +32,7 @@ function OrganisationNavbar() {
           style={{ backgroundColor: "#0e2643", height: "80px" }}
         >
           <div className="container-fluid" style={{ fontSize: "1.2rem" }}>
-            <Link to="/organisationevents" className="navbar-brand ms-5">
+            <Link to="/organisationdashboard" className="navbar-brand ms-5">
               EventWiz
             </Link>
             <button
@@ -68,9 +68,7 @@ function OrganisationNavbar() {
                 <li className="nav-item">
                   <NavLink
                     to="/organisationevents/orgevents"
-                    className={`nav-link ${
-                      isHomeActive ? "" : ""
-                    }`}
+                    className={`nav-link ${isHomeActive ? "" : ""}`}
                   >
                     Event
                   </NavLink>
@@ -78,9 +76,7 @@ function OrganisationNavbar() {
                 <li className="nav-item">
                   <NavLink
                     to="/organisationevents/organizationmemberdetails"
-                    className={`nav-link ${
-                      isHomeActive ? "" : ""
-                    }`}
+                    className={`nav-link ${isHomeActive ? "" : ""}`}
                   >
                     Member Data
                   </NavLink>
@@ -88,9 +84,7 @@ function OrganisationNavbar() {
                 <li className="nav-item">
                   <NavLink
                     to="/organisationevents/organisationmemberships"
-                    className={`nav-link ${
-                      isHomeActive ? "" : ""
-                    }`}
+                    className={`nav-link ${isHomeActive ? "" : ""}`}
                   >
                     Membership
                   </NavLink>
@@ -98,9 +92,7 @@ function OrganisationNavbar() {
                 <li className="nav-item">
                   <NavLink
                     to="/organisationevents/authorization"
-                    className={`nav-link ${
-                      isHomeActive ? "" : ""
-                    }`}
+                    className={`nav-link ${isHomeActive ? "" : ""}`}
                   >
                     Authorization
                   </NavLink>
@@ -108,9 +100,7 @@ function OrganisationNavbar() {
                 <li className="nav-item">
                   <NavLink
                     to="/organisationevents/otherevents"
-                    className={`nav-link ${
-                      isHomeActive ? "" : ""
-                    }`}
+                    className={`nav-link ${isHomeActive ? "" : ""}`}
                   >
                     Other Events
                   </NavLink>
@@ -120,9 +110,7 @@ function OrganisationNavbar() {
                     <NavLink
                       style={{ marginTop: "0" }}
                       to="/orgplatformfeedback"
-                      className={`nav-link ${
-                        isHomeActive ? "" : ""
-                      }`}
+                      className={`nav-link ${isHomeActive ? "" : ""}`}
                     >
                       Platform Feedback
                       {/* <img
@@ -141,19 +129,14 @@ function OrganisationNavbar() {
                     <NavLink
                       to="/"
                       onClick={handleSignOut}
-                      className={`nav-link ${
-                        !isHomeActive ? "" : ""
-                      }`}
+                      className={`nav-link ${!isHomeActive ? "" : ""}`}
                     >
                       Logout {orgData.username}
-                      
                     </NavLink>
                   ) : (
                     <NavLink
                       to="/loginregister"
-                      className={`nav-link ${
-                        !isHomeActive ? "" : ""
-                      }`}
+                      className={`nav-link ${!isHomeActive ? "" : ""}`}
                     >
                       Login/Register
                     </NavLink>
@@ -162,16 +145,11 @@ function OrganisationNavbar() {
                 {orgData?.username ? (
                   <li className="nav-item">
                     <NavLink
-                    to="/usersfeedbacks"
-                    className={`nav-link ${
-                      isHomeActive ? "" : ""
-                    }`}
-                  >
-                    <VscFeedback 
-                      style={{ fontSize: "1.8rem"}}
-                      />
-                  </NavLink>
-                    
+                      to="/usersfeedbacks"
+                      className={`nav-link ${isHomeActive ? "" : ""}`}
+                    >
+                      <VscFeedback style={{ fontSize: "1.8rem" }} />
+                    </NavLink>
                   </li>
                 ) : (
                   ""
