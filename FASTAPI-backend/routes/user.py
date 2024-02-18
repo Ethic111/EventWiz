@@ -465,7 +465,11 @@ def orgupdatingmemberdata(data):
 
 @event.get('/')
 async def find_all_users():
-    return serializeList(conn.EventWiz.users.find())
+    org = conn.EventWiz.organisation.find()
+    if org:
+        return serializeList(org)
+    else:
+        return {"error": "No Organisations", "success": False}
 
 # /////////////////////////////ADMIN///////////////////////////////////////////
 
@@ -3387,67 +3391,6 @@ async def get_all_subscribed_year(data: dict):
 
 
 from collections import defaultdict
-# # org dashboard graph data
-# @event.post("/orgdashboardgraph")
-# async def org_dashboard_graph(data: dict):
-
-#     clubname = data["clubname"]
-#     org = conn.EventWiz.organisation.find_one({"clubname": clubname})
-#     datayear = data["datayear"]
-#     maindata =[]
-
-#     if org:
-#         org = serializeDict(org)
-#         nonsubscribers = []
-#         subscribers = []
-
-#         for i in org["members"]:
-#             if i["subscribe"]:
-#                 subscribers.append(i)
-#             else:
-#                 nonsubscribers.append(i)
-
-#         month_names = [
-#             "January", "February", "March", "April",
-#             "May", "June", "July", "August",
-#             "September", "October", "November", "December"
-#         ]
-
-#         all_months = set(range(1, 13))
-#         month_counts = defaultdict(int)
-#         year_month_counts = defaultdict(lambda: defaultdict(int))
-
-#         for i in subscribers:
-#             startdate = i["start_date"]
-#             year_month_counts[startdate.year][startdate.month] += 1
-
-#         result = []
-
-#         for year, month_counts in sorted(year_month_counts.items()):
-#             year_data = [{"name": month_names[month-1], "subcribers": month_counts[month]} for month in all_months]
-#             result.append({int(year): year_data})
-#             result.sort(reverse=True, key=lambda x: list(x.keys())[0])
-#         # print(result)
-#         if result:
-            
-#             for i in result:
-#                 for key, value in i.items():
-#                     if key == datayear:
-#                         maindata.append(value)
-#             # print(maindata)
-#             if maindata:
-#                 # print(maindata[0])
-
-#             # print(result)
-#                 return maindata[0]
-#             else:
-#                 return {"error": "No Data Found", "success": False}
-#         else:
-#             return {"error": "No Data Found", "success": False}
-#     else:
-#         return {"error": "Organisation Not Found", "success": False}
-
-
 
 # org dashboard graph data
 @event.post("/orgdashboardgraph")
@@ -3717,8 +3660,7 @@ def past_events():
 
 
  
-
-    
+   
 
 
 # //////////////////////////////////////////////////////////////////

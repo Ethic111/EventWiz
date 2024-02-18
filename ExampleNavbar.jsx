@@ -39,7 +39,7 @@ function AdminNavbar() {
               </li>
               <li className="nav-item">
                 {userData?.username ? (
-                  <NavLink to="/home" onClick={handleSignOut} className={`nav-link ${!isHomeActive ? 'font-weight-bold' : ''}`}>Logout {userData.username}
+                  <NavLink to="/" onClick={handleSignOut} className={`nav-link ${!isHomeActive ? 'font-weight-bold' : ''}`}>Logout {userData.username}
                   </NavLink>
                 ) : (
                   <NavLink to="*"></NavLink>

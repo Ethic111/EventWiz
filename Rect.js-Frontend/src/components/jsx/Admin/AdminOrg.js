@@ -86,8 +86,8 @@ function AdminOrg() {
     const deleteorgdata = { clubname: org["clubname"] };
     console.log(deleteorgdata);
     const response = await api.post("/admindeletesorg", deleteorgdata);
-    // console.log(response.data);
     fetchAllOrgdetails();
+    // console.log(response.data);
   };
 
   return (

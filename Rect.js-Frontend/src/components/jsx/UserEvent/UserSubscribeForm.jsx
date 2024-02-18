@@ -45,7 +45,7 @@ function UserSubscribeForm() {
             const checking = await api.put("/usersubscribe", lFormData);
             if (checking.data.success !== false) {
                 toast.success(checking.data.data)
-                navigate("/home");
+                navigate("/");
                 setLFormData({
                     clubname: "",
                     name: "",

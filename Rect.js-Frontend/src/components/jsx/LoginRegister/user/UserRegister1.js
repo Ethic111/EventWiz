@@ -36,7 +36,7 @@ function UserRegister1({ setUBoolean }) {
                     username: "",
                     pwd: "",
                 });
-                navigate("/home");
+                navigate("/");
               } else {
                 toast.error(checking.data.error);
               }
@@ -168,7 +168,7 @@ function UserRegister1({ setUBoolean }) {
                                 </div>
                                 <div className="col-12">
                                     <div className="d-grid">
-                                        <button style={{color: 'white',backgroundColor: '#0e2643',border: 'none',marginLeft: '1rem',padding: '0.3rem 0.5rem 0.3rem 0.5rem',borderRadius: '0.375rem'}} type="submit">Log in now</button>
+                                        <button style={{color: 'white',backgroundColor: '#0e2643',border: 'none',marginLeft: '1rem',padding: '0.3rem 0.5rem 0.3rem 0.5rem',borderRadius: '0.375rem'}} type="submit"> Register now</button>
                                     </div>
                                 </div>
                             </div>

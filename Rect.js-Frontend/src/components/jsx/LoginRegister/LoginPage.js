@@ -19,7 +19,7 @@ function LoginPage() {
   }, []);
 
   if(user){
-    Navigate("/home")
+    Navigate("/")
   }
 
   

@@ -161,7 +161,7 @@ function OrgEvent() {
     }
   };
 
-  const [openmodal, setOpenmodal] = useState(false);
+  
 
   const handlemodalclose = () => {
     setUpdatepriceform({
@@ -181,7 +181,7 @@ function OrgEvent() {
   const [clickedpost, setClickedpost] = useState();
 
   const handleupdatepriceclicked = (post) => {
-    setOpenmodal(true);
+
     // console.log(post)
     setClickedpost(post);
   };
@@ -194,7 +194,7 @@ function OrgEvent() {
       const data = { pricedata: updatepriceform, postdata: clickedpost };
       const response = await api.put("/updatepostprice", data);
       if (response.data.success !== false) {
-        // setOpenmodal(false)
+      
         toast.success(response.data.message);
         setUpdatepriceform({
           oldprice: "",
@@ -314,7 +314,7 @@ function OrgEvent() {
   return (
     <>
       <div>{<OrganisationNavbar />}</div>
-      {openmodal && (
+      {(
         <div
           className="modal fade"
           id="updatePriceModal"
@@ -334,6 +334,7 @@ function OrgEvent() {
                   className="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  
                 ></button>
               </div>
               <div className="modal-body">
@@ -388,6 +389,7 @@ function OrgEvent() {
           </div>
         </div>
       )}
+
 
       {/* <div>
         <Link to="/organisationevents/addpost">

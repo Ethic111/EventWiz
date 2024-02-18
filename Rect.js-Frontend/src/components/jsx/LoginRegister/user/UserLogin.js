@@ -48,7 +48,7 @@ function UserLogin({ setUBoolean }) {
           username: "",
           pwd: "",
         });
-        navigate("/home");
+        navigate("/");
       } else {
         toast.error(checking.data.error);
       }

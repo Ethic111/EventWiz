@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 
 function Navbar() {
   const location = useLocation();
-  const isHomeActive = location.pathname === "/home";
+  const isHomeActive = location.pathname === "/";
   const [userData, setUserData] = useState(
     JSON.parse(localStorage.getItem("users"))
   );

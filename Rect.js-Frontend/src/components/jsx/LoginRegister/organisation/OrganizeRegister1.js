@@ -124,7 +124,7 @@ function OrganizeRegister1({ setOBoolean }) {
             <div className="row">
               <div className="col-12">
                 <div className="mb-4">
-                  <h3>Organization Sign up</h3>
+                  <h3>Organization Registration</h3>
                   <p>
                     If you have an account?{" "}
                     <button
@@ -382,7 +382,7 @@ function OrganizeRegister1({ setOBoolean }) {
                       }}
                       type="submit"
                     >
-                      Log in now
+                      Register now
                     </button>
                   </div>
                 </div>

@@ -99,7 +99,7 @@ function AdminNavbar() {
               <li className="nav-item">
                 {userData?.username ? (
                   <NavLink
-                    to="/home"
+                    to="/"
                     onClick={handleSignOut}
                     className={`nav-link ${
                       !isHomeActive ? "" : ""

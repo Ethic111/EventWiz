@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { PieChart, Pie, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import OrgDashboardSec2 from "./OrgDashboardSec2";
+import Footer from "../Footer";
 
 function OrgDashboard() {
   const [orgdata, setOrgData] = useState(
@@ -322,6 +323,9 @@ function OrgDashboard() {
 
       </div>
       <div><OrgDashboardSec2/></div>
+      <div className="footersection">
+        <Footer/>
+      </div>
     </>
   );
 }
