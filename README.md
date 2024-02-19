@@ -6,12 +6,12 @@ Welcome to EventWiz, a comprehensive event management platform that streamlines 
 
 Organizations can effortlessly post and manage events, choosing between public visibility or exclusivity for specific membership users. The dedicated dashboard empowers organizations with:
 
-### User Filtration: Easily find and manage users with various filtering options.
-### Subscription Management: View users who subscribed and took memberships through the website.
-### Event Management: Post, update, or delete events, set pricing, and define event capacity.
-### Feedback Insights: Track feedback on both individual events and the organization's overall performance.
-### Profit Analytics: Visualize profits and graphs of EventWiz subscribers, providing insights across the years.
-### Most Popular Events: Identify and analyze the popularity of events hosted on the platform.
+User Filtration: Easily find and manage users with various filtering options.
+Subscription Management: View users who subscribed and took memberships through the website.
+Event Management: Post, update, or delete events, set pricing, and define event capacity.
+Feedback Insights: Track feedback on both individual events and the organization's overall performance.
+Profit Analytics: Visualize profits and graphs of EventWiz subscribers, providing insights across the years.
+Most Popular Events: Identify and analyze the popularity of events hosted on the platform.
 
 
 ## Users
