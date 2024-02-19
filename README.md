@@ -1,7 +1,9 @@
 #EventWiz
+
 Welcome to EventWiz, a comprehensive event management platform that streamlines the entire event lifecycle. With three major sections tailored for Organizations, Users, and Admins, EventWiz offers a dynamic and user-centric approach to event planning.
 
 ##Organization
+
 Organizations can effortlessly post and manage events, choosing between public visibility or exclusivity for specific membership users. The dedicated dashboard empowers organizations with:
 
 User Filtration: Easily find and manage users with various filtering options.
@@ -13,6 +15,7 @@ Most Popular Events: Identify and analyze the popularity of events hosted on the
 
 
 ##Users
+
 Users enjoy a user-friendly interface with extensive features:
 
 Event Exploration: Explore all posted events with advanced filtering options.
