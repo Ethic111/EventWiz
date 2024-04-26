@@ -1,0 +1,38 @@
+Step-1:
+
+	Creating virtual environment:
+ 	->  python -m venv environmentName
+
+	Activating virtual environment:
+	->  .\environmentName\Scripts\activate
+
+Step-2:
+
+	In Terminal-1
+
+	Activating virtual environment:
+	->  .\environmentName\Scripts\activate
+
+	Shifting Into Backend-FASTAPI Folder:
+	-> cd .\FASTAPI-backend
+
+	Installing all requirements:
+
+	-> pip install -r requirements.txt
+
+	For Runing Backend:
+	-> uvicorn index:app --reload
+
+Step-3:
+
+	In Terminal-2
+
+	Shifting Into Frontend-React.js Folder:
+	-> cd .\React.js-Frontend
+
+	Installing all requirements:
+
+	-> npm i 
+
+	For Runing Frontend:
+	-> npm start
